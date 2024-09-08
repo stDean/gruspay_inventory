@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Payment_Plan {
+  FREE
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+}
+
+model Company {
+  id            String       @id @default(uuid())
+  company_name  String
+  company_email String       @unique
+  password      String
+  payment_plan  Payment_Plan @default(FREE)
+  Users         Users[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  verified      Boolean      @default(false)
+  Products      Products[]
+  Sales         Sales[]
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+}
+
+model Users {
+  id         String     @id @default(uuid())
+  first_name String?
+  last_name  String?
+  email      String     @unique
+  password   String
+  role       Role       @default(EMPLOYEE)
+  Company    Company?   @relation(fields: [companyId], references: [id])
+  companyId  String?
+  Products   Products[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Products {
+  id              String            @id @default(uuid())
+  product_name    String
+  brand           String
+  description     String
+  type            String
+  price           String
+  other_meta_data String
+  Company         Company?          @relation(fields: [companyId], references: [id])
+  companyId       String?
+  User            Users?            @relation(fields: [added_by], references: [id])
+  added_by        String?
+  ProductSupplier ProductSupplier[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Sales           Sales[]
+}
+
+model ProductSupplier {
+  id           String   @id @default(uuid())
+  full_name    String
+  phone_number String
+  email        String?
+  Product      Products @relation(fields: [productsId], references: [id])
+  productsId   String
+}
+
+model Sales {
+  id         String    @id @default(uuid())
+  Product    Products? @relation(fields: [productsId], references: [id])
+  productsId String?
+  Company    Company?  @relation(fields: [companyId], references: [id])
+  companyId  String?
+  Buyer      Buyer     @relation(fields: [buyerId], references: [id])
+  buyerId    String
+}
+
+model Buyer {
+  id           String   @id @default(uuid())
+  full_name    String
+  email        String?
+  phone_number String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Sales        Sales[]
+}
