@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { authRoutes, DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { useAppSelector } from "./app/redux";
+
 
 export function middleware(request: NextRequest) {
 	const { nextUrl } = request;

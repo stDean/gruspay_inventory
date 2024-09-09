@@ -2,6 +2,7 @@ import { prisma } from "../utils/db.mjs";
 import { StatusCodes } from "http-status-codes";
 import { generateVerificationToken } from "../utils/token.mjs";
 import { hashPassword, comparePassword, createJWT } from "../utils/helper.mjs";
+import { sendMail } from "../utils/sendMail.mjs";
 
 export const AuthController = {
 	sendOtp: async (req, res) => {
@@ -31,6 +32,7 @@ export const AuthController = {
 		console.log("token", token);
 
 		// TODO:Send Token
+		sendMail(company_email, token);
 
 		// create company
 		const hashedPassword = await hashPassword(password);
@@ -88,16 +90,22 @@ export const AuthController = {
 			where: { company_email: company_email },
 		});
 		// create user
-		await prisma.users.create({
-			data: {
-				companyId: company.id,
-				email: company.company_email,
-				password: company.password,
-				role: "ADMIN",
-			},
-		});
+		if (company) {
+			await prisma.users.create({
+				data: {
+					companyId: company.id,
+					email: company.company_email,
+					password: company.password,
+					role: "ADMIN",
+				},
+			});
+		}
 
-		res.status(StatusCodes.OK).json({ message: "OTP verified", success: true });
+		const jwtToken = createJWT({ email: company_email });
+
+		res
+			.status(StatusCodes.OK)
+			.json({ message: "OTP verified", success: true, jwtToken });
 	},
 	resendOtp: async (req, res) => {
 		const existingToken = await prisma.otp.findFirst({
@@ -119,6 +127,7 @@ export const AuthController = {
 		});
 
 		// TODO:Send Token
+		sendMail(existingToken.email, token);
 
 		console.log("token", token);
 

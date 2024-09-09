@@ -12,13 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { SelectItem } from "@/components/ui/select";
 import { AuthSchema } from "@/schema";
-import { setLoggedInUser, setToken } from "@/state";
+import { setEmail, setLoggedInUser, setToken } from "@/state";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
+import { SendOTP } from "@/actions/registration";
+import Link from "next/link";
 
 const PAYMENT_PLANS = ["Free", "Basic", "Standard", "Premium"];
 
@@ -45,25 +47,47 @@ export const AuthForm = () => {
 	const handleSubmit = (data: z.infer<typeof AuthSchema>) => {
 		startTransition(async () => {
 			if (pathname === "/") {
-				console.log("Not Here");
-
 				const values = {
 					...data,
 					payment_plan: payment,
 					country: country?.label,
 				};
-				console.log({ values });
 
+				if (values.password !== values.confirmPassword) {
+					toast.error("Error", {
+						description: "Passwords do not match",
+					});
+
+					return;
+				}
+
+				// TODO:Send OTP
+				const { error, success } = await SendOTP({ values });
+
+				if (error) {
+					toast.error("Error", {
+						description: error,
+					});
+				}
+
+				if (success) {
+					dispatch(setEmail(values.email));
+					toast.success("Success", {
+						description: "OTP sent successfully",
+					});
+					router.push("/code");
+					form.reset();
+				}
 				return;
 			}
 
 			const { error, success } = await Login({ values: data });
 			if (error) {
-				toast.success("Error", {
+				toast.error("Error", {
 					description: error,
 				});
 			}
-      
+
 			if (success) {
 				dispatch(setLoggedInUser(true));
 				dispatch(setToken(success.user));
@@ -71,6 +95,8 @@ export const AuthForm = () => {
 					description: "Login successfully",
 				});
 				router.push("/dashboard");
+
+				form.reset();
 			}
 		});
 	};
@@ -160,6 +186,40 @@ export const AuthForm = () => {
 								}
 							/>
 						</>
+					)}
+
+					{pathname === "/login" && (
+						<p className="-mt-3">
+							Forgot password?{" "}
+							<Link
+								href="/login"
+								className="font-semibold text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
+							>
+								Reset
+							</Link>
+						</p>
+					)}
+
+					{pathname === "/" ? (
+						<p className="text-center text-base">
+							Have an account?{" "}
+							<Link
+								href="/login"
+								className="font-semibold text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
+							>
+								Login Now
+							</Link>
+						</p>
+					) : (
+						<p className="text-center text-base">
+							Don't have an account?{" "}
+							<Link
+								href="/"
+								className="font-semibold text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
+							>
+								Register Now
+							</Link>
+						</p>
 					)}
 
 					<hr />

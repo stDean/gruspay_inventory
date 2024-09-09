@@ -12,4 +12,5 @@ export const AuthSchema = z.object({
 	),
 	company_name: z.string().optional(),
 	payment_plan: z.string().optional(),
+	country: z.string().optional(),
 });

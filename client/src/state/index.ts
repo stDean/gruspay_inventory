@@ -5,6 +5,7 @@ export interface InitialStateTypes {
 	isDarkMode: boolean;
 	loggedInUser: false;
 	token: "";
+  email: ""
 }
 
 const initialState: InitialStateTypes = {
@@ -12,6 +13,7 @@ const initialState: InitialStateTypes = {
 	isDarkMode: false,
 	loggedInUser: false,
 	token: "",
+  email: ""
 };
 
 export const globalSlice = createSlice({
@@ -30,6 +32,9 @@ export const globalSlice = createSlice({
 		setToken: (state, action: PayloadAction<any>) => {
 			state.token = action.payload;
 		},
+    setEmail: (state, action: PayloadAction<any>) => {
+      state.email = action.payload;
+    },
 	},
 });
 
@@ -38,6 +43,7 @@ export const {
 	setIsDarkMode,
 	setLoggedInUser,
 	setToken,
+  setEmail
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

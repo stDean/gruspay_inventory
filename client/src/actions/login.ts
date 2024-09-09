@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 export const Login = async ({
 	values,
 }: {
-	values: z.infer<typeof AuthSchema>;
+	values?: z.infer<typeof AuthSchema>;
 }) => {
 	const validatedFields = AuthSchema.safeParse(values);
 	if (!validatedFields.success) {
