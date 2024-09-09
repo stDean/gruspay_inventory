@@ -5,9 +5,9 @@ import { hashPassword, comparePassword, createJWT } from "../utils/helper.mjs";
 
 export const AuthController = {
 	sendOtp: async (req, res) => {
-		const { company_name, company_email, password } = req.body;
+		const { company_name, company_email, password, country } = req.body;
 
-		if (!company_email || !company_name || !password) {
+		if (!company_email || !company_name || !password || !country) {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "All fields are required", success: false });
@@ -35,7 +35,7 @@ export const AuthController = {
 		// create company
 		const hashedPassword = await hashPassword(password);
 		const company = await prisma.company.create({
-			data: { company_name, company_email, password: hashedPassword },
+			data: { company_name, company_email, password: hashedPassword, country },
 		});
 
 		// Store email and hashed password temporarily
@@ -87,8 +87,6 @@ export const AuthController = {
 		const company = await prisma.company.findUnique({
 			where: { company_email: company_email },
 		});
-		const jwtToken = createJWT({ email: company.email, id: company.id });
-
 		// create user
 		await prisma.users.create({
 			data: {
@@ -99,9 +97,7 @@ export const AuthController = {
 			},
 		});
 
-		res
-			.status(StatusCodes.OK)
-			.json({ message: "OTP verified", success: true, jwtToken });
+		res.status(StatusCodes.OK).json({ message: "OTP verified", success: true });
 	},
 	resendOtp: async (req, res) => {
 		const existingToken = await prisma.otp.findFirst({
@@ -130,6 +126,36 @@ export const AuthController = {
 			.status(StatusCodes.OK)
 			.json({ message: "OTP sent to your email", success: true });
 	},
-	login: async (req, res) => {},
-	logout: async (req, res) => {},
+	login: async (req, res) => {
+		const { email, password } = req.body;
+		if (!email || !password) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "All fields are required", success: false });
+		}
+
+		const user = await prisma.users.findUnique({
+			where: { email },
+		});
+		if (!user) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "No user with this credentials", success: false });
+		}
+		const passwordMatch = await comparePassword(password, user.password);
+		if (!passwordMatch) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Incorrect password!", success: false });
+		}
+
+		const jwtToken = createJWT({
+			email: user.email,
+			company_id: user.companyId,
+		});
+
+		res
+			.status(StatusCodes.OK)
+			.json({ success: true, user: user.id, token: jwtToken });
+	},
 };

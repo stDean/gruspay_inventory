@@ -30,6 +30,7 @@ model Company {
   company_name  String
   company_email String       @unique
   password      String
+  country       String
   payment_plan  Payment_Plan @default(FREE)
   Users         Users[]
   createdAt     DateTime     @default(now())

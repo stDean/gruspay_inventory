@@ -15,7 +15,7 @@ app.use(morgen("common"));
 app.use(cors());
 
 // Route
-app.use("/api", Routes);
+app.use("/api", Routes); 
 
 const PORT = 5001 | process.env.PORT;
 const start = async () => {

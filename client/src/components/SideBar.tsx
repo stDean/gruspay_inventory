@@ -1,144 +1,171 @@
 "use client";
 
+import { Logout } from "@/actions/logout";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setIsSidebarCollapsed } from "@/state";
+import { setIsSidebarCollapsed, setLoggedInUser, setToken } from "@/state";
 import {
-  Archive,
-  CircleDollarSign,
-  Clipboard,
-  Layout,
-  LucideIcon,
-  Menu,
-  SlidersHorizontal,
-  Users,
+	Archive,
+	CircleDollarSign,
+	Clipboard,
+	Layout,
+	LogOut,
+	LucideIcon,
+	Menu,
+	SlidersHorizontal,
+	Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface SidebarLinkProps {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-  isCollapsed: boolean;
+	href: string;
+	icon: LucideIcon;
+	label: string;
+	isCollapsed: boolean;
 }
 
 const SidebarLink = ({
-  href,
-  icon: Icon,
-  label,
-  isCollapsed,
+	href,
+	icon: Icon,
+	label,
+	isCollapsed,
 }: SidebarLinkProps) => {
-  const pathname = usePathname();
-  const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
+	const pathname = usePathname();
+	const isActive =
+		pathname === href || (pathname === "/" && href === "/dashboard");
 
-  return (
-    <Link href={href}>
-      <div
-        className={`cursor-pointer flex items-center ${
-          isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
-        }
+	return (
+		<Link href={href}>
+			<div
+				className={`cursor-pointer flex items-center ${
+					isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
+				}
         hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
-          isActive ? "bg-blue-200 text-white" : ""
-        }
+					isActive ? "bg-blue-200 text-white" : ""
+				}
       }`}
-      >
-        <Icon className="w-6 h-6 !text-gray-700" />
-        <span
-          className={`${
-            isCollapsed ? "hidden" : "block"
-          } font-medium text-gray-700`}
-        >
-          {label}
-        </span>
-      </div>
-    </Link>
-  );
+			>
+				<Icon className="w-6 h-6 !text-gray-700" />
+				<span
+					className={`${
+						isCollapsed ? "hidden" : "block"
+					} font-medium text-gray-700`}
+				>
+					{label}
+				</span>
+			</div>
+		</Link>
+	);
 };
 
 export const SideBar = () => {
-  const dispatch = useAppDispatch();
-  const { isSidebarCollapsed, isDarkMode } = useAppSelector(
-    ({ global }) => global
-  );
+	const router = useRouter();
+	const dispatch = useAppDispatch();
+	const { isSidebarCollapsed, isDarkMode } = useAppSelector(
+		({ global }) => global
+	);
 
-  const toggleSidebar = () => {
-    dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
-  };
+	const toggleSidebar = () => {
+		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
+	};
 
-  const sidebarClassNames = `fixed flex flex-col ${
-    isSidebarCollapsed ? "w-0 md:w-20" : "w-72 md:w-64"
-  } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
+	const handleLogout = async () => {
+		dispatch(setLoggedInUser(false));
+		dispatch(setToken(""));
+		console.log("Logged Out");
+		await Logout();
+		router.push("/login");
+	};
 
-  return (
-    <div className={sidebarClassNames}>
-      {/* TOP LOGO */}
-      <div
-        className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${
-          isSidebarCollapsed ? "px-4" : "px-8"
-        }`}
-      >
-        <Image
-          src={isSidebarCollapsed ? "/gup.PNG" : "/logo.png"}
-          alt="logo"
-          width={isSidebarCollapsed ? 250 : 150}
-          height={isSidebarCollapsed ? 250 : 150}
-          className={`${isDarkMode && "invert"}`}
-        />
+	const sidebarClassNames = `fixed flex flex-col ${
+		isSidebarCollapsed ? "w-0 md:w-20" : "w-72 md:w-64"
+	} bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
-        <button
-          className="md:hidden px-3 py-3 bg-gray-100 rounded-full hover:bg-blue-100"
-          onClick={toggleSidebar}
-        >
-          <Menu className="w-4 h-4" />
-        </button>
-      </div>
+	return (
+		<div className={sidebarClassNames}>
+			{/* TOP LOGO */}
+			<div
+				className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${
+					isSidebarCollapsed ? "px-4" : "px-8"
+				}`}
+			>
+				<Image
+					src={isSidebarCollapsed ? "/gup.PNG" : "/logo.png"}
+					alt="logo"
+					width={isSidebarCollapsed ? 250 : 150}
+					height={isSidebarCollapsed ? 250 : 150}
+					className={`${isDarkMode && "invert"}`}
+				/>
 
-      {/* LINKS */}
-      <div className="flex-grow mt-8">
-        <SidebarLink
-          href="/dashboard"
-          icon={Layout}
-          label="Dashboard"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/inventory"
-          icon={Archive}
-          label="Inventory"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/products"
-          icon={Clipboard}
-          label="Products"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/users"
-          icon={Users}
-          label="Users"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/settings"
-          icon={SlidersHorizontal}
-          label="Settings"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/expenses"
-          icon={CircleDollarSign}
-          label="Expenses"
-          isCollapsed={isSidebarCollapsed}
-        />
-      </div>
+				<button
+					className="md:hidden px-3 py-3 bg-gray-100 rounded-full hover:bg-blue-100"
+					onClick={toggleSidebar}
+				>
+					<Menu className="w-4 h-4" />
+				</button>
+			</div>
 
-      {/* FOOTER */}
-      <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10`}>
-        <p className="text-center text-xs text-gray-500">&copy; 2024 Gruspay</p>
-      </div>
-    </div>
-  );
+			{/* LINKS */}
+			<div className="flex-grow mt-8">
+				<SidebarLink
+					href="/dashboard"
+					icon={Layout}
+					label="Dashboard"
+					isCollapsed={isSidebarCollapsed}
+				/>
+				<SidebarLink
+					href="/inventory"
+					icon={Archive}
+					label="Inventory"
+					isCollapsed={isSidebarCollapsed}
+				/>
+				<SidebarLink
+					href="/products"
+					icon={Clipboard}
+					label="Products"
+					isCollapsed={isSidebarCollapsed}
+				/>
+				<SidebarLink
+					href="/users"
+					icon={Users}
+					label="Users"
+					isCollapsed={isSidebarCollapsed}
+				/>
+				<SidebarLink
+					href="/settings"
+					icon={SlidersHorizontal}
+					label="Settings"
+					isCollapsed={isSidebarCollapsed}
+				/>
+				<SidebarLink
+					href="/expenses"
+					icon={CircleDollarSign}
+					label="Expenses"
+					isCollapsed={isSidebarCollapsed}
+				/>
+			</div>
+
+			{/* FOOTER */}
+			<div className="mb-10">
+				<div className="flex justify-between items-center px-6 mb-4">
+					<div className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
+						<p className="font-semibold text-base">Omitaoumu Basit</p>
+						<p>Omitaoumu@gmail.com</p>
+					</div>
+					<LogOut
+						className="text-red-500 cursor-pointer"
+						onClick={handleLogout}
+					/>
+				</div>
+				<p
+					className={`text-center text-xs text-gray-500 ${
+						isSidebarCollapsed ? "hidden" : "block"
+					}`}
+				>
+					&copy; 2024 Gruspay
+				</p>
+			</div>
+		</div>
+	);
 };
