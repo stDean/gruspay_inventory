@@ -1,6 +1,6 @@
 "use server";
 
-import { AuthSchema } from "@/schema";
+import { AuthSchema, ResetSchema } from "@/schema";
 import { z } from "zod";
 import axios from "axios";
 import { cookies } from "next/headers";
@@ -26,7 +26,61 @@ export const Login = async ({
 			cookieStore.set("user", JSON.stringify(res.data.token));
 		}
 		return { success: res.data };
-	} catch (error) {
-		return { error: "Invalid credentials!" };
+	} catch (e: any) {
+		if (e.response.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong." };
+	}
+};
+
+export const ResetOTP = async ({
+	values,
+}: {
+	values: z.infer<typeof ResetSchema>;
+}) => {
+	const validatedFields = ResetSchema.safeParse(values);
+	if (!validatedFields.success) {
+		return { error: "Invalid fields!" };
+	}
+
+	try {
+		const { email, password } = validatedFields.data;
+		const { data } = await axios.post(
+			"http://localhost:5001/api/auth/resetOtp",
+			{ email, password }
+		);
+		return data;
+	} catch (e: any) {
+		if (e.response.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong." };
+	}
+};
+
+export const VerifyOTPAndUpdatePass = async ({
+	email,
+	password,
+  otp
+}: {
+	email: string;
+	password: string;
+	otp: string;
+}) => {
+	try {
+		const { data } = await axios.post(
+			"http://localhost:5001/api/auth/updatePassword",
+			{ email, password, otp }
+		);
+		return { success: true, data };
+	} catch (e: any) {
+		if (e.response.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong." };
 	}
 };

@@ -14,3 +14,32 @@ export const AuthSchema = z.object({
 	payment_plan: z.string().optional(),
 	country: z.string().optional(),
 });
+
+export const ResetSchema = z
+	.object({
+		email: z.string().email(),
+		password: z
+			.string()
+			.min(8, { message: "password must be at least 8 characters long." }),
+		confirmPassword: z
+			.string()
+			.min(8, { message: "password must be at least 8 characters long." }),
+	})
+	.refine(
+		data => {
+			if (data.password && !data.confirmPassword) {
+				return false;
+			}
+
+			if (!data.password && data.confirmPassword) {
+				return false;
+			}
+
+			if (data.password !== data.confirmPassword) {
+				return false;
+			}
+
+			return true;
+		},
+		{ message: "New password is required.", path: ["confirmPassword"] }
+	);

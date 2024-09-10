@@ -18,13 +18,41 @@ export const AuthController = {
 			where: { company_email },
 		});
 
-		if (existingCompany) {
+		if (existingCompany?.company_email) {
+			if (!existingCompany?.verified) {
+				const { token, expires } = await generateVerificationToken(
+					existingCompany.company_email
+				);
+				sendMail(existingCompany.company_email, token, "OTP Verification");
+				const existingOtp = await prisma.otp.findFirst({
+					where: { email: existingCompany.company_email },
+				});
+
+				if (existingOtp) {
+					await prisma.otp.update({
+						where: { id: existingOtp.id, email: existingOtp.email },
+						data: { otp: token, expiresAt: expires },
+					});
+				}
+
+				return res
+					.status(StatusCodes.OK)
+					.json({ message: "check your email for OTP", success: true });
+			}
+
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "Company already exists", success: false });
 		}
 
 		const { token, expires } = await generateVerificationToken(company_email);
+		const existingOtp = await prisma.otp.findFirst({
+			where: { email: company_email },
+		});
+
+		if (existingOtp) {
+			await prisma.otp.delete({ where: { email: company_email } });
+		}
 		await prisma.otp.create({
 			data: { email: company_email, otp: token, expiresAt: expires },
 		});
@@ -108,15 +136,15 @@ export const AuthController = {
 			.json({ message: "OTP verified", success: true, jwtToken });
 	},
 	resendOtp: async (req, res) => {
+		if (!req.body.email) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Email is required", success: false });
+		}
+
 		const existingToken = await prisma.otp.findFirst({
 			where: { email: req.body.email },
 		});
-
-		if (!existingToken) {
-			return res
-				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "Invalid email", success: false });
-		}
 
 		const { token, expires } = await generateVerificationToken(
 			existingToken.email
@@ -126,7 +154,7 @@ export const AuthController = {
 			data: { otp: token, expiresAt: expires },
 		});
 
-		sendMail(existingToken.email, token, "OTP Code");
+		sendMail(existingToken.email, token, "Confirmation Code");
 
 		console.log("token", token);
 
@@ -165,5 +193,73 @@ export const AuthController = {
 		res
 			.status(StatusCodes.OK)
 			.json({ success: true, user: user.id, token: jwtToken });
+	},
+	otp: async (req, res) => {
+		const { email, password } = req.body;
+		if (!email) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Email is required", success: false });
+		}
+
+		if (!password) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Password is required", success: false });
+		}
+
+		const existingToken = await prisma.otp.findFirst({
+			where: { email },
+		});
+
+		const { token, expires } = await generateVerificationToken(email);
+		if (existingToken) {
+			await prisma.otp.update({
+				where: { id: existingToken.id },
+				data: { otp: token },
+			});
+		}
+
+		await prisma.otp.create({
+			data: { email, otp: token, expiresAt: expires },
+		});
+		sendMail(email, token, "Confirmation Code");
+		res
+			.status(StatusCodes.OK)
+			.json({ message: "OTP sent to your email", success: true, expires });
+	},
+	verifyAndUpdatePassword: async (req, res) => {
+		const { email, otp, password } = req.body;
+
+		const existingOtp = await prisma.otp.findFirst({
+			where: { email, otp },
+		});
+		if (!existingOtp) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Invalid OTP", success: false });
+		}
+		const existingUser = await prisma.users.findUnique({
+			where: { email },
+		});
+		if (!existingUser) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "No user with this credentials", success: false });
+		}
+
+		const hashPass = await hashPassword(password);
+		await prisma.users.update({
+			where: { id: existingUser.id },
+			data: { password: hashPass },
+		});
+
+		await prisma.otp.delete({
+			where: { id: existingOtp.id },
+		});
+
+		res
+			.status(StatusCodes.OK)
+			.json({ message: "Password updated successfully", success: true });
 	},
 };

@@ -25,20 +25,38 @@ export const SendOTP = async ({
 		);
 		return { success: data };
 	} catch (e: any) {
-		return { error: "Invalid credentials!" };
+		if (e.response.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong." };
 	}
 };
 
 // TODO:Resend OTP
-export const ResendOTP = async ({ email }: { email: string }) => {
-	const { data } = await axios.post(
-		"http://localhost:5001/api/auth/resendOTP",
-		{
-			email,
-		}
-	);
+export const ResendOTP = async ({
+	email,
+	password,
+}: {
+	email: string;
+	password?: string;
+}) => {
+	try {
+		const { data } = await axios.post(
+			"http://localhost:5001/api/auth/resendOTP",
+			{
+				email,
+			}
+		);
 
-	return data;
+		return data;
+	} catch (e: any) {
+		if (e.response.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong." };
+	}
 };
 
 // TODO:Verify OTP

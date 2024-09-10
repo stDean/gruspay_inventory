@@ -105,7 +105,14 @@ export const AuthForm = () => {
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)}>
 				<div className="flex flex-col gap-4 w-[300px] md:w-[450px]">
-					<p className="text-2xl font-semibold text-center">
+					<img
+						src="/logo.png"
+						alt="logo"
+						className="w-44 md:w-52 lg:w-56 cursor-pointer mx-auto"
+						// onClick={() => router.push("/dashboard")}
+					/>
+
+					<p className="text-2xl font-semibold">
 						{pathname === "/" ? "Register" : "Log In"}
 					</p>
 
@@ -192,7 +199,7 @@ export const AuthForm = () => {
 						<p className="-mt-3">
 							Forgot password?{" "}
 							<Link
-								href="/login"
+								href="/reset"
 								className="font-semibold text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
 							>
 								Reset

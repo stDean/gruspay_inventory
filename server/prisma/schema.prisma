@@ -27,7 +27,7 @@ enum Role {
 
 model Company {
   id            String       @id @default(uuid())
-  company_name  String
+  company_name  String       @unique
   company_email String       @unique
   password      String
   country       String
@@ -56,7 +56,7 @@ model Users {
   email      String     @unique
   password   String
   role       Role       @default(EMPLOYEE)
-  Company    Company?   @relation(fields: [companyId], references: [id])
+  Company    Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId  String?
   Products   Products[]
   createdAt  DateTime   @default(now())
@@ -71,7 +71,7 @@ model Products {
   type            String
   price           String
   other_meta_data String
-  Company         Company?          @relation(fields: [companyId], references: [id])
+  Company         Company?          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId       String?
   User            Users?            @relation(fields: [added_by], references: [id])
   added_by        String?
@@ -94,7 +94,7 @@ model Sales {
   id         String    @id @default(uuid())
   Product    Products? @relation(fields: [productsId], references: [id])
   productsId String?
-  Company    Company?  @relation(fields: [companyId], references: [id])
+  Company    Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId  String?
   Buyer      Buyer     @relation(fields: [buyerId], references: [id])
   buyerId    String

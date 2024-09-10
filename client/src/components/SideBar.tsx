@@ -2,7 +2,12 @@
 
 import { Logout } from "@/actions/logout";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setIsSidebarCollapsed, setLoggedInUser, setToken } from "@/state";
+import {
+	setEmail,
+	setIsSidebarCollapsed,
+	setLoggedInUser,
+	setToken,
+} from "@/state";
 import {
 	Archive,
 	CircleDollarSign,
@@ -73,6 +78,7 @@ export const SideBar = () => {
 	const handleLogout = async () => {
 		dispatch(setLoggedInUser(false));
 		dispatch(setToken(""));
+		dispatch(setEmail(""));
 		console.log("Logged Out");
 		await Logout();
 		router.push("/login");
