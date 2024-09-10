@@ -32,7 +32,7 @@ export const AuthController = {
 		console.log("token", token);
 
 		// TODO:Send Token
-		sendMail(company_email, token);
+		sendMail(company_email, token, "OTP Verification");
 
 		// create company
 		const hashedPassword = await hashPassword(password);
@@ -126,8 +126,7 @@ export const AuthController = {
 			data: { otp: token, expiresAt: expires },
 		});
 
-		// TODO:Send Token
-		sendMail(existingToken.email, token);
+		sendMail(existingToken.email, token, "OTP Code");
 
 		console.log("token", token);
 

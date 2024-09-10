@@ -13,7 +13,7 @@ const oAuth2Client = new OAuth2(
 	SENDERS_EMAIL
 );
 
-export const sendMail = (to, token) => {
+export const sendMail = (to, token, sub) => {
 	oAuth2Client.setCredentials({
 		refresh_token: GOOGLE_REFRESH_TOKEN,
 	});
@@ -33,7 +33,7 @@ export const sendMail = (to, token) => {
 	const mailOptions = {
 		from: SENDERS_EMAIL,
 		to: to,
-		subject: "OTP verification",
+		subject: `Gruspay - ${sub}`,
 		generateTextFromHTML: true,
 		html: `
     <div style=" width: 700px; border: 1px solid #ddd; box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); margin-left: auto; margin-right: auto;">
