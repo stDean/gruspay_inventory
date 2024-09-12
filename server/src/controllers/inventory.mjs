@@ -16,7 +16,16 @@ export const InventoryCtrl = {
 	createProduct: async (req, res) => {
 		const {
 			user: { company_id, email },
-			body: { product_name, brand, description, type, price, serialNo },
+			body: {
+				product_name,
+				brand,
+				description,
+				type,
+				price,
+				serialNo,
+				supplier_name,
+				supplierPhoneNo,
+			},
 		} = req;
 
 		const product = await prisma.products.findUnique({
@@ -38,6 +47,8 @@ export const InventoryCtrl = {
 				serialNo,
 				companyId: company.id,
 				added_by: user.id,
+        supplier_name,
+        supplierPhoneNo
 			},
 		});
 

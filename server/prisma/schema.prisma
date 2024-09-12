@@ -64,31 +64,24 @@ model Users {
 }
 
 model Products {
-  id              String            @id @default(uuid())
+  id              String   @id @default(uuid())
   product_name    String
   brand           String
   description     String
   type            String
   price           String
   other_meta_data String?
-  serialNo        String @unique
-  Company         Company?          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  serialNo        String   @unique
+  Company         Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId       String?
-  User            Users?            @relation(fields: [added_by], references: [id])
+  User            Users?   @relation(fields: [added_by], references: [id])
   added_by        String?
-  productSupplier ProductSupplier?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  supplier_name   String
+  supplierPhoneNo String
+  supplierEmail   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   soldTo          Sales?
-}
-
-model ProductSupplier {
-  id           String   @id @default(uuid())
-  full_name    String
-  phone_number String
-  email        String?
-  Product   Products @relation(fields: [productId], references: [id])
-  productId String   @unique
 }
 
 model Sales {
