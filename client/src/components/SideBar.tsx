@@ -38,7 +38,7 @@ const SidebarLink = ({
 }: SidebarLinkProps) => {
 	const pathname = usePathname();
 	const isActive =
-		pathname === href || (pathname === "/" && href === "/dashboard");
+		pathname === href || (pathname === "/" && href === "/dashboard") || pathname.includes(href);
 
 	return (
 		<Link href={href}>

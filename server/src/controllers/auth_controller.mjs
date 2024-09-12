@@ -116,10 +116,6 @@ export const AuthController = {
 			where: { id: existingOtp.id },
 		});
 
-		// const company = await prisma.company.findUnique({
-		// 	where: { company_email: company_email },
-		// });
-
 		// create user
 		let user;
 		if (company) {
@@ -199,7 +195,7 @@ export const AuthController = {
 
 		res
 			.status(StatusCodes.OK)
-			.json({ success: true, user: user.id, jwtToken });
+			.json({ success: true, jwtToken });
 	},
 	otp: async (req, res) => {
 		const { email, password } = req.body;

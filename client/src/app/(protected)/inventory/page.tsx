@@ -1,7 +1,5 @@
-export default function Inventory() {
-	return (
-		<div>
-			<h1>Inventory Page</h1>
-		</div>
-	);
+import { InventoryContent } from "./InventoryContent";
+
+export default async function Inventory() {
+	return <InventoryContent />;
 }

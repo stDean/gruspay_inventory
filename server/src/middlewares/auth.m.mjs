@@ -1,12 +1,10 @@
-import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
+import UnauthenticatedError from "../errors/unauthenticated.error.mjs";
 
 export const AuthMiddleware = (req, res, next) => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader || !authHeader.startsWith("Bearer")) {
-		return res
-			.status(StatusCodes.UNAUTHORIZED)
-			.json({ msg: "Invalid Authentication." });
+		throw new UnauthenticatedError("Invalid Authorization");
 	}
 
 	const token = authHeader.split(" ")[1];

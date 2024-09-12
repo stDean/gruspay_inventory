@@ -6,7 +6,7 @@ import { ReactNode, useEffect } from "react";
 import { useAppSelector } from "./redux";
 
 const DashBoardLayout = ({ children }: { children: ReactNode }) => {
-	const { isDarkMode, isSidebarCollapsed, loggedInUser } = useAppSelector(
+	const { isDarkMode, isSidebarCollapsed } = useAppSelector(
 		({ global }) => global
 	);
 

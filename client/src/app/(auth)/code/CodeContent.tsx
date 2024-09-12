@@ -22,7 +22,7 @@ export const CodeContent = () => {
 			const { error, success } = await verifyOTPToken({ email, otp: value });
 			if (success) {
 				dispatch(setLoggedInUser(true));
-				dispatch(setToken(success.token));
+				dispatch(setToken(success.jwtToken));
 
 				router.push("/dashboard");
 				toast.success("Success", {

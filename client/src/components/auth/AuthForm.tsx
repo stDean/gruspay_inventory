@@ -90,7 +90,7 @@ export const AuthForm = () => {
 
 			if (success) {
 				dispatch(setLoggedInUser(true));
-				dispatch(setToken(success.user));
+				dispatch(setToken(success.jwtToken));
 				toast.success("Success", {
 					description: "Login successfully",
 				});

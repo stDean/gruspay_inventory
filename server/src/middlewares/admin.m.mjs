@@ -1,4 +1,5 @@
 import { prisma } from "../utils/db.mjs";
+import UnauthenticatedError from "../errors/unauthenticated.error.mjs";
 
 export const AdminMiddleware = async (req, res, next) => {
 	const { email } = req.user;
@@ -7,17 +8,8 @@ export const AdminMiddleware = async (req, res, next) => {
 		where: { email },
 	});
 
-	if (!user) {
-		return res
-			.status(StatusCodes.UNAUTHORIZED)
-			.json({ msg: "Unauthorized", success: false });
-	}
-
-	if (user.role !== "ADMIN") {
-		return res
-			.status(StatusCodes.UNAUTHORIZED)
-			.json({ msg: "Unauthorized", success: false });
-	}
+	if (user.role !== "ADMIN")
+		throw new UnauthenticatedError("Invalid Authorization");
 
 	next();
 };

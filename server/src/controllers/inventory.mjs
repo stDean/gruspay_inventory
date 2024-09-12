@@ -47,16 +47,28 @@ export const InventoryCtrl = {
 				serialNo,
 				companyId: company.id,
 				added_by: user.id,
-        supplier_name,
-        supplierPhoneNo
+				supplier_name,
+				supplierPhoneNo,
 			},
 		});
 
 		res.status(StatusCodes.OK).json({ msg: "createProduct" });
 	},
 	getProducts: async (req, res) => {
-		const products = await prisma.products.findMany();
+		const { product_name } = req.params;
+		const products = await prisma.products.findMany({
+			where: { companyId: req.user.company_id, product_name },
+		});
 		res.status(StatusCodes.OK).json(products);
+	},
+	getProductWithCount: async (req, res) => {
+		const productsByCount = await prisma.products.groupBy({
+			by: ["type", "brand", "product_name"],
+			_count: {
+				type: true,
+			},
+		});
+		return res.status(StatusCodes.OK).json(productsByCount);
 	},
 	getProduct: async (req, res) => {
 		const { id } = req.params;

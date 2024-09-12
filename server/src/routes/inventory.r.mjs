@@ -8,7 +8,12 @@ const router = Router();
 router
 	.route("/createProduct")
 	.post(AuthMiddleware, InventoryCtrl.createProduct);
-router.route("/getProducts").get(AuthMiddleware, InventoryCtrl.getProducts);
+router
+	.route("/getProducts/:product_name")
+	.get(AuthMiddleware, InventoryCtrl.getProducts);
+router
+	.route("/getProductsByStock")
+	.get(AuthMiddleware, InventoryCtrl.getProductWithCount);
 router.route("/getProduct/:id").get(AuthMiddleware, InventoryCtrl.getProduct);
 router
 	.route("/updateProduct/:id")

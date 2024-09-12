@@ -20,7 +20,7 @@ export const NavBar = () => {
 	};
 
 	return (
-		<div className="flex justify-between items-center w-full mb-7 -mt-2">
+		<div className="flex justify-between items-center w-full mb-7 -mt-2 border-b pb-3 border-[#F9AE19]">
 			{/* LEFT SIDE */}
 			<div className="flex justify-between items-center gap-5">
 				<button
@@ -46,7 +46,7 @@ export const NavBar = () => {
 			{/* RIGHT SIDE */}
 			<div className="flex justify-between items-center gap-5">
 				<div className="hidden md:flex justify-between items-center gap-5">
-					<div>
+					{/* <div>
 						<button onClick={toggleDarkMode}>
 							{isDarkMode ? (
 								<Sun className="cursor-pointer text-gray-500" size={24} />
@@ -54,7 +54,7 @@ export const NavBar = () => {
 								<Moon className="cursor-pointer text-gray-500" size={24} />
 							)}
 						</button>
-					</div>
+					</div> */}
 
 					{/* <div className="relative">
 						<Bell className="cursor-pointer text-gray-500" size={24} />
