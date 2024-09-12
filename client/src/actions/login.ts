@@ -23,7 +23,7 @@ export const Login = async ({
 		});
 		if (res.status === 200) {
 			const cookieStore = cookies();
-			cookieStore.set("user", JSON.stringify(res.data.token));
+			cookieStore.set("user", JSON.stringify(res.data.jwtToken));
 		}
 		return { success: res.data };
 	} catch (e: any) {

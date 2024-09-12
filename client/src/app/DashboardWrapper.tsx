@@ -1,9 +1,9 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
 import { NavBar } from "@/components/NavBar";
 import { SideBar } from "@/components/SideBar";
-import StoreProvider, { useAppSelector } from "./redux";
+import { ReactNode, useEffect } from "react";
+import { useAppSelector } from "./redux";
 
 const DashBoardLayout = ({ children }: { children: ReactNode }) => {
 	const { isDarkMode, isSidebarCollapsed, loggedInUser } = useAppSelector(

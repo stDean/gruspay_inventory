@@ -1,14 +1,19 @@
+import { StatusCodes } from "http-status-codes";
+import jwt from "jsonwebtoken";
+
 export const AuthMiddleware = (req, res, next) => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader || !authHeader.startsWith("Bearer")) {
-		throw new UnauthenticatedError("Invalid Authorization");
+		return res
+			.status(StatusCodes.UNAUTHORIZED)
+			.json({ msg: "Invalid Authentication." });
 	}
 
 	const token = authHeader.split(" ")[1];
 
 	try {
-		const payload = jwt.verify(token, process.env.JWT_ACC_SECRET);
-		req.company = payload;
+		const payload = jwt.verify(token, process.env.JWT_SECRET);
+		req.user = payload;
 		next();
 	} catch (error) {
 		throw new Error("Invalid Authentication.");

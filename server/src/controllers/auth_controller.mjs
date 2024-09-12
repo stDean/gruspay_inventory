@@ -104,22 +104,26 @@ export const AuthController = {
 		});
 
 		// update company verified field
-		await prisma.company.update({
+		const company = await prisma.company.update({
 			where: { company_email: existingOtp.email },
 			data: { verified: true },
 		});
+
+		console.log("company", company);
 
 		// delete the otp
 		await prisma.otp.delete({
 			where: { id: existingOtp.id },
 		});
 
-		const company = await prisma.company.findUnique({
-			where: { company_email: company_email },
-		});
+		// const company = await prisma.company.findUnique({
+		// 	where: { company_email: company_email },
+		// });
+
 		// create user
+		let user;
 		if (company) {
-			await prisma.users.create({
+			user = await prisma.users.create({
 				data: {
 					companyId: company.id,
 					email: company.company_email,
@@ -129,7 +133,10 @@ export const AuthController = {
 			});
 		}
 
-		const jwtToken = createJWT({ email: company_email });
+		const jwtToken = createJWT({
+			email: user.email,
+			company_id: user.companyId,
+		});
 
 		res
 			.status(StatusCodes.OK)
@@ -192,7 +199,7 @@ export const AuthController = {
 
 		res
 			.status(StatusCodes.OK)
-			.json({ success: true, user: user.id, token: jwtToken });
+			.json({ success: true, user: user.id, jwtToken });
 	},
 	otp: async (req, res) => {
 		const { email, password } = req.body;

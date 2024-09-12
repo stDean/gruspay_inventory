@@ -70,15 +70,16 @@ model Products {
   description     String
   type            String
   price           String
-  other_meta_data String
+  other_meta_data String?
+  serialNo        String @unique
   Company         Company?          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId       String?
   User            Users?            @relation(fields: [added_by], references: [id])
   added_by        String?
-  ProductSupplier ProductSupplier[]
+  productSupplier ProductSupplier?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  Sales           Sales[]
+  soldTo          Sales?
 }
 
 model ProductSupplier {
@@ -86,18 +87,18 @@ model ProductSupplier {
   full_name    String
   phone_number String
   email        String?
-  Product      Products @relation(fields: [productsId], references: [id])
-  productsId   String
+  Product   Products @relation(fields: [productId], references: [id])
+  productId String   @unique
 }
 
 model Sales {
-  id         String    @id @default(uuid())
-  Product    Products? @relation(fields: [productsId], references: [id])
-  productsId String?
-  Company    Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId  String?
-  Buyer      Buyer     @relation(fields: [buyerId], references: [id])
-  buyerId    String
+  id        String   @id @default(uuid())
+  Company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String?
+  Buyer     Buyer    @relation(fields: [buyerId], references: [id])
+  buyerId   String
+  Product   Products @relation(fields: [productId], references: [id])
+  productId String   @unique
 }
 
 model Buyer {
