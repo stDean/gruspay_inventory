@@ -11,6 +11,7 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@headlessui/react": "^2.1.8",
     "@hookform/resolvers": "^3.9.0",
     "@mui/material": "^6.0.2",
     "@mui/x-data-grid": "^7.15.0",
@@ -41,7 +42,8 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
     "world-countries": "^5.0.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20.16.5",

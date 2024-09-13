@@ -1,14 +1,16 @@
 "use client";
 
 import { getProductsByName } from "@/actions/inventory";
+import { AddButton } from "@/components/AddButton";
+import { ProductsTable } from "@/components/ProductsTable";
+import { Spinner } from "@/components/Spinners";
 import { UseReduxState } from "@/hook/useRedux";
 import { ProductProps } from "@/lib/types";
 import { ChevronRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { ProductsTable } from "@/components/ProductsTable";
-import { useSearchParams } from "next/navigation";
-import { Spinner } from "@/components/Spinners";
+import useAddProductModal from "@/hook/useAddProductModal";
 
 export const SingleProductsByName = ({ name }: { name: string }) => {
 	const [products, setProducts] = useState<ProductProps[]>([]);
@@ -16,6 +18,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
+	const addProductsModal = useAddProductModal();
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
@@ -41,7 +44,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 
 	const productName = name.replace(/%20/g, " ");
 
-	return products ? (
+	return products.length !== 0 ? (
 		<>
 			{isPending ? (
 				<Spinner />
@@ -60,8 +63,10 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 			)}
 		</>
 	) : (
-		<div>
-			<p>No Product Found</p>
-		</div>
+		<AddButton
+			title="No Inventory Items Yet."
+			buttonText="Add Product(s)"
+			handleAdd={addProductsModal.onOpen}
+		/>
 	);
 };

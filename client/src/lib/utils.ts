@@ -19,3 +19,18 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 		{ skipNull: true }
 	);
 }
+
+export const AddProductsType = {
+  name: "add_products",
+  options: [
+    {
+      title: "Add an Item",
+      subTitle: "Add one product at a time",
+    },
+
+    {
+      title: "Bulk items upload",
+      subTitle: "Add multiple products at once",
+    },
+  ],
+} as const;

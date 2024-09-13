@@ -25,6 +25,7 @@ export const InventoryCtrl = {
 				serialNo,
 				supplier_name,
 				supplierPhoneNo,
+				suppliersEmail,
 			},
 		} = req;
 
@@ -52,17 +53,33 @@ export const InventoryCtrl = {
 			},
 		});
 
+		const supplier = await prisma.supplier.findUnique({
+			where: { name: supplier_name },
+		});
+		if (!supplier) {
+			await prisma.supplier.create({
+				data: {
+					name: supplier_name,
+					phoneNo: supplierPhoneNo,
+					email: suppliersEmail || "",
+				},
+			});
+		}
+
 		res.status(StatusCodes.OK).json({ msg: "createProduct" });
 	},
+	createManyProducts: async (req, res) => {},
 	getProducts: async (req, res) => {
 		const { product_name } = req.params;
 		const products = await prisma.products.findMany({
 			where: { companyId: req.user.company_id, product_name },
 		});
+
 		res.status(StatusCodes.OK).json(products);
 	},
 	getProductWithCount: async (req, res) => {
 		const productsByCount = await prisma.products.groupBy({
+			where: { companyId: req.user.company_id },
 			by: ["type", "brand", "product_name"],
 			_count: {
 				type: true,
@@ -71,10 +88,10 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json(productsByCount);
 	},
 	getProduct: async (req, res) => {
-		const { id } = req.params;
+		const { id, serialNo } = req.params;
 
 		const product = await prisma.products.findUnique({
-			where: { id },
+			where: { id, serialNo },
 			include: { User: true },
 		});
 		if (!product) {

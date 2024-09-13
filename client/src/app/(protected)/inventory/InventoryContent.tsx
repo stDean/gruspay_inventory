@@ -1,6 +1,7 @@
 "use client";
 
 import { getProductsByStock } from "@/actions/inventory";
+import { AddButton } from "@/components/AddButton";
 import { InventorySummaryTable } from "@/components/InventorySummaryTable";
 import { Spinner } from "@/components/Spinners";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { ProductStockProps } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import useAddProductModal from "@/hook/useAddProductModal";
 
 export const InventoryContent = () => {
 	const [products, setProducts] = useState<Array<ProductStockProps>>([]);
@@ -16,6 +18,7 @@ export const InventoryContent = () => {
 	const searchParam = useSearchParams();
 	const [isPending, startTransition] = useTransition();
 	const page = Number(searchParam.get("page"));
+	const addProductsModal = useAddProductModal();
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
@@ -32,7 +35,7 @@ export const InventoryContent = () => {
 		getProducts();
 	}, [getProducts]);
 
-	return products ? (
+	return products.length !== 0 ? (
 		<>
 			{isPending ? (
 				<Spinner />
@@ -47,8 +50,10 @@ export const InventoryContent = () => {
 			)}
 		</>
 	) : (
-		<div>
-			<p>No Product Yet</p>
-		</div>
+		<AddButton
+			title="No Inventory Items Yet."
+			buttonText="Add Product(s)"
+			handleAdd={addProductsModal.onOpen}
+		/>
 	);
 };

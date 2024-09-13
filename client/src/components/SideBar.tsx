@@ -1,23 +1,24 @@
 "use client";
 
 import { Logout } from "@/actions/logout";
-import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { useAppDispatch } from "@/app/redux";
+import { UseReduxState } from "@/hook/useRedux";
 import {
-	setEmail,
-	setIsSidebarCollapsed,
-	setLoggedInUser,
-	setToken,
+  setEmail,
+  setIsSidebarCollapsed,
+  setLoggedInUser,
+  setToken,
 } from "@/state";
 import {
-	Archive,
-	CircleDollarSign,
-	Clipboard,
-	Layout,
-	LogOut,
-	LucideIcon,
-	Menu,
-	SlidersHorizontal,
-	Users,
+  Archive,
+  CircleDollarSign,
+  Clipboard,
+  Layout,
+  LogOut,
+  LucideIcon,
+  Menu,
+  SlidersHorizontal,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,7 +39,9 @@ const SidebarLink = ({
 }: SidebarLinkProps) => {
 	const pathname = usePathname();
 	const isActive =
-		pathname === href || (pathname === "/" && href === "/dashboard") || pathname.includes(href);
+		pathname === href ||
+		(pathname === "/" && href === "/dashboard") ||
+		pathname.includes(href);
 
 	return (
 		<Link href={href}>
@@ -67,9 +70,7 @@ const SidebarLink = ({
 export const SideBar = () => {
 	const router = useRouter();
 	const dispatch = useAppDispatch();
-	const { isSidebarCollapsed, isDarkMode } = useAppSelector(
-		({ global }) => global
-	);
+	const { isSidebarCollapsed } = UseReduxState();
 
 	const toggleSidebar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
@@ -101,7 +102,6 @@ export const SideBar = () => {
 					alt="logo"
 					width={isSidebarCollapsed ? 250 : 150}
 					height={isSidebarCollapsed ? 250 : 150}
-					className={`${isDarkMode && "invert"}`}
 				/>
 
 				<button

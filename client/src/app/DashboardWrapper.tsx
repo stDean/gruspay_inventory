@@ -2,28 +2,14 @@
 
 import { NavBar } from "@/components/NavBar";
 import { SideBar } from "@/components/SideBar";
-import { ReactNode, useEffect } from "react";
-import { useAppSelector } from "./redux";
+import { UseReduxState } from "@/hook/useRedux";
+import { ReactNode } from "react";
 
 const DashBoardLayout = ({ children }: { children: ReactNode }) => {
-	const { isDarkMode, isSidebarCollapsed } = useAppSelector(
-		({ global }) => global
-	);
-
-	useEffect(() => {
-		if (isDarkMode) {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.add("light");
-		}
-	});
+	const { isSidebarCollapsed } = UseReduxState();
 
 	return (
-		<div
-			className={`${
-				isDarkMode ? "dark" : "light"
-			} flex bg-gray-50 text-gray-900 w-full min-h-screen`}
-		>
+		<div className={` flex bg-gray-50 text-gray-900 w-full min-h-screen`}>
 			<SideBar />
 			<main
 				className={`flex flex-col w-full h-full py-7 px-9 bg-gray-50 ${
