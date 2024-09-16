@@ -1,17 +1,18 @@
 "use client";
 
+import { useAppDispatch } from "@/app/redux";
 import { DropzoneContainer } from "@/components/DropzoneContainer";
 import { Modal } from "@/components/modals/Modal";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import useAddMultipleProductModal from "@/hook/useAddMultipleProductsModal";
+import { setPreviewProducts } from "@/state";
 import { Download, File, Trash2 } from "lucide-react";
-import { parse } from "papaparse";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { FileRejection } from "react-dropzone";
 import { toast } from "sonner";
-import { useCallback, useEffect, useState, useTransition } from "react";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { addMultipleProduct } from "@/actions/inventory";
-import { useReduxState } from "@/hook/useRedux";
+import { parse } from "papaparse";
 
 enum STEPS {
 	UPLOAD = 0,
@@ -20,9 +21,9 @@ enum STEPS {
 
 export const AddMultipleProductsModal = () => {
 	const addMultipleProductModal = useAddMultipleProductModal();
-	const { token } = useReduxState();
+	const dispatch = useAppDispatch();
+	const router = useRouter();
 
-	const [isPending, startTransition] = useTransition();
 	const [data, setData] = useState<Array<any>>([]);
 	const [uploadedFile, setUploadedFile] = useState<{
 		name: string;
@@ -101,23 +102,10 @@ export const AddMultipleProductsModal = () => {
 	const handleUpload = useCallback(() => {
 		setProgress({ percentage: 0, show: true });
 		const products = data.filter(product => product?.product_name !== "");
-		startTransition(async () => {
-			const { data, error } = await addMultipleProduct({
-				token,
-				products,
-			});
-
-			if (error) {
-				toast.error("Error", { description: error });
-				return;
-			}
-
-			toast.success("Success", {
-				description: "Products added successfully",
-			});
-		});
+		dispatch(setPreviewProducts(products));
+    setProgress({ percentage: 100, show: true });
 		setTimeout(() => {
-			setProgress({ percentage: 100, show: true });
+			router.push("/inventory/preview");
 			addMultipleProductModal.onClose();
 		}, 500);
 	}, [setProgress, data]);
@@ -201,10 +189,7 @@ export const AddMultipleProductsModal = () => {
 				</div>
 
 				<div className="px-4 pb-4 flex justify-end">
-					<Button
-						onClick={handleUpload}
-						disabled={progress.percentage !== 100 && isPending}
-					>
+					<Button onClick={handleUpload}>
 						Add Products
 					</Button>
 				</div>

@@ -58,7 +58,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 								{item.serialNo}
 							</TableCell>
 							<TableCell className="border-r capitalize">
-								{format(item.createdAt, "PPP")}
+								{format(item?.createdAt, "PPP")}
 							</TableCell>
 							<TableCell className="border-r capitalize">
 								{item.description}

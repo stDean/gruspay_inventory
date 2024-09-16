@@ -5,6 +5,7 @@ export interface InitialStateTypes {
 	loggedInUser: false;
 	token: "";
 	email: "";
+	previewProducts: [];
 }
 
 const initialState: InitialStateTypes = {
@@ -12,6 +13,7 @@ const initialState: InitialStateTypes = {
 	loggedInUser: false,
 	token: "",
 	email: "",
+	previewProducts: [],
 };
 
 export const globalSlice = createSlice({
@@ -31,10 +33,18 @@ export const globalSlice = createSlice({
 		setEmail: (state, action: PayloadAction<any>) => {
 			state.email = action.payload;
 		},
+		setPreviewProducts: (state, action: PayloadAction<any>) => {
+			state.previewProducts = action.payload;
+		},
 	},
 });
 
-export const { setIsSidebarCollapsed, setLoggedInUser, setToken, setEmail } =
-	globalSlice.actions;
+export const {
+	setIsSidebarCollapsed,
+	setLoggedInUser,
+	setToken,
+	setEmail,
+	setPreviewProducts,
+} = globalSlice.actions;
 
 export default globalSlice.reducer;
