@@ -1,14 +1,14 @@
 "use client";
 
 import { useAppDispatch } from "@/app/redux";
-import { UseReduxState } from "@/hook/useRedux";
+import { useReduxState } from "@/hook/useRedux";
 import { setIsSidebarCollapsed } from "@/state";
 import { Menu, Settings } from "lucide-react";
 import Link from "next/link";
 
 export const NavBar = () => {
 	const dispatch = useAppDispatch();
-	const { isSidebarCollapsed } = UseReduxState();
+	const { isSidebarCollapsed } = useReduxState();
 
 	const toggleSidebar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));

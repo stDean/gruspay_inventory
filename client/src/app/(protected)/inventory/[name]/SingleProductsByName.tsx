@@ -4,7 +4,7 @@ import { getProductsByName } from "@/actions/inventory";
 import { AddButton } from "@/components/AddButton";
 import { ProductsTable } from "@/components/ProductsTable";
 import { Spinner } from "@/components/Spinners";
-import { UseReduxState } from "@/hook/useRedux";
+import { useReduxState } from "@/hook/useRedux";
 import { ProductProps } from "@/lib/types";
 import { ChevronRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -14,7 +14,7 @@ import useAddProductModal from "@/hook/useAddProductModal";
 
 export const SingleProductsByName = ({ name }: { name: string }) => {
 	const [products, setProducts] = useState<ProductProps[]>([]);
-	const { token } = UseReduxState();
+	const { token } = useReduxState();
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
@@ -44,7 +44,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 
 	const productName = name.replace(/%20/g, " ");
 
-	return products.length !== 0 ? (
+	return products ? (
 		<>
 			{isPending ? (
 				<Spinner />

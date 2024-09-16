@@ -23,7 +23,9 @@ export const Login = async ({
 		});
 		if (res.status === 200) {
 			const cookieStore = cookies();
-			cookieStore.set("user", JSON.stringify(res.data.jwtToken));
+			cookieStore.set("user", JSON.stringify(res.data.jwtToken), {
+				maxAge: 60 * 60 * 24 * 7,
+			});
 		}
 		return { success: res.data };
 	} catch (e: any) {
@@ -64,7 +66,7 @@ export const ResetOTP = async ({
 export const VerifyOTPAndUpdatePass = async ({
 	email,
 	password,
-  otp
+	otp,
 }: {
 	email: string;
 	password: string;

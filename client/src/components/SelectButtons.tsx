@@ -12,7 +12,7 @@ export const SelectButtons = ({ options, onChange }: SelectButtonProps) => {
 		<>
 			{[AddProductsType].map(({ name, options: selectedOptions }) => (
 				<RadioGroup value={options[name]} onChange={onChange} key={name}>
-					<div className="mt-3 space-y-4">
+					<div className="mt-3 space-y-4 p-6">
 						{selectedOptions.map(option => (
 							<Radio
 								key={option.title}

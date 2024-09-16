@@ -1,8 +1,8 @@
 "use client";
 
-import { X } from "lucide-react";
-import { useState, useEffect, useCallback, ReactElement } from "react";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 
 interface ModalProps {
 	isOpen: boolean;
@@ -15,6 +15,7 @@ interface ModalProps {
 	actionLabel?: string;
 	onSubmit?: () => void;
 	addedStyle?: string;
+	footer?: boolean;
 }
 
 export const Modal = ({
@@ -28,6 +29,7 @@ export const Modal = ({
 	actionLabel,
 	onSubmit,
 	addedStyle,
+	footer,
 }: ModalProps) => {
 	const [showModal, setShowModal] = useState<boolean>(isOpen);
 
@@ -85,28 +87,33 @@ export const Modal = ({
 							</div>
 
 							{/* Body */}
-							<div className="relative p-6 flex-auto">{body}</div>
+							<div className="relative flex-auto">{body}</div>
 
 							{/* Footer */}
-							<div className="border-t flex flex-col gap-2 px-6 py-6">
-								<div className="flex flex-row items-center gap-4 w-full">
-									{secondaryAction && secondaryActionLabel && (
-										<Button disabled={disabled} onClick={handleSecondaryAction}>
-											{secondaryActionLabel}
-										</Button>
-									)}
+							{footer && (
+								<div className="border-t flex flex-col gap-2 px-6 py-6">
+									<div className="flex flex-row items-center gap-4 w-full">
+										{secondaryAction && secondaryActionLabel && (
+											<Button
+												disabled={disabled}
+												onClick={handleSecondaryAction}
+											>
+												{secondaryActionLabel}
+											</Button>
+										)}
 
-									{onSubmit && actionLabel && (
-										<Button
-											disabled={disabled}
-											onClick={handleSubmit}
-											className={`px-6 py-5 ${addedStyle}`}
-										>
-											{actionLabel}
-										</Button>
-									)}
+										{onSubmit && actionLabel && (
+											<Button
+												disabled={disabled}
+												onClick={handleSubmit}
+												className={`px-6 py-5 ${addedStyle}`}
+											>
+												{actionLabel}
+											</Button>
+										)}
+									</div>
 								</div>
-							</div>
+							)}
 						</div>
 					</div>
 				</div>

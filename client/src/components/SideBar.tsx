@@ -2,23 +2,23 @@
 
 import { Logout } from "@/actions/logout";
 import { useAppDispatch } from "@/app/redux";
-import { UseReduxState } from "@/hook/useRedux";
+import { useReduxState } from "@/hook/useRedux";
 import {
-  setEmail,
-  setIsSidebarCollapsed,
-  setLoggedInUser,
-  setToken,
+	setEmail,
+	setIsSidebarCollapsed,
+	setLoggedInUser,
+	setToken,
 } from "@/state";
 import {
-  Archive,
-  CircleDollarSign,
-  Clipboard,
-  Layout,
-  LogOut,
-  LucideIcon,
-  Menu,
-  SlidersHorizontal,
-  Users,
+	Archive,
+	CircleDollarSign,
+	Clipboard,
+	Layout,
+	LogOut,
+	LucideIcon,
+	Menu,
+	SlidersHorizontal,
+	Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -70,7 +70,7 @@ const SidebarLink = ({
 export const SideBar = () => {
 	const router = useRouter();
 	const dispatch = useAppDispatch();
-	const { isSidebarCollapsed } = UseReduxState();
+	const { isSidebarCollapsed } = useReduxState();
 
 	const toggleSidebar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));

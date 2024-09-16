@@ -38,6 +38,7 @@ model Company {
   verified      Boolean      @default(false)
   Products      Products[]
   Sales         Sales[]
+  suppliers     Supplier[]
 }
 
 model Otp {
@@ -91,6 +92,8 @@ model Supplier {
   phoneNo   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
 }
 
 model Sales {

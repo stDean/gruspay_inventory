@@ -60,8 +60,8 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 							<TableCell className="border-r capitalize">
 								{format(item.createdAt, "PPP")}
 							</TableCell>
-							<TableCell className="border-r capitalize hover:underline hover:underline-offset-3 text-blue-500 hover:text-blue-400">
-								{item.other_meta_data}
+							<TableCell className="border-r capitalize">
+								{item.description}
 							</TableCell>
 							<TableCell className="border-r">{item.price}</TableCell>
 							<TableCell className="border-r">{item.supplier_name}</TableCell>

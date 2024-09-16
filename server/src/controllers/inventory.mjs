@@ -62,13 +62,49 @@ export const InventoryCtrl = {
 					name: supplier_name,
 					phoneNo: supplierPhoneNo,
 					email: suppliersEmail || "",
+					companyId: company.id,
 				},
 			});
 		}
 
 		res.status(StatusCodes.OK).json({ msg: "createProduct" });
 	},
-	createManyProducts: async (req, res) => {},
+	createProducts: async (req, res) => {
+		const {
+			user: { company_id, email },
+		} = req;
+		const { company, user: userData } = await useUserAndCompany({
+			company_id,
+			email,
+		});
+		const productData = req.body.map(product => ({
+			...product,
+			companyId: company.id,
+			added_by: userData.id,
+		}));
+		const supplierData = req.body.map(supplier => ({
+			name: supplier.supplier_name,
+			email: supplier.suppliersEmail,
+			phoneNo: supplier.supplierPhoneNo,
+			companyId: company.id,
+		}));
+		const addMany = await prisma.products.createMany({
+			data: productData,
+			skipDuplicates: true,
+		});
+
+		await prisma.supplier.createMany({
+			data: supplierData,
+			skipDuplicates: true,
+		});
+
+		if (addMany.count === 0)
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Product already exists" });
+
+		res.status(StatusCodes.OK).json({ msg: "createManyProducts", addMany });
+	},
 	getProducts: async (req, res) => {
 		const { product_name } = req.params;
 		const products = await prisma.products.findMany({

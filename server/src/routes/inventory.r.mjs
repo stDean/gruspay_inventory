@@ -8,6 +8,9 @@ const router = Router();
 router
 	.route("/createProduct")
 	.post(AuthMiddleware, InventoryCtrl.createProduct);
+  router
+	.route("/createProducts")
+	.post(AuthMiddleware, InventoryCtrl.createProducts);
 router
 	.route("/getProducts/:product_name")
 	.get(AuthMiddleware, InventoryCtrl.getProducts);

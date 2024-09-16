@@ -43,3 +43,15 @@ export const ResetSchema = z
 		},
 		{ message: "New password is required.", path: ["confirmPassword"] }
 	);
+
+export const AddProductSchema = z.object({
+	product_name: z.string(),
+	brand: z.string(),
+	description: z.string(),
+	type: z.string(),
+	price: z.string(),
+	serialNo: z.string(),
+	supplier_name: z.string(),
+	supplier_phoneNo: z.string(),
+	supplier_email: z.string().optional(),
+});

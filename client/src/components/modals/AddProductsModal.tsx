@@ -7,10 +7,12 @@ import { SelectButtons } from "@/components/SelectButtons";
 import { useState } from "react";
 import { AddProductsType } from "@/lib/utils";
 import useAddSingleProductModal from "@/hook/useAddSingleProductModal";
+import useAddMultipleProductModal from "@/hook/useAddMultipleProductsModal";
 
 export const AddProductsModal = () => {
 	const addProductsModal = useAddProductModal();
 	const addSingleProduct = useAddSingleProductModal();
+	const addMultipleProductModal = useAddMultipleProductModal();
 	const [options, setOptions] = useState<{
 		add_products: (typeof AddProductsType.options)[number];
 	}>({ add_products: AddProductsType.options[0] });
@@ -52,9 +54,13 @@ export const AddProductsModal = () => {
 							addProductsModal.onClose();
 							addSingleProduct.onOpen();
 					  }
-					: () => {}
+					: () => {
+							addProductsModal.onClose();
+							addMultipleProductModal.onOpen();
+					  }
 			}
 			addedStyle="ml-auto"
+			footer
 		/>
 	);
 };

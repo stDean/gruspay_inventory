@@ -2,17 +2,17 @@
 
 import { NavBar } from "@/components/NavBar";
 import { SideBar } from "@/components/SideBar";
-import { UseReduxState } from "@/hook/useRedux";
+import { useReduxState } from "@/hook/useRedux";
 import { ReactNode } from "react";
 
 const DashBoardLayout = ({ children }: { children: ReactNode }) => {
-	const { isSidebarCollapsed } = UseReduxState();
+	const { isSidebarCollapsed } = useReduxState();
 
 	return (
 		<div className={` flex bg-gray-50 text-gray-900 w-full min-h-screen`}>
 			<SideBar />
 			<main
-				className={`flex flex-col w-full h-full py-7 px-9 bg-gray-50 ${
+				className={`flex flex-col w-full h-full py-7 px-4 bg-gray-50 ${
 					isSidebarCollapsed ? "md:pl-24" : "md:pl-72"
 				}`}
 			>

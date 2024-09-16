@@ -57,8 +57,6 @@ export const AuthController = {
 			data: { email: company_email, otp: token, expiresAt: expires },
 		});
 
-		console.log("token", token);
-
 		// TODO:Send Token
 		sendMail(company_email, token, "OTP Verification");
 
@@ -109,8 +107,6 @@ export const AuthController = {
 			data: { verified: true },
 		});
 
-		console.log("company", company);
-
 		// delete the otp
 		await prisma.otp.delete({
 			where: { id: existingOtp.id },
@@ -159,8 +155,6 @@ export const AuthController = {
 
 		sendMail(existingToken.email, token, "Confirmation Code");
 
-		console.log("token", token);
-
 		res
 			.status(StatusCodes.OK)
 			.json({ message: "OTP sent to your email", success: true });
@@ -193,9 +187,7 @@ export const AuthController = {
 			company_id: user.companyId,
 		});
 
-		res
-			.status(StatusCodes.OK)
-			.json({ success: true, jwtToken });
+		res.status(StatusCodes.OK).json({ success: true, jwtToken });
 	},
 	otp: async (req, res) => {
 		const { email, password } = req.body;

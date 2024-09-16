@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/app/redux";
 
-export const UseReduxState = () => {
+export const useReduxState = () => {
 	const { email, isSidebarCollapsed, loggedInUser, token } = useAppSelector(
 		({ global }) => global
 	);
