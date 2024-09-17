@@ -19,7 +19,7 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
 		return { error: "Invalid token" };
@@ -47,7 +47,7 @@ export const getProductsByName = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 		return { error: "Invalid token" };
@@ -100,7 +100,7 @@ export const addSingleProduct = async ({
 
 		return data;
 	} catch (e: any) {
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -129,10 +129,71 @@ export const addMultipleProduct = async ({
 		return data;
 	} catch (e: any) {
 		console.log(e.response);
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong." };
+	}
+};
+
+export const getProduct = async ({
+	token,
+	serialNo,
+}: {
+	token: string;
+	serialNo: string;
+}) => {
+	try {
+		console.log({ serialNo });
+		const { data } = await axios.get(
+			`http://localhost:5001/api/inventory/getProduct/${serialNo}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Invalid token" };
+	}
+};
+
+export const sellProduct = async ({
+	token,
+	serialNo,
+	customerInfo,
+}: {
+	token: string;
+	serialNo: string;
+	customerInfo: {
+		full_name: string;
+		email?: string;
+		amountPaid: string;
+		phone_number: string;
+	};
+}) => {
+	try {
+		const { data } = await axios.patch(
+			`http://localhost:5001/api/inventory/sellProduct/${serialNo}`,
+			customerInfo,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Something went wrong, try again" };
 	}
 };

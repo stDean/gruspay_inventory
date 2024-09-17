@@ -1,16 +1,15 @@
 "use client";
 
 import { getProductsByName } from "@/actions/inventory";
-import { AddButton } from "@/components/AddButton";
 import { ProductsTable } from "@/components/ProductsTable";
 import { Spinner } from "@/components/Spinners";
 import { useReduxState } from "@/hook/useRedux";
+import useShowProductModal from "@/hook/useShowProduct";
 import { ProductProps } from "@/lib/types";
-import { ChevronRight } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import useAddProductModal from "@/hook/useAddProductModal";
 
 export const SingleProductsByName = ({ name }: { name: string }) => {
 	const [products, setProducts] = useState<ProductProps[]>([]);
@@ -18,7 +17,8 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
-	const addProductsModal = useAddProductModal();
+  const showProductModal = useShowProductModal();
+	const router = useRouter();
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
@@ -29,7 +29,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 			}
 			setProducts(data);
 		});
-	}, [token, name]);
+	}, [token, name, showProductModal.isOpen]);
 
 	useEffect(() => {
 		getProducts();
@@ -44,29 +44,27 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 
 	const productName = name.replace(/%20/g, " ");
 
-	return products ? (
-		<>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<div className="">
-					<h1 className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3 -mt-4">
-						<span className="text-xl">{brands}</span>
-						<ChevronRight className="h-5 w-5" />
-						<span className="text-xl">{types}</span>
-						<ChevronRight className="h-6 w-6" />
-						{productName}
-					</h1>
-
-					<ProductsTable products={products} page={page} />
-				</div>
-			)}
-		</>
+	return isPending ? (
+		<Spinner />
 	) : (
-		<AddButton
-			title="No Inventory Items Yet."
-			buttonText="Add Product(s)"
-			handleAdd={addProductsModal.onOpen}
-		/>
+		<div className="-mt-4">
+			<p
+				className="flex items-center gap-1 border rounded-2xl w-fit p-1 px-3 justify-center border-blue-500 text-blue-500 hover:border-blue-400 cursor-pointer hover:text-blue-400 mb-3"
+				onClick={() => {
+					router.push("/inventory");
+				}}
+			>
+				<ArrowLeft className="h-4 w-4" /> Back
+			</p>
+			<h1 className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3">
+				<span className="text-xl">{brands}</span>
+				<ChevronRight className="h-5 w-5" />
+				<span className="text-xl">{types}</span>
+				<ChevronRight className="h-6 w-6" />
+				{productName}
+			</h1>
+
+			<ProductsTable products={products} page={page} />
+		</div>
 	);
 };

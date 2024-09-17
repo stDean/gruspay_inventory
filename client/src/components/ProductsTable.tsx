@@ -1,5 +1,7 @@
 "use client";
 
+import { getProduct } from "@/actions/inventory";
+import { useAppDispatch } from "@/app/redux";
 import { Pagination } from "@/components/Pagination";
 import {
 	Table,
@@ -9,9 +11,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { useReduxState } from "@/hook/useRedux";
+import useShowProductModal from "@/hook/useShowProduct";
 import { ProductProps } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { setSingleData } from "@/state";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface InventoryProps {
 	products: ProductProps[];
@@ -19,6 +25,10 @@ interface InventoryProps {
 }
 
 export const ProductsTable = ({ products, page }: InventoryProps) => {
+	const showProductModal = useShowProductModal();
+	const { token } = useReduxState();
+	const dispatch = useAppDispatch();
+
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -30,6 +40,20 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+	const showProduct = async (serialNo: string) => {
+		const { data, error } = await getProduct({ token, serialNo });
+
+		if (error) {
+			toast.error("Error", {
+				description: error,
+			});
+			return;
+		}
+
+		dispatch(setSingleData(data));
+		showProductModal.onOpen();
+	};
 
 	return (
 		<div className="rounded-md border w-fit md:w-full shadow-md">
@@ -54,7 +78,12 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 							className="hover:!bg-none"
 						>
 							<TableCell className="border-r">{idx + 1}</TableCell>
-							<TableCell className="border-r capitalize">
+							<TableCell
+								className="border-r capitalize text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
+								onClick={() => {
+									showProduct(item.serialNo);
+								}}
+							>
 								{item.serialNo}
 							</TableCell>
 							<TableCell className="border-r capitalize">

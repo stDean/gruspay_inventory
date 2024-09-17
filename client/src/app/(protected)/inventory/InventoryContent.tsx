@@ -39,25 +39,21 @@ export const InventoryContent = () => {
 		getProducts();
 	}, [getProducts]);
 
-	return products ? (
-		<>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<>
-					<div className="flex justify-between items-center mb-3 -mt-4">
-						<h1 className="text-2xl font-semibold">Inventory</h1>
-						<Button onClick={addProductsModal.onOpen}>Add Product(s)</Button>
-					</div>
-					<InventorySummaryTable products={products} page={page} />
-				</>
-			)}
-		</>
-	) : (
+	return isPending ? (
+		<Spinner />
+	) : products.length === 0 ? (
 		<AddButton
 			title="No Inventory Items Yet."
 			buttonText="Add Product(s)"
 			handleAdd={addProductsModal.onOpen}
 		/>
+	) : (
+		<>
+			<div className="flex justify-between items-center mb-3 -mt-4">
+				<h1 className="text-2xl font-semibold">Inventory</h1>
+				<Button onClick={addProductsModal.onOpen}>Add Product(s)</Button>
+			</div>
+			<InventorySummaryTable products={products} page={page} />
+		</>
 	);
 };

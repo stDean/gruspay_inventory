@@ -108,14 +108,20 @@ export const InventoryCtrl = {
 	getProducts: async (req, res) => {
 		const { product_name } = req.params;
 		const products = await prisma.products.findMany({
-			where: { companyId: req.user.company_id, product_name },
+			where: { companyId: req.user.company_id, product_name, sold: false },
 		});
+
+		if (!products) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Product not found" });
+		}
 
 		res.status(StatusCodes.OK).json(products);
 	},
 	getProductWithCount: async (req, res) => {
 		const productsByCount = await prisma.products.groupBy({
-			where: { companyId: req.user.company_id },
+			where: { companyId: req.user.company_id, sold: false },
 			by: ["type", "brand", "product_name"],
 			_count: {
 				type: true,
@@ -124,11 +130,10 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json(productsByCount);
 	},
 	getProduct: async (req, res) => {
-		const { id, serialNo } = req.params;
+		const { serialNo } = req.params;
 
 		const product = await prisma.products.findUnique({
-			where: { id, serialNo },
-			include: { User: true },
+			where: { serialNo },
 		});
 		if (!product) {
 			return res
@@ -157,5 +162,51 @@ export const InventoryCtrl = {
 		});
 
 		res.status(StatusCodes.OK).json({ msg: "updateProduct", updatedProduct });
+	},
+	sellProduct: async (req, res) => {
+		const { serialNo } = req.params;
+		const { full_name, email, amountPaid, phone_number } = req.body;
+
+		const product = await prisma.products.findUnique({
+			where: { serialNo },
+		});
+
+		if (product.sold) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Product already sold", success: false });
+		}
+
+		const updatedProduct = await prisma.products.update({
+			where: { serialNo },
+			data: {
+				sold: true,
+				customersName: full_name,
+				customersPhoneNo: phone_number,
+			},
+		});
+
+		const customer = await prisma.buyer.findFirst({
+			where: {
+				companyId: req.user.company_id,
+				full_name,
+			},
+		});
+
+		if (!customer) {
+			await prisma.buyer.create({
+				data: {
+					full_name,
+					email,
+					phone_number,
+					amountPaid,
+					companyId: req.user.company_id,
+				},
+			});
+		}
+
+		res
+			.status(StatusCodes.OK)
+			.json({ msg: "Successfully sold", updatedProduct });
 	},
 };

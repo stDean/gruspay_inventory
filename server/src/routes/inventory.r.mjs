@@ -8,7 +8,7 @@ const router = Router();
 router
 	.route("/createProduct")
 	.post(AuthMiddleware, InventoryCtrl.createProduct);
-  router
+router
 	.route("/createProducts")
 	.post(AuthMiddleware, InventoryCtrl.createProducts);
 router
@@ -17,9 +17,14 @@ router
 router
 	.route("/getProductsByStock")
 	.get(AuthMiddleware, InventoryCtrl.getProductWithCount);
-router.route("/getProduct/:id").get(AuthMiddleware, InventoryCtrl.getProduct);
+router
+	.route("/getProduct/:serialNo")
+	.get(AuthMiddleware, InventoryCtrl.getProduct);
 router
 	.route("/updateProduct/:id")
 	.patch([AuthMiddleware, AdminMiddleware], InventoryCtrl.updateProduct);
+router
+	.route("/sellProduct/:serialNo")
+	.patch([AuthMiddleware], InventoryCtrl.sellProduct);
 
 export default router;

@@ -2,6 +2,7 @@ import DashboardWrapper from "@/app/DashboardWrapper";
 import { AddMultipleProductsModal } from "@/components/modals/AddMultipleProductsModal";
 import { AddProductsModal } from "@/components/modals/AddProductsModal";
 import { AddSingleProductModal } from "@/components/modals/AddSingleProductModal";
+import { ShowProductModal } from "@/components/modals/ShowProductModal";
 
 export default function RootLayout({
 	children,
@@ -13,6 +14,7 @@ export default function RootLayout({
 			<AddProductsModal />
 			<AddSingleProductModal />
 			<AddMultipleProductsModal />
+			<ShowProductModal />
 			<DashboardWrapper>{children}</DashboardWrapper>
 		</>
 	);

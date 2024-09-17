@@ -37,8 +37,8 @@ model Company {
   updatedAt     DateTime     @updatedAt
   verified      Boolean      @default(false)
   Products      Products[]
-  Sales         Sales[]
   suppliers     Supplier[]
+  customers     Buyer[]
 }
 
 model Otp {
@@ -65,30 +65,32 @@ model Users {
 }
 
 model Products {
-  id              String   @id @default(uuid())
-  product_name    String
-  brand           String
-  description     String
-  type            String
-  price           String
-  other_meta_data String?
-  serialNo        String   @unique
-  Company         Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId       String?
-  User            Users?   @relation(fields: [added_by], references: [id])
-  added_by        String?
-  supplier_name   String
-  supplierPhoneNo String
-  supplierEmail   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  soldTo          Sales?
+  id               String   @id @default(uuid())
+  product_name     String
+  brand            String
+  description      String
+  type             String
+  price            String
+  other_meta_data  String?
+  serialNo         String   @unique
+  Company          Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId        String?
+  User             Users?   @relation(fields: [added_by], references: [id])
+  added_by         String?
+  supplier_name    String
+  supplierPhoneNo  String
+  supplierEmail    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  sold             Boolean  @default(false)
+  customersName    String?
+  customersPhoneNo String?
 }
 
 model Supplier {
   id        String   @id @default(uuid())
   name      String   @unique
-  email     String?  @unique
+  email     String?
   phoneNo   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,22 +98,14 @@ model Supplier {
   companyId String?
 }
 
-model Sales {
-  id        String   @id @default(uuid())
-  Company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId String?
-  Buyer     Buyer    @relation(fields: [buyerId], references: [id])
-  buyerId   String
-  Product   Products @relation(fields: [productId], references: [id])
-  productId String   @unique
-}
-
 model Buyer {
   id           String   @id @default(uuid())
   full_name    String
   email        String?
   phone_number String
+  amountPaid   String
+  Company      Company? @relation(fields: [companyId], references: [id])
+  companyId    String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  Sales        Sales[]
 }
