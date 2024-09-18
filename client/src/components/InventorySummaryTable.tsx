@@ -1,25 +1,26 @@
 "use client";
 
+import { Pagination } from "@/components/Pagination";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { ProductStockProps } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/Pagination";
 
 interface InventoryProps {
 	products: ProductStockProps[];
 	page?: number;
+  linkTo: string;
+  count: string
 }
 
-export const InventorySummaryTable = ({ products, page }: InventoryProps) => {
+export const InventorySummaryTable = ({ products, page, count, linkTo }: InventoryProps) => {
 	const rowsPerPage = 15;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -43,7 +44,7 @@ export const InventorySummaryTable = ({ products, page }: InventoryProps) => {
 						<TableHead className="px-2 border-r w-36">Type</TableHead>
 						<TableHead className="px-2 border-r w-36">Brand</TableHead>
 						<TableHead className="px-2 border-r w-36">Name</TableHead>
-						<TableHead className="px-2 w-28">Stock Count</TableHead>
+						<TableHead className="px-2 w-28">{count} Count</TableHead>
 					</TableRow>
 				</TableHeader>
 
@@ -56,7 +57,7 @@ export const InventorySummaryTable = ({ products, page }: InventoryProps) => {
 								{item.brand}
 							</TableCell>
 							<TableCell className="border-r capitalize hover:underline hover:underline-offset-3 text-blue-500 hover:text-blue-400">
-								<Link href={`/inventory/${item.product_name}`}>
+								<Link href={`/${linkTo}/${item.product_name}`}>
 									{item.product_name}
 								</Link>
 							</TableCell>

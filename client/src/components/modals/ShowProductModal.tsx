@@ -16,7 +16,6 @@ export const ShowProductModal = () => {
 	const { singleData, token } = useReduxState();
 	const dispatch = useAppDispatch();
 
-	console.log({ token });
 
 	const [isPending, startTransition] = useTransition();
 	const [sold, setSold] = useState<boolean>(false);

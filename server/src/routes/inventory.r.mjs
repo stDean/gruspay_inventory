@@ -11,6 +11,7 @@ router
 router
 	.route("/createProducts")
 	.post(AuthMiddleware, InventoryCtrl.createProducts);
+
 router
 	.route("/getProducts/:product_name")
 	.get(AuthMiddleware, InventoryCtrl.getProducts);
@@ -20,11 +21,19 @@ router
 router
 	.route("/getProduct/:serialNo")
 	.get(AuthMiddleware, InventoryCtrl.getProduct);
+
+router
+	.route("/getSoldProductsByCount")
+	.get(AuthMiddleware, InventoryCtrl.getCountOfSoldProducts);
+router
+	.route("/getSoldProducts/:product_name")
+	.get(AuthMiddleware, InventoryCtrl.getSoldProductsByName);
+
 router
 	.route("/updateProduct/:id")
 	.patch([AuthMiddleware, AdminMiddleware], InventoryCtrl.updateProduct);
 router
 	.route("/sellProduct/:serialNo")
-	.patch([AuthMiddleware], InventoryCtrl.sellProduct);
+	.patch(AuthMiddleware, InventoryCtrl.sellProduct);
 
 export default router;

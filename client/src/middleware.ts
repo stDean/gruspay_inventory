@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
 	const { nextUrl } = request;
 
 	const isLoggedIn = !!request.cookies.get("user")?.value;
-	console.log({ isLoggedIn });
 
 	const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 

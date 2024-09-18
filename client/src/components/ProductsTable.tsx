@@ -29,6 +29,8 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 	const { token } = useReduxState();
 	const dispatch = useAppDispatch();
 
+	console.log({ products });
+
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -64,10 +66,14 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 							S/N
 						</TableHead>
 						<TableHead className={`px-2 border-r`}>Serial No</TableHead>
-						<TableHead className="px-2 border-r">Date Added</TableHead>
+						<TableHead className="px-2 border-r">
+							Date {productsByPage[0]?.SoldByUser ? "Sold" : "Added"}
+						</TableHead>
 						<TableHead className="px-2 border-r">Specifications</TableHead>
 						<TableHead className="px-2 border-r">Value</TableHead>
-						<TableHead className="px-2">Supplied By</TableHead>
+						<TableHead className="px-2">
+							{productsByPage[0]?.SoldByUser ? "Sold By" : "Supplied By"}
+						</TableHead>
 					</TableRow>
 				</TableHeader>
 
@@ -93,7 +99,13 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 								{item.description}
 							</TableCell>
 							<TableCell className="border-r">{item.price}</TableCell>
-							<TableCell className="border-r">{item.supplier_name}</TableCell>
+							{item.SoldByUser ? (
+								<TableCell className="border-r">
+									{item.SoldByUser.first_name} {item.SoldByUser.last_name}
+								</TableCell>
+							) : (
+								<TableCell className="border-r">{item.supplier_name}</TableCell>
+							)}
 						</TableRow>
 					))}
 				</TableBody>

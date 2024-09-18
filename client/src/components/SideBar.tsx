@@ -19,6 +19,7 @@ import {
 	Menu,
 	SlidersHorizontal,
 	Users,
+	ClipboardCheck,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -80,7 +81,6 @@ export const SideBar = () => {
 		dispatch(setLoggedInUser(false));
 		dispatch(setToken(""));
 		dispatch(setEmail(""));
-		console.log("Logged Out");
 		await Logout();
 		router.push("/login");
 	};
@@ -126,10 +126,16 @@ export const SideBar = () => {
 					label="Inventory"
 					isCollapsed={isSidebarCollapsed}
 				/>
-				<SidebarLink
+				{/* <SidebarLink
 					href="/products"
 					icon={Clipboard}
 					label="Products"
+					isCollapsed={isSidebarCollapsed}
+				/> */}
+				<SidebarLink
+					href="/sold"
+					icon={ClipboardCheck}
+					label="Sales History"
 					isCollapsed={isSidebarCollapsed}
 				/>
 				<SidebarLink

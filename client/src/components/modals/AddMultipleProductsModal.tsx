@@ -48,7 +48,6 @@ export const AddMultipleProductsModal = () => {
 
 	// File upload
 	const handleDropRejected = (rejectedFiles: FileRejection[]) => {
-		console.log({ rejectedFiles });
 		rejectedFiles.forEach(file => {
 			file.errors.forEach(error => {
 				if (error.code === "file-invalid-type") {

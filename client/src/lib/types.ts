@@ -14,6 +14,8 @@ export interface ProductProps {
 	supplier_name: string;
 	type: string;
 	updatedAt: string;
+	sold_by?: string;
+	SoldByUser?: { first_name: string; last_name: string; email: string };
 }
 
 export interface ProductStockProps {
@@ -29,7 +31,7 @@ export interface PaginationProps {
 }
 
 export interface UrlQueryParams {
-  params: string;
-  key: string;
-  value: string;
+	params: string;
+	key: string;
+	value: string;
 }

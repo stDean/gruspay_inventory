@@ -128,7 +128,6 @@ export const addMultipleProduct = async ({
 
 		return data;
 	} catch (e: any) {
-		console.log(e.response);
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
@@ -145,7 +144,6 @@ export const getProduct = async ({
 	serialNo: string;
 }) => {
 	try {
-		console.log({ serialNo });
 		const { data } = await axios.get(
 			`http://localhost:5001/api/inventory/getProduct/${serialNo}`,
 			{

@@ -53,7 +53,12 @@ export const InventoryContent = () => {
 				<h1 className="text-2xl font-semibold">Inventory</h1>
 				<Button onClick={addProductsModal.onOpen}>Add Product(s)</Button>
 			</div>
-			<InventorySummaryTable products={products} page={page} />
+			<InventorySummaryTable
+				products={products}
+				page={page}
+				linkTo="inventory"
+				count="Stock"
+			/>
 		</>
 	);
 };
