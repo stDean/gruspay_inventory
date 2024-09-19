@@ -1,7 +1,7 @@
 "use client";
 
 import { getProductsByName } from "@/actions/inventory";
-import { ProductsTable } from "@/components/ProductsTable";
+import { ProductsTable } from "@/components/table/ProductsTable";
 import { Spinner } from "@/components/Spinners";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
@@ -17,7 +17,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
-  const showProductModal = useShowProductModal();
+	const showProductModal = useShowProductModal();
 	const router = useRouter();
 
 	const getProducts = useCallback(() => {
@@ -43,6 +43,8 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 		.filter((v, i, a) => a.indexOf(v) === i)[0];
 
 	const productName = name.replace(/%20/g, " ");
+
+	console.log({ products });
 
 	return isPending ? (
 		<Spinner />

@@ -22,7 +22,8 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
-		return { error: "Invalid token" };
+
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -33,10 +34,6 @@ export const getProductsByName = async ({
 	name: string;
 	token: string;
 }) => {
-	if (!token) {
-		return { error: "No token provided" };
-	}
-
 	const URI = `http://localhost:5001/api/inventory/getProducts/${name}`;
 	try {
 		const { data } = await axios.get(URI, {
@@ -47,10 +44,13 @@ export const getProductsByName = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response?.status === 404) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
-		return { error: "Invalid token" };
+
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -73,9 +73,9 @@ export const addSingleProduct = async ({
 			description,
 			type,
 			price,
-			serialNo,
+			serial_no,
 			supplier_name,
-			supplier_phoneNo,
+			supplier_phone_no,
 			supplier_email,
 		} = validatedFields.data;
 		const { data } = await axios.post(
@@ -86,10 +86,10 @@ export const addSingleProduct = async ({
 				description,
 				type,
 				price,
-				serialNo,
+				serial_no,
 				supplier_name,
-				supplierPhoneNo: supplier_phoneNo,
-				supplierEmail: supplier_email,
+				supplier_phone_no,
+				supplier_email,
 			},
 			{
 				headers: {
@@ -102,9 +102,11 @@ export const addSingleProduct = async ({
 	} catch (e: any) {
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
 		}
 
-		return { error: "Something went wrong." };
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -155,10 +157,13 @@ export const getProduct = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response?.status === 404) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
-		return { error: "Invalid token" };
+
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -170,10 +175,10 @@ export const sellProduct = async ({
 	token: string;
 	serialNo: string;
 	customerInfo: {
-		full_name: string;
-		email?: string;
-		amountPaid: string;
-		phone_number: string;
+		buyer_name: string;
+		buyer_email?: string;
+		amount_paid: string;
+		phone_no: string;
 	};
 }) => {
 	try {
@@ -190,6 +195,8 @@ export const sellProduct = async ({
 		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
 		return { error: "Something went wrong, try again" };

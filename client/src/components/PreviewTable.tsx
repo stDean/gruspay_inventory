@@ -5,17 +5,16 @@ import { useAppDispatch } from "@/app/redux";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { useReduxState } from "@/hook/useRedux";
 import { cn } from "@/lib/utils";
 import { setPreviewProducts } from "@/state";
-import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -64,7 +63,7 @@ const PreviewTableData = ({
 						>
 							<TableCell className="border-r">{idx + 1}</TableCell>
 							<TableCell className="border-r capitalize">
-								{item.serialNo}
+								{item.serial_no}
 							</TableCell>
 							<TableCell className="border-r capitalize">
 								{item.product_name}

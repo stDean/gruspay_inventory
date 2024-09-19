@@ -1,7 +1,7 @@
 "use client";
 
 import { getSoldProductsByCount } from "@/actions/sales";
-import { InventorySummaryTable } from "@/components/InventorySummaryTable";
+import { InventorySummaryTable } from "@/components/table/InventorySummaryTable";
 import { Spinner } from "@/components/Spinners";
 import { useReduxState } from "@/hook/useRedux";
 import { ProductStockProps } from "@/lib/types";

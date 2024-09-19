@@ -5,7 +5,6 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-// TODO:Send OTP
 export const SendOTP = async ({
 	values,
 }: {
@@ -25,7 +24,7 @@ export const SendOTP = async ({
 		);
 		return { success: data };
 	} catch (e: any) {
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -33,7 +32,6 @@ export const SendOTP = async ({
 	}
 };
 
-// TODO:Resend OTP
 export const ResendOTP = async ({
 	email,
 	password,
@@ -51,7 +49,7 @@ export const ResendOTP = async ({
 
 		return data;
 	} catch (e: any) {
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -59,7 +57,6 @@ export const ResendOTP = async ({
 	}
 };
 
-// TODO:Verify OTP
 export const verifyOTPToken = async ({
 	email,
 	otp,

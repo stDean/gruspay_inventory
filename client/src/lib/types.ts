@@ -1,21 +1,28 @@
 export interface ProductProps {
-	added_by: string;
+	id: string;
+	product_name: string;
 	brand: string;
+	description: string;
+	type: string;
+	price: string;
+	serial_no: string;
 	companyId: string;
 	createdAt: string;
-	description: string;
-	id: string;
-	other_meta_data?: string;
-	price: string;
-	product_name: string;
-	serialNo: string;
-	supplierEmail?: string;
-	supplierPhoneNo: string;
-	supplier_name: string;
-	type: string;
 	updatedAt: string;
-	sold_by?: string;
+	date_sold?: string;
+	AddedByUser?: { first_name: string; last_name: string; email: string };
 	SoldByUser?: { first_name: string; last_name: string; email: string };
+	Supplier: {
+		supplier_name: string;
+		supplier_email?: string;
+		supplier_phone_no: string;
+	};
+	Customer?: {
+		buyer_name: string;
+		buyer_email?: string;
+		buyer_phone_no: string;
+		amount_paid: string;
+	};
 }
 
 export interface ProductStockProps {

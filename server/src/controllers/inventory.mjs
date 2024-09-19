@@ -57,7 +57,7 @@ export const InventoryCtrl = {
 						where: { supplier_name },
 						create: {
 							supplier_name,
-							supplier_email: supplier_email || "",
+							supplier_email: supplier_email || null,
 							supplier_phone_no,
 							companyId: company.id,
 						},
@@ -148,7 +148,7 @@ export const InventoryCtrl = {
 		if (!products) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
-				.json({ msg: "Product not found" });
+				.json({ msg: "No products found with that name" });
 		}
 
 		res.status(StatusCodes.OK).json(products);

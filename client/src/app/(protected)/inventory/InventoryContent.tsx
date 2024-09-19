@@ -2,7 +2,7 @@
 
 import { getProductsByStock } from "@/actions/inventory";
 import { AddButton } from "@/components/AddButton";
-import { InventorySummaryTable } from "@/components/InventorySummaryTable";
+import { InventorySummaryTable } from "@/components/table/InventorySummaryTable";
 import { Spinner } from "@/components/Spinners";
 import { Button } from "@/components/ui/button";
 import { useReduxState } from "@/hook/useRedux";

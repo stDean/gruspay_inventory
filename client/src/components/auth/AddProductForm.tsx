@@ -27,9 +27,9 @@ export const AddProductForm = () => {
 			description: "",
 			type: "",
 			price: "",
-			serialNo: "",
+			serial_no: "",
 			supplier_name: "",
-			supplier_phoneNo: "",
+			supplier_phone_no: "",
 			supplier_email: "",
 		},
 	});
@@ -82,7 +82,7 @@ export const AddProductForm = () => {
 
 						<div className="flex justify-between items-center gap-5">
 							<CustomInput
-								name="serialNo"
+								name="serial_no"
 								label="Serial Number"
 								control={form.control}
 								placeholder="Serial Number"
@@ -121,7 +121,7 @@ export const AddProductForm = () => {
 							/>
 
 							<CustomInput
-								name="supplier_phoneNo"
+								name="supplier_phone_no"
 								label="Supplier Phone Number"
 								control={form.control}
 								placeholder="Supplier Phone Number"

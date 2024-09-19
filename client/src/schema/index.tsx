@@ -50,8 +50,8 @@ export const AddProductSchema = z.object({
 	description: z.string(),
 	type: z.string(),
 	price: z.string(),
-	serialNo: z.string(),
+	serial_no: z.string(),
 	supplier_name: z.string(),
-	supplier_phoneNo: z.string(),
+	supplier_phone_no: z.string(),
 	supplier_email: z.string().optional(),
 });

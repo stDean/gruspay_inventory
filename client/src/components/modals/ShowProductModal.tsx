@@ -20,15 +20,15 @@ export const ShowProductModal = () => {
 	const [isPending, startTransition] = useTransition();
 	const [sold, setSold] = useState<boolean>(false);
 	const [customerInfo, setCustomerInfo] = useState<{
-		full_name: string;
-		email?: string;
-		phone_number: string;
-		amountPaid: string;
+		buyer_name: string;
+		buyer_email?: string;
+		phone_no: string;
+		amount_paid: string;
 	}>({
-		full_name: "",
-		email: "",
-		phone_number: "",
-		amountPaid: "",
+		buyer_name: "",
+		buyer_email: "",
+		phone_no: "",
+		amount_paid: "",
 	});
 
 	const handleClose = () => {
@@ -36,10 +36,10 @@ export const ShowProductModal = () => {
 		dispatch(setSingleData(null));
 		setSold(false);
 		setCustomerInfo({
-			full_name: "",
-			email: "",
-			phone_number: "",
-			amountPaid: "",
+			buyer_name: "",
+			buyer_email: "",
+			phone_no: "",
+			amount_paid: "",
 		});
 	};
 
@@ -52,9 +52,9 @@ export const ShowProductModal = () => {
 		if (sold) {
 			startTransition(async () => {
 				if (
-					customerInfo.full_name === "" ||
-					customerInfo.phone_number === "" ||
-					customerInfo.amountPaid === ""
+					customerInfo.buyer_name === "" ||
+					customerInfo.phone_no === "" ||
+					customerInfo.amount_paid === ""
 				) {
 					toast.error("Error", { description: "Please fill all the fields!" });
 					return;
@@ -62,7 +62,7 @@ export const ShowProductModal = () => {
 
 				const { data, error } = await sellProduct({
 					token,
-					serialNo: singleData?.serialNo!,
+					serialNo: singleData?.serial_no!,
 					customerInfo,
 				});
 
@@ -119,7 +119,7 @@ export const ShowProductModal = () => {
 					<div className="flex flex-col gap-1 flex-1">
 						<p className="text-sm text-gray-500 font-semibold">Serial No</p>
 						<Input
-							value={singleData?.serialNo}
+							value={singleData?.serial_no}
 							className="capitalize"
 							disabled
 						/>
@@ -138,7 +138,7 @@ export const ShowProductModal = () => {
 									Suppliers Full Name
 								</p>
 								<Input
-									value={singleData?.supplier_name}
+									value={singleData?.Supplier.supplier_name}
 									className="capitalize"
 									disabled
 								/>
@@ -149,7 +149,7 @@ export const ShowProductModal = () => {
 									Suppliers Phone Number
 								</p>
 								<Input
-									value={singleData?.supplierPhoneNo}
+									value={singleData?.Supplier.supplier_phone_no}
 									className="capitalize"
 									disabled
 								/>
@@ -173,10 +173,10 @@ export const ShowProductModal = () => {
 									Customers Name
 								</p>
 								<Input
-									value={customerInfo?.full_name}
+									value={customerInfo?.buyer_name}
 									className=""
 									onChange={handleChange}
-									name="full_name"
+									name="buyer_name"
 									placeholder="Customers Full Name"
 								/>
 							</div>
@@ -186,7 +186,7 @@ export const ShowProductModal = () => {
 									Customers Email
 								</p>
 								<Input
-									value={customerInfo?.email}
+									value={customerInfo?.buyer_email}
 									className=""
 									name="email"
 									onChange={handleChange}
@@ -201,7 +201,7 @@ export const ShowProductModal = () => {
 									Customers Phone Number
 								</p>
 								<Input
-									value={customerInfo?.phone_number}
+									value={customerInfo?.phone_no}
 									className=""
 									onChange={handleChange}
 									name="phone_number"
@@ -214,7 +214,7 @@ export const ShowProductModal = () => {
 									Amount Paid
 								</p>
 								<Input
-									value={customerInfo?.amountPaid}
+									value={customerInfo?.amount_paid}
 									className=""
 									name="amountPaid"
 									placeholder="Amount Paid"

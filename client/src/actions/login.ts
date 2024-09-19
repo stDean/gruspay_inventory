@@ -29,7 +29,7 @@ export const Login = async ({
 		}
 		return { success: res.data };
 	} catch (e: any) {
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -55,7 +55,7 @@ export const ResetOTP = async ({
 		);
 		return data;
 	} catch (e: any) {
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -79,7 +79,7 @@ export const VerifyOTPAndUpdatePass = async ({
 		);
 		return { success: true, data };
 	} catch (e: any) {
-		if (e.response.status === 400) {
+		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
