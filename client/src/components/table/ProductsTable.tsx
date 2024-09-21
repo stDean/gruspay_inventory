@@ -21,8 +21,6 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 	const { token } = useReduxState();
 	const dispatch = useAppDispatch();
 
-	console.log({ products });
-
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;

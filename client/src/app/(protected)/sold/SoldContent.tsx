@@ -32,11 +32,9 @@ export const SoldContent = () => {
 		getProducts();
 	}, [getProducts]);
 
-	console.log({ products });
-
 	return isPending ? (
 		<Spinner />
-	) : products ? (
+	) : products.length ? (
 		<>
 			<div className="flex justify-between items-center mb-3 -mt-4">
 				<h1 className="text-2xl font-semibold">Sales History</h1>

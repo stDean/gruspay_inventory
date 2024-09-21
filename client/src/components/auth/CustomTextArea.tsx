@@ -25,7 +25,7 @@ export const CustomTextArea = ({
           <FormControl>
             <Textarea
               placeholder={placeholder}
-              className="resize-none h-16"
+              className="resize-none h-20"
               {...field}
             />
           </FormControl>

@@ -16,6 +16,9 @@ router
 	.route("/getProducts/:product_name")
 	.get(AuthMiddleware, InventoryCtrl.getProducts);
 router
+	.route("/getAllProducts")
+	.get(AuthMiddleware, InventoryCtrl.getAllProductNotSold);
+router
 	.route("/getProductsByStock")
 	.get(AuthMiddleware, InventoryCtrl.getProductWithCount);
 router
@@ -35,5 +38,7 @@ router
 router
 	.route("/sellProduct/:serialNo")
 	.patch(AuthMiddleware, InventoryCtrl.sellProduct);
+
+router.route("/swapProducts").patch(AuthMiddleware, InventoryCtrl.swapProducts);
 
 export default router;

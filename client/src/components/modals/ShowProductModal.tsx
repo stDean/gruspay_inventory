@@ -1,25 +1,29 @@
 "use client";
 
-import useShowProductModal from "@/hook/useShowProduct";
-import { Modal } from "@/components/modals/Modal";
-import { useReduxState } from "@/hook/useRedux";
-import { useAppDispatch } from "@/app/redux";
-import { setSingleData } from "@/state";
-import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
-import { useState, useTransition } from "react";
 import { sellProduct } from "@/actions/inventory";
+import { useAppDispatch } from "@/app/redux";
+import { CustomerInfo } from "@/components/CustomerInfo";
+import { Modal } from "@/components/modals/Modal";
+import { Input } from "@/components/ui/input";
+import { useReduxState } from "@/hook/useRedux";
+import useShowProductModal from "@/hook/useShowProduct";
+import useSwapProductModal, { ItemProps } from "@/hook/useSwapModal";
+import { setSingleData } from "@/state";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 
 export const ShowProductModal = () => {
 	const showProductModal = useShowProductModal();
+	const swapProductModal = useSwapProductModal();
+
 	const { singleData, token } = useReduxState();
 	const dispatch = useAppDispatch();
 
-
 	const [isPending, startTransition] = useTransition();
 	const [sold, setSold] = useState<boolean>(false);
-	const [customerInfo, setCustomerInfo] = useState<{
+
+  const [customerInfo, setCustomerInfo] = useState<{
 		buyer_name: string;
 		buyer_email?: string;
 		phone_no: string;
@@ -30,6 +34,12 @@ export const ShowProductModal = () => {
 		phone_no: "",
 		amount_paid: "",
 	});
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setCustomerInfo(prev => ({ ...prev, [name]: value }));
+	};
+
 
 	const handleClose = () => {
 		showProductModal.onClose();
@@ -43,10 +53,6 @@ export const ShowProductModal = () => {
 		});
 	};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setCustomerInfo(prev => ({ ...prev, [name]: value }));
-	};
 
 	const handleSold = () => {
 		if (sold) {
@@ -78,6 +84,11 @@ export const ShowProductModal = () => {
 		}
 
 		setSold(true);
+	};
+
+	const handleSwap = (item: ItemProps) => {
+		showProductModal.onClose();
+		swapProductModal.onOpen(item);
 	};
 
 	const headerContent = (
@@ -163,65 +174,8 @@ export const ShowProductModal = () => {
 
 			{sold && (
 				<>
-					<p className="font-semibold text-base mt-3 px-4">
-						Customers Information
-					</p>
-					<div className="space-y-4 p-4">
-						<div className="flex items-center gap-4">
-							<div className="flex flex-col gap-1 flex-1">
-								<p className="text-sm text-gray-500 font-semibold">
-									Customers Name
-								</p>
-								<Input
-									value={customerInfo?.buyer_name}
-									className=""
-									onChange={handleChange}
-									name="buyer_name"
-									placeholder="Customers Full Name"
-								/>
-							</div>
-
-							<div className="flex flex-col gap-1 flex-1">
-								<p className="text-sm text-gray-500 font-semibold">
-									Customers Email
-								</p>
-								<Input
-									value={customerInfo?.buyer_email}
-									className=""
-									name="email"
-									onChange={handleChange}
-									placeholder="Customers Email"
-								/>
-							</div>
-						</div>
-
-						<div className="flex items-center gap-4">
-							<div className="flex flex-col gap-1 flex-1">
-								<p className="text-sm text-gray-500 font-semibold">
-									Customers Phone Number
-								</p>
-								<Input
-									value={customerInfo?.phone_no}
-									className=""
-									onChange={handleChange}
-									name="phone_number"
-									placeholder="Customers Phone Number"
-								/>
-							</div>
-
-							<div className="flex flex-col gap-1 flex-1">
-								<p className="text-sm text-gray-500 font-semibold">
-									Amount Paid
-								</p>
-								<Input
-									value={customerInfo?.amount_paid}
-									className=""
-									name="amountPaid"
-									placeholder="Amount Paid"
-									onChange={handleChange}
-								/>
-							</div>
-						</div>
+					<div className="p-4 pt-0 space-y-4">
+						<CustomerInfo customerInfo={customerInfo} handleChange={handleChange} />
 					</div>
 
 					<hr />
@@ -236,7 +190,18 @@ export const ShowProductModal = () => {
 				>
 					{sold ? "Confirm Sale" : "Mark as Sold"}
 				</Button>
-				<Button className="w-full py-5">Swap</Button>
+				<Button
+					className="w-full py-5"
+					onClick={() =>
+						handleSwap({
+							product_name: singleData?.product_name!,
+							serial_no: singleData?.serial_no!,
+							price: singleData?.price!,
+						})
+					}
+				>
+					Swap
+				</Button>
 			</div>
 		</>
 	);

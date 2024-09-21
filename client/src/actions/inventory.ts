@@ -202,3 +202,16 @@ export const sellProduct = async ({
 		return { error: "Something went wrong, try again" };
 	}
 };
+
+export const getAllProductsNotSold = async ({ token }: { token: string }) => {
+	const { data } = await axios.get(
+		"http://localhost:5001/api/inventory/getAllProducts",
+		{
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}
+	);
+
+	return { data };
+};

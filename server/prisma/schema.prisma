@@ -86,9 +86,9 @@ model Products {
   added_by     String
   SoldByUser   Users?     @relation("product_sold_by", fields: [sold_by], references: [id])
   sold_by      String?
-  Supplier     Supplier   @relation(fields: [supplierId], references: [id])
+  Supplier     Supplier   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   supplierId   String
-  Customer     Buyer?     @relation(fields: [buyerId], references: [id])
+  Customer     Buyer?     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
   date_sold    DateTime?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -97,25 +97,29 @@ model Products {
 
 model Supplier {
   id                String     @id @default(uuid())
-  supplier_name     String     @unique
-  supplier_email    String?    @unique
+  supplier_name     String
+  supplier_email    String?
   supplier_phone_no String
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   Company           Company?   @relation(fields: [companyId], references: [id])
   companyId         String?
   Products          Products[]
+
+  @@unique([supplier_email, supplier_name])
 }
 
 model Buyer {
   id             String     @id @default(uuid())
-  buyer_name     String     @unique
-  buyer_email          String?    @unique
+  buyer_name     String
+  buyer_email    String?
   buyer_phone_no String
-  amount_paid     String
+  amount_paid    String
   Company        Company?   @relation(fields: [companyId], references: [id])
   companyId      String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   Products       Products[]
+
+  @@unique([buyer_email, buyer_name])
 }
