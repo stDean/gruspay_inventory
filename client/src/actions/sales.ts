@@ -23,7 +23,13 @@ export const getSoldProductsByCount = async ({ token }: { token: string }) => {
 	}
 };
 
-export const getSoldProductsByName = async ({ token, name }: { token: string, name: string }) => {
+export const getSoldProductsByName = async ({
+	token,
+	name,
+}: {
+	token: string;
+	name: string;
+}) => {
 	try {
 		const { data } = await axios.get(
 			`http://localhost:5001/api/inventory/getSoldProducts/${name}`,

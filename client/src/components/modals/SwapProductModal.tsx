@@ -1,6 +1,6 @@
 "use client";
 
-import { getProduct } from "@/actions/inventory";
+import { getProduct, swapProducts } from "@/actions/inventory";
 import { CustomerInfo } from "@/components/CustomerInfo";
 import { Modal } from "@/components/modals/Modal";
 import { Button } from "@/components/ui/button";
@@ -123,11 +123,12 @@ export const SwapProductModal = () => {
 		}
 	}, [search.value]);
 
-	const handleConfirmSwap = useCallback(() => {
+	const handleConfirmSwap = useCallback(async () => {
 		startTransition(async () => {
 			const isDuplicate = products.some(
 				product => product.serial_no === incoming.serial_no
 			);
+
 			if (isDuplicate) {
 				toast.warning("Error", {
 					description: "Product has already been added",
@@ -135,20 +136,29 @@ export const SwapProductModal = () => {
 				return;
 			}
 
+			// Update products in the state first
 			setProducts(prevProducts => {
 				const updatedProducts = [...prevProducts, incoming];
-				console.log({ b: updatedProducts });
-
-				// TODO:submit the product to backend
-				const dataToDb = {
-					incoming: updatedProducts,
-					outgoing: swapProductModal.items.map(item => item.serial_no),
-					customerInfo: customerInfo,
-				};
-				console.log(dataToDb);
-
+				console.log({ updatedProducts });
 				return updatedProducts;
 			});
+
+			// Prepare data for the backend request
+			const dataToDb = {
+				incoming: [...products, incoming], // make sure to include the new product
+				outgoing: swapProductModal.items.map(item => item.serial_no),
+				customerInfo: customerInfo,
+			};
+
+			// Submit to backend (separate async from state setter)
+			const { data, error } = await swapProducts({ token, ...dataToDb });
+			if (error) {
+				toast.error("Error", { description: error });
+			}
+			console.log(data);
+			toast.success("Success", { description: data.msg });
+
+			// Reset incoming product
 			setIncoming({
 				product_name: "",
 				type: "",
@@ -158,10 +168,10 @@ export const SwapProductModal = () => {
 				price: "",
 			});
 
-			// swapProductModal.onClose();
-			// router.push("/inventory")
+			swapProductModal.onClose();
+			router.push("/inventory");
 		});
-	}, [products, incoming]);
+	}, [products, incoming, token, customerInfo, swapProductModal.items]);
 
 	const handleAddAnotherItem = async (serial_no: string) => {
 		if (!serial_no) return;

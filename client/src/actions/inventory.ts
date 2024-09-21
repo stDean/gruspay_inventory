@@ -215,3 +215,51 @@ export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 
 	return { data };
 };
+
+interface SwapProductsProps {
+	token: string;
+	customerInfo: {
+		buyer_name: string;
+		buyer_email?: string;
+		phone_no: string;
+		amount_paid: string;
+	};
+	outgoing: string[];
+	incoming: {
+		product_name: string;
+		type: string;
+		brand: string;
+		price: string;
+		serial_no: string;
+		description: string;
+	}[];
+}
+
+export const swapProducts = async ({
+	token,
+	incoming,
+	outgoing,
+	customerInfo,
+}: SwapProductsProps) => {
+	try {
+		const { data } = await axios.patch(
+			"http://localhost:5001/api/inventory/swapProducts",
+			{ incoming, outgoing, customerInfo },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+    return {data}
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "something went wrong, try again" };
+	}
+};
