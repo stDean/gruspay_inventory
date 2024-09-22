@@ -1,4 +1,4 @@
-import { ProductProps } from "@/lib/types";
+import { ProductProps, UserProps } from "@/lib/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface InitialStateTypes {
@@ -8,6 +8,7 @@ export interface InitialStateTypes {
 	email: "";
 	previewProducts: [];
 	singleData: ProductProps | null;
+	user: UserProps | null;
 }
 
 const initialState: InitialStateTypes = {
@@ -17,6 +18,7 @@ const initialState: InitialStateTypes = {
 	email: "",
 	previewProducts: [],
 	singleData: null,
+	user: null,
 };
 
 export const globalSlice = createSlice({
@@ -42,6 +44,9 @@ export const globalSlice = createSlice({
 		setSingleData: (state, action: PayloadAction<any>) => {
 			state.singleData = action.payload;
 		},
+		setUser: (state, action: PayloadAction<any>) => {
+			state.user = action.payload;
+		},
 	},
 });
 
@@ -51,7 +56,8 @@ export const {
 	setToken,
 	setEmail,
 	setPreviewProducts,
-  setSingleData,
+	setSingleData,
+	setUser,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

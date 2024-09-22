@@ -42,3 +42,15 @@ export interface UrlQueryParams {
 	key: string;
 	value: string;
 }
+
+export interface UserProps {
+	companyId: string;
+	createdAt: string;
+	email: string;
+	first_name: string;
+	id: string;
+	last_name: string;
+	password: string;
+	role: string;
+	updatedAt: string;
+}

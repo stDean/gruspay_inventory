@@ -55,3 +55,11 @@ export const AddProductSchema = z.object({
 	supplier_phone_no: z.string(),
 	supplier_email: z.string().optional(),
 });
+
+export const UpdateUserSchema = z.object({
+	first_name: z.string(),
+	last_name: z.string(),
+	email: z.string().email(),
+	password: z.string(),
+	confirmPassword: z.string(),
+});

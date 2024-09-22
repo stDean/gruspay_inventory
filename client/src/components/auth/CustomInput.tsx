@@ -81,13 +81,13 @@ export const CustomInput = ({
 									/>
 
 									<div
-										className="w-[18px] h-[18px] absolute right-3"
+										className="w-[18px] h-[18px] absolute right-1 top-3 md:top-2 md:right-3"
 										onClick={handleShow}
 									>
 										{show ? (
-											<Eye className="w-[18px] h-[18px] cursor-pointer" />
+											<Eye className="w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer" />
 										) : (
-											<EyeOff className="w-[18px] h-[18px] cursor-pointer" />
+											<EyeOff className="w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer" />
 										)}
 									</div>
 								</div>

@@ -8,6 +8,7 @@ export const useReduxState = () => {
 		token,
 		previewProducts,
 		singleData,
+    user
 	} = useAppSelector(({ global }) => global);
 
 	return {
@@ -17,5 +18,6 @@ export const useReduxState = () => {
 		token,
 		previewProducts,
 		singleData,
+    user
 	};
 };
