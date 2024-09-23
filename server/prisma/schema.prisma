@@ -93,6 +93,7 @@ model Products {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   buyerId      String?
+  // add amount paid here optional until a buyer pays
 }
 
 model Supplier {
@@ -114,6 +115,7 @@ model Buyer {
   buyer_name     String
   buyer_email    String?
   buyer_phone_no String
+  // remove the amount paid
   amount_paid    String
   Company        Company?   @relation(fields: [companyId], references: [id])
   companyId      String?

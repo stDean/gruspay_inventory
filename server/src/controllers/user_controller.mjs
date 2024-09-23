@@ -52,4 +52,60 @@ export const UserCtrl = {
 	},
 	createUser: async (req, res) => {},
 	updateUserRole: async (req, res) => {},
+	getUserById: async (req, res) => {
+		const { id } = req.params;
+		const user = await prisma.users.findUnique({
+			where: { id },
+		});
+
+		if (!user) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "No user with that id" });
+		}
+		return res.status(StatusCodes.OK).json({ user });
+	},
+	getCustomers: async (req, res) => {
+		const { user } = req;
+		const customers = await prisma.buyer.findMany({
+			where: { companyId: user.company_id },
+			include: { Products: true },
+		});
+
+		return res.status(StatusCodes.OK).json({ customers });
+	},
+	getCustomer: async (req, res) => {
+		const customer = await prisma.buyer.findUnique({
+			where: { id: req.params.id, companyId: req.user.company_id },
+		});
+
+		if (!customer) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "No customer with that id" });
+		}
+
+		return res.status(StatusCodes.OK).json({ customer });
+	},
+	getSuppliers: async (req, res) => {
+		const suppliers = await prisma.supplier.findMany({
+			where: { companyId: req.user.company_id },
+			include: { Products: true },
+		});
+
+		return res.status(StatusCodes.OK).json({ suppliers });
+	},
+	getSupplier: async (req, res) => {
+		const supplier = await prisma.supplier.findUnique({
+			where: { id: req.params.id, companyId: req.user.company_id },
+		});
+
+		if (!supplier) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "No supplier with that id" });
+		}
+
+		return res.status(StatusCodes.OK).json({ supplier });
+	},
 };

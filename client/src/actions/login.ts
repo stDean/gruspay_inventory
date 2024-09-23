@@ -25,6 +25,8 @@ export const Login = async ({
 			const cookieStore = cookies();
 			cookieStore.set("user", JSON.stringify(res.data.jwtToken), {
 				maxAge: 60 * 60 * 24 * 7,
+				httpOnly: true,
+				secure: true,
 			});
 		}
 		return { success: res.data };

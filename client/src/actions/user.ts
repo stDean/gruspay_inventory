@@ -24,6 +24,35 @@ export const getUser = async ({ token }: { token: string }) => {
 	}
 };
 
+export const getUserById = async ({
+	token,
+	id,
+}: {
+	token: string;
+	id: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`http://localhost:5001/api/user/getUser/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response.status === 404) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
 export const getUsers = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
@@ -64,6 +93,108 @@ export const updateUser = async ({
 		const { data } = await axios.patch(
 			"http://localhost:5001/api/user/updateUser",
 			{ email, password, first_name, last_name },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response.status === 404) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+// SUPPLIER
+export const getSuppliers = async ({ token }: { token: string }) => {
+	try {
+		const { data } = await axios.get(
+			"http://localhost:5001/api/user/getSuppliers",
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+export const getSupplier = async ({
+	token,
+	id,
+}: {
+	token: string;
+	id: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`http://localhost:5001/api/user/getSupplier/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response.status === 404) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+// CUSTOMER
+export const getCustomers = async ({ token }: { token: string }) => {
+	try {
+		const { data } = await axios.get(
+			"http://localhost:5001/api/user/getCustomers",
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+export const getCustomer = async ({
+	token,
+	id,
+}: {
+	token: string;
+	id: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`http://localhost:5001/api/user/getCustomer/${id}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

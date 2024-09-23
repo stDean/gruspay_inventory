@@ -5,8 +5,8 @@ import { ReactElement } from "react";
 interface TableContainerProps {
 	tableHeaders: ReactElement;
 	tableBody: ReactElement;
-  totalPages: number;
-  currentPage: number;
+  totalPages?: number;
+  currentPage?: number;
 }
 
 export const TableContainer = ({
@@ -25,9 +25,9 @@ export const TableContainer = ({
 				<TableBody>{tableBody}</TableBody>
 			</Table>
 
-			{totalPages > 1 && (
+			{totalPages! > 1 && (
 				<div className=" w-full border-t">
-					<Pagination totalPages={totalPages} page={currentPage} />
+					<Pagination totalPages={totalPages!} page={currentPage!} />
 				</div>
 			)}
 		</div>

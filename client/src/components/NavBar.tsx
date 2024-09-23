@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export const NavBar = () => {
 	const dispatch = useAppDispatch();
-	const { isSidebarCollapsed } = useReduxState();
+	const { isSidebarCollapsed, user } = useReduxState();
 
 	const toggleSidebar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
@@ -32,7 +32,9 @@ export const NavBar = () => {
 					<hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-2" />
 
 					<div className="flex items-center cursor-pointer">
-						<span className="font-semibold">Hello, Basit</span>
+						<span className="font-semibold">
+							Hello, {user?.first_name ? user?.first_name : "there"}
+						</span>
 					</div>
 				</div>
 

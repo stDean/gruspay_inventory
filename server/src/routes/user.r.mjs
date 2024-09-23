@@ -9,6 +9,21 @@ router.route("/getUser").get(AuthMiddleware, UserCtrl.getUser);
 router
 	.route("/getUsers")
 	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getUsers);
+router
+	.route("/getUser/:id")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getUserById);
+router
+	.route("/getSuppliers")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getSuppliers);
+router
+	.route("/getSupplier/:id")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getSupplier);
+router
+	.route("/getCustomers")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCustomers);
+router
+	.route("/getCustomer/:id")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCustomer);
 
 router.route("/updateUser").patch(AuthMiddleware, UserCtrl.updateUser);
 router.route("/updateUserRole").patch(AuthMiddleware, UserCtrl.updateUser);

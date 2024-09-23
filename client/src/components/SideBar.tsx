@@ -8,6 +8,7 @@ import {
 	setIsSidebarCollapsed,
 	setLoggedInUser,
 	setToken,
+	setUser,
 } from "@/state";
 import {
 	Archive,
@@ -71,7 +72,7 @@ const SidebarLink = ({
 export const SideBar = () => {
 	const router = useRouter();
 	const dispatch = useAppDispatch();
-	const { isSidebarCollapsed } = useReduxState();
+	const { isSidebarCollapsed, user } = useReduxState();
 
 	const toggleSidebar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
@@ -81,6 +82,7 @@ export const SideBar = () => {
 		dispatch(setLoggedInUser(false));
 		dispatch(setToken(""));
 		dispatch(setEmail(""));
+		dispatch(setUser({}));
 		await Logout();
 		router.push("/login");
 	};
@@ -150,20 +152,23 @@ export const SideBar = () => {
 					label="Settings"
 					isCollapsed={isSidebarCollapsed}
 				/>
-				<SidebarLink
+				{/* <SidebarLink
 					href="/expenses"
 					icon={CircleDollarSign}
 					label="Expenses"
 					isCollapsed={isSidebarCollapsed}
-				/>
+				/> */}
 			</div>
 
 			{/* FOOTER */}
 			<div className="mb-10">
 				<div className="flex justify-between items-center px-6 mb-4">
 					<div className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
-						<p className="font-semibold text-base">Omitaoumu Basit</p>
-						<p>Omitaoumu@gmail.com</p>
+						<p className="font-semibold text-base truncate">
+							{user?.first_name && `${user?.first_name}`}{" "}
+							{user?.last_name && ` ${user?.last_name}`}
+						</p>
+						<p className="text-sm">{user?.email}</p>
 					</div>
 					<LogOut
 						className="text-red-500 cursor-pointer"

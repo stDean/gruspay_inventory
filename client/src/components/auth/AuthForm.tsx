@@ -113,7 +113,7 @@ export const AuthForm = () => {
 						// onClick={() => router.push("/dashboard")}
 					/>
 
-					<p className="text-2xl font-semibold">
+					<p className="text-xl md:text-2xl font-semibold">
 						{pathname === "/" ? "Register" : "Log In"}
 					</p>
 

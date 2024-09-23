@@ -78,7 +78,11 @@ export const verifyOTPToken = async ({
 		});
 		if (res.status === 200) {
 			const cookieStore = cookies();
-			cookieStore.set("user", JSON.stringify(res.data.jwtToken));
+			cookieStore.set("user", JSON.stringify(res.data.jwtToken), {
+				maxAge: 60 * 60 * 24 * 7,
+				httpOnly: true,
+				secure: true,
+			});
 		}
 		return { success: res.data };
 	} catch (e: any) {

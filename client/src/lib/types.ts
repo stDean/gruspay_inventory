@@ -54,3 +54,26 @@ export interface UserProps {
 	role: string;
 	updatedAt: string;
 }
+
+export interface CustomerProps {
+	Products: Array<ProductProps>;
+	amount_paid: string;
+	buyer_email: string;
+	buyer_name: string;
+	buyer_phone_no: string;
+	companyId: string;
+	createdAt: string;
+	id: string;
+	updatedAt: string;
+}
+
+export interface SupplierProps {
+	Products: Array<ProductProps>;
+	companyId: string;
+	createdAt: string;
+	id: string;
+	supplier_email: string;
+	supplier_name: string;
+	supplier_phone_no: string;
+	updatedAt: string;
+}

@@ -276,6 +276,7 @@ export const InventoryCtrl = {
 							buyer_email: buyer_email || null,
 							amount_paid,
 							buyer_phone_no,
+              companyId: req.user.company_id,
 						},
 					},
 				},
@@ -418,6 +419,7 @@ export const InventoryCtrl = {
 								buyer_email: customerInfo.buyer_email || null,
 								amount_paid: customerInfo.amount_paid,
 								buyer_phone_no: customerInfo.phone_no,
+                companyId: company.id
 							},
 						},
 					},

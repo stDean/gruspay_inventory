@@ -63,3 +63,10 @@ export const UpdateUserSchema = z.object({
 	password: z.string(),
 	confirmPassword: z.string(),
 });
+
+export const AddUserSchema = z.object({
+	first_name: z.string().optional(),
+	last_name: z.string().optional(),
+	email: z.string().email(),
+	password: z.string(),
+});
