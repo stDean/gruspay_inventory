@@ -50,7 +50,25 @@ export const UserCtrl = {
 			.status(StatusCodes.OK)
 			.json({ msg: "profile updated successful", updatedUser });
 	},
-	createUser: async (req, res) => {},
+	createUser: async (req, res) => {
+		const existingUser = await prisma.users.findUnique({
+			where: { companyId: req.user.company_id, email: req.body.email },
+		});
+		if (existingUser) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "User with this email already exists." });
+		}
+
+		const hashPass = await hashPassword(req.body.password);
+		await prisma.users.create({
+			data: { ...req.body, password: hashPass, companyId: req.user.company_id },
+		});
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "User created successfully" });
+	},
 	updateUserRole: async (req, res) => {},
 	getUserById: async (req, res) => {
 		const { id } = req.params;
@@ -77,6 +95,7 @@ export const UserCtrl = {
 	getCustomer: async (req, res) => {
 		const customer = await prisma.buyer.findUnique({
 			where: { id: req.params.id, companyId: req.user.company_id },
+			include: { Products: true },
 		});
 
 		if (!customer) {
@@ -98,6 +117,7 @@ export const UserCtrl = {
 	getSupplier: async (req, res) => {
 		const supplier = await prisma.supplier.findUnique({
 			where: { id: req.params.id, companyId: req.user.company_id },
+			include: { Products: true },
 		});
 
 		if (!supplier) {

@@ -1,6 +1,6 @@
 "use server";
 
-import { UpdateUserSchema } from "@/schema";
+import { AddUserSchema, UpdateUserSchema } from "@/schema";
 import axios from "axios";
 import { z } from "zod";
 
@@ -93,6 +93,43 @@ export const updateUser = async ({
 		const { data } = await axios.patch(
 			"http://localhost:5001/api/user/updateUser",
 			{ email, password, first_name, last_name },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response.status === 404) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+export const createUser = async ({
+	token,
+	userData,
+	role,
+}: {
+	token: string;
+	userData: z.infer<typeof AddUserSchema>;
+	role: string;
+}) => {
+	const validateFields = AddUserSchema.safeParse(userData);
+	if (!validateFields.success) {
+		return { error: "Invalid fields!" };
+	}
+
+	try {
+		const { data } = await axios.post(
+			"http://localhost:5001/api/user/createUser",
+			{ ...validateFields.data, role },
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

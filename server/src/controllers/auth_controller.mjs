@@ -57,7 +57,6 @@ export const AuthController = {
 			data: { email: company_email, otp: token, expiresAt: expires },
 		});
 
-		// TODO:Send Token
 		sendMail(company_email, token, "OTP Verification");
 
 		// create company
@@ -139,6 +138,16 @@ export const AuthController = {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "Email is required", success: false });
+		}
+
+		const existingUser = await prisma.users.findUnique({
+			where: { email: req.body.email },
+		});
+
+		if (!existingUser) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "No user was found with that email" });
 		}
 
 		const existingToken = await prisma.otp.findFirst({

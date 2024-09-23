@@ -40,45 +40,49 @@ export const UserSettingsForm = () => {
 
 	const handleUpdateUser = (userData: z.infer<typeof UpdateUserSchema>) => {
 		startTransition(async () => {
-			if (userData.password && !userData.confirmPassword) {
-				toast.warning("Warning", {
-					description: "confirm password field cannot be empty",
-				});
-				return;
+			// If the password is provided, validate it along with confirmPassword
+			if (userData.password || userData.confirmPassword) {
+				if (!userData.password || !userData.confirmPassword) {
+					toast.warning("Warning", {
+						description: "Both password and confirm password must be provided",
+					});
+					return;
+				}
+
+				// Check if password and confirm password have the correct length
+				if (
+					userData.password.length < 8 ||
+					userData.confirmPassword.length < 8
+				) {
+					toast.warning("Warning", {
+						description: "Password must be at least 8 characters",
+					});
+					return;
+				}
+
+				// Check if password and confirm password match
+				if (userData.password !== userData.confirmPassword) {
+					toast.warning("Warning", {
+						description: "Passwords must match",
+					});
+					return;
+				}
 			}
 
-			if (!userData.password && userData.confirmPassword) {
-				toast.warning("Warning", {
-					description: "password field cannot be empty",
-				});
-				return;
-			}
-
-			if (
-				userData.password.length <= 8 ||
-				userData.confirmPassword.length <= 8
-			) {
-				toast.warning("Warning", {
-					description: "password cannot be less than 8 characters",
-				});
-				return;
-			}
-
-			if (userData.password !== userData.confirmPassword) {
-				toast.warning("Warning", { description: "password must be equal" });
-				return;
-			}
-
+			// Proceed with updating the user even if the password is not provided
 			const { error, data } = await updateUser({ token, userData });
 
 			if (error) {
-				toast.error("Error", { description: error });
+				toast.error("Error", {
+					description: error,
+				});
 				return;
 			}
 
 			toast.success("Success", {
 				description: "Profile has been updated successfully",
 			});
+
 			dispatch(setUser(data.updatedUser));
 			router.refresh();
 		});

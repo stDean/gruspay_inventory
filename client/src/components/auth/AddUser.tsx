@@ -10,8 +10,15 @@ import { CustomSelect } from "@/components/auth/CustomSelect";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { SelectItem } from "@/components/ui/select";
+import { createUser } from "@/actions/user";
+import { useReduxState } from "@/hook/useRedux";
+import { toast } from "sonner";
+import useAddUserModal from "@/hook/useAddUserModal";
 
 export const AddUser = () => {
+	const userModal = useAddUserModal();
+	const { token } = useReduxState();
+
 	const [password, setPassword] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const [role, setRole] = useState<string>("EMPLOYEE");
@@ -27,9 +34,23 @@ export const AddUser = () => {
 	});
 
 	const handleAddUser = (data: z.infer<typeof AddUserSchema>) => {
-		startTransition(() => {
-			const dataToDb = { ...data, role };
-			console.log(dataToDb);
+		startTransition(async () => {
+			const { error, data: success } = await createUser({
+				token,
+				role,
+				userData: data,
+			});
+
+			if (error) {
+				toast.error("Error", { description: error });
+				return;
+			}
+
+			toast.success("Success", { description: "User added successfully" });
+			setTimeout(() => {
+				userModal.onClose();
+				form.reset();
+			}, 300);
 		});
 	};
 

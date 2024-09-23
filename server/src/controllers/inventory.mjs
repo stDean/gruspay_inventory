@@ -268,15 +268,20 @@ export const InventoryCtrl = {
 				sales_status: "SOLD",
 				SoldByUser: { connect: { id: user.id } },
 				date_sold: new Date(),
+				bought_for: amount_paid,
 				Customer: {
 					connectOrCreate: {
-						where: { buyer_name },
+						where: {
+							buyer_email_buyer_name: {
+								buyer_email,
+								buyer_name,
+							},
+						},
 						create: {
 							buyer_name,
 							buyer_email: buyer_email || null,
-							amount_paid,
 							buyer_phone_no,
-              companyId: req.user.company_id,
+							companyId: req.user.company_id,
 						},
 					},
 				},
@@ -406,6 +411,7 @@ export const InventoryCtrl = {
 					SoldByUser: { connect: { id: user.id } }, // Connect SoldByUser for each product
 					date_sold: new Date(),
 					sales_status: "SWAP",
+					bought_for: customerInfo.amount_paid,
 					Customer: {
 						connectOrCreate: {
 							where: {
@@ -417,9 +423,8 @@ export const InventoryCtrl = {
 							create: {
 								buyer_name: customerInfo.buyer_name,
 								buyer_email: customerInfo.buyer_email || null,
-								amount_paid: customerInfo.amount_paid,
 								buyer_phone_no: customerInfo.phone_no,
-                companyId: company.id
+								companyId: company.id,
 							},
 						},
 					},

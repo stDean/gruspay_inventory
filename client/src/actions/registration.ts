@@ -42,14 +42,14 @@ export const ResendOTP = async ({
 	try {
 		const { data } = await axios.post(
 			"http://localhost:5001/api/auth/resendOTP",
-			{
-				email,
-			}
+			{ email }
 		);
 
 		return data;
 	} catch (e: any) {
 		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -86,6 +86,10 @@ export const verifyOTPToken = async ({
 		}
 		return { success: res.data };
 	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
 		return { error: "Invalid OTP!" };
 	}
 };

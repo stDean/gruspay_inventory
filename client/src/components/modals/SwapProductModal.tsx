@@ -155,8 +155,7 @@ export const SwapProductModal = () => {
 			if (error) {
 				toast.error("Error", { description: error });
 			}
-			console.log(data);
-			toast.success("Success", { description: data.msg });
+			toast.success("Success", { description: "Transaction successfull"});
 
 			// Reset incoming product
 			setIncoming({

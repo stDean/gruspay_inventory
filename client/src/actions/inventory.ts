@@ -184,7 +184,7 @@ export const sellProduct = async ({
 	try {
 		const { data } = await axios.patch(
 			`http://localhost:5001/api/inventory/sellProduct/${serialNo}`,
-			customerInfo,
+			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no },
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -244,7 +244,14 @@ export const swapProducts = async ({
 	try {
 		const { data } = await axios.patch(
 			"http://localhost:5001/api/inventory/swapProducts",
-			{ incoming, outgoing, customerInfo },
+			{
+				incoming,
+				outgoing,
+				customerInfo: {
+					...customerInfo,
+					buyer_phone_no: customerInfo.phone_no,
+				},
+			},
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -252,7 +259,7 @@ export const swapProducts = async ({
 			}
 		);
 
-    return {data}
+		return { data };
 	} catch (e: any) {
 		if (e.response.status === 401) {
 			return { error: e.response.data.msg };
