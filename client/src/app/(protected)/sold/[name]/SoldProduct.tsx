@@ -47,6 +47,7 @@ export const SoldProduct = ({ name }: { name: string }) => {
 		products && (
 			<div className="-mt-4">
 				<ItemsHeader
+					addBrand
 					brands={brands}
 					routeTo="/sold"
 					types={types}

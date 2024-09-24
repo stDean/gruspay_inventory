@@ -1,7 +1,7 @@
 "use client";
 
 import { Tab } from "@/components/Tab";
-import { CustomerTable } from "@/components/table/CustomerTable";
+import { CustomersTable } from "@/components/table/CustomersTable";
 import { EmployeeTable } from "@/components/table/EmployeeTable";
 import { SuppliersTable } from "@/components/table/SuppliersTable";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ export const UserContent = () => {
 			</div>
 
 			{tab.employees && <EmployeeTable />}
-			{tab.customers && <CustomerTable />}
+			{tab.customers && <CustomersTable />}
 			{tab.suppliers && <SuppliersTable />}
 		</div>
 	);

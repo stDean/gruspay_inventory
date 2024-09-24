@@ -70,7 +70,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 						{item.Customer?.buyer_name!}
 					</TableCell>
 					<TableCell className="border-r">
-						{item.Customer?.amount_paid!}
+						{item?.bought_for!}
 					</TableCell>
 				</TableRow>
 			))}

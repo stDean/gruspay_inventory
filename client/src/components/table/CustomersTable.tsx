@@ -1,33 +1,33 @@
 "use client";
 
-import { getSuppliers } from "@/actions/user";
+import { getCustomers } from "@/actions/user";
+import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { useReduxState } from "@/hook/useRedux";
-import { useTransition, useState, useEffect } from "react";
+import { CustomerProps } from "@/lib/types";
+import Link from "next/link";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../Spinners";
-import { CustomerProps, SupplierProps } from "@/lib/types";
-import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { TableContainer } from "./Table";
-import Link from "next/link";
 
-export const SuppliersTable = () => {
+export const CustomersTable = () => {
 	const { token } = useReduxState();
 	const [isPending, startTransition] = useTransition();
-	const [suppliers, setSuppliers] = useState<Array<SupplierProps>>([]);
+	const [customers, setCustomers] = useState<Array<CustomerProps>>([]);
 
-	const getAllSuppliers = () => {
+	const getAllCustomers = () => {
 		startTransition(async () => {
-			const { error, data } = await getSuppliers({ token });
+			const { error, data } = await getCustomers({ token });
 			if (error) {
 				toast.error("Error", { description: error });
 				return;
 			}
-			setSuppliers(data.suppliers);
+			setCustomers(data.customers);
 		});
 	};
 
 	useEffect(() => {
-		getAllSuppliers();
+		getAllCustomers();
 	}, []);
 
 	const tableHeaders = (
@@ -36,28 +36,28 @@ export const SuppliersTable = () => {
 			<TableHead className={`px-2 border-r`}>Customer Name</TableHead>
 			<TableHead className="px-2 border-r">Email Address</TableHead>
 			<TableHead className="px-2 border-r">Phone Number</TableHead>
-			<TableHead className="px-2 border-r">Supplied Count</TableHead>
+			<TableHead className="px-2 border-r">Bought Count</TableHead>
 		</>
 	);
 
 	const bodyContent = (
 		<>
-			{suppliers.map((supplier, idx) => (
-				<TableRow key={supplier.id}>
+			{customers.map((customer, idx) => (
+				<TableRow key={customer.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell className="px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize">
-            <Link href={`/users/supplier/${supplier.id}`}>
-						{supplier.supplier_name}
-            </Link>
+						<Link href={`/users/customer/${customer.id}`}>
+							{customer.buyer_name}
+						</Link>
 					</TableCell>
 					<TableCell className="px-2 border-r">
-						{supplier.supplier_email}
+						{customer.buyer_email}
 					</TableCell>
 					<TableCell className="px-2 border-r">
-						{supplier.supplier_phone_no}
+						{customer.buyer_phone_no}
 					</TableCell>
 					<TableCell className="px-2 border-r">
-						{supplier.Products.length}
+						{customer.Products.length}
 					</TableCell>
 				</TableRow>
 			))}
@@ -66,9 +66,9 @@ export const SuppliersTable = () => {
 
 	return isPending ? (
 		<Spinner />
-	) : suppliers.length !== 0 ? (
+	) : customers.length !== 0 ? (
 		<TableContainer tableHeaders={tableHeaders} tableBody={bodyContent} />
 	) : (
-		<p>No Suppliers yet</p>
+		<p>No Customers yet</p>
 	);
 };

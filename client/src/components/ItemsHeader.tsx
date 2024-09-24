@@ -7,11 +7,13 @@ export const ItemsHeader = ({
 	routeTo,
 	types,
 	productName,
+	addBrand,
 }: {
-	brands: string;
+	brands?: string;
 	routeTo: string;
 	types: string;
 	productName: string;
+	addBrand?: boolean;
 }) => {
 	const router = useRouter();
 	return (
@@ -25,8 +27,12 @@ export const ItemsHeader = ({
 				<ArrowLeft className="h-4 w-4" /> Back
 			</p>
 			<h1 className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3">
-				<span className="text-xl">{brands}</span>
-				<ChevronRight className="h-5 w-5" />
+				{addBrand && (
+					<>
+						<span className="text-xl">{brands}</span>
+						<ChevronRight className="h-5 w-5" />
+					</>
+				)}
 				<span className="text-xl">{types}</span>
 				<ChevronRight className="h-6 w-6" />
 				{productName}

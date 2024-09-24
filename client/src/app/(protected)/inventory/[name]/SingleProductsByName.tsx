@@ -43,12 +43,12 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 
 	const productName = name.replace(/%20/g, " ");
 
-
 	return isPending ? (
 		<Spinner />
 	) : (
 		<div className="-mt-4">
 			<ItemsHeader
+				addBrand
 				brands={brands}
 				routeTo="/inventory"
 				types={types}

@@ -19,9 +19,10 @@ const getOrCreateSupplier = async supplierData => {
 
 	const existingSupplier = await prisma.supplier.findUnique({
 		where: {
-			supplier_email_supplier_name: {
+			supplier_email_supplier_name_companyId: {
 				supplier_email: supplier_email || null,
 				supplier_name,
+				companyId,
 			},
 		},
 	});
@@ -57,7 +58,7 @@ export const InventoryCtrl = {
 		} = req;
 
 		const product = await prisma.products.findUnique({
-			where: { serial_no },
+			where: { serial_no_companyId: { serial_no, companyId: company_id } },
 		});
 		if (product)
 			return res
@@ -132,8 +133,11 @@ export const InventoryCtrl = {
 					},
 				});
 
+				console.log({ result });
+
 				results.push(result); // Collect the successful result
 			} catch (error) {
+				console.log({ error });
 				errors.push({
 					product: product.serial_no,
 					error: `Error creating product with serial number ${product.serial_no}: ${error.message}`,
@@ -203,7 +207,12 @@ export const InventoryCtrl = {
 		const { serialNo } = req.params;
 
 		const product = await prisma.products.findUnique({
-			where: { serial_no: serialNo },
+			where: {
+				serial_no_companyId: {
+					serial_no: serialNo,
+					companyId: req.user.company_id,
+				},
+			},
 			include: {
 				Supplier: {
 					select: {
@@ -247,7 +256,12 @@ export const InventoryCtrl = {
 		const { buyer_name, buyer_email, amount_paid, buyer_phone_no } = req.body;
 
 		const product = await prisma.products.findUnique({
-			where: { serial_no: serialNo },
+			where: {
+				serial_no_companyId: {
+					serial_no: serialNo,
+					companyId: req.user.company_id,
+				},
+			},
 		});
 
 		if (product.sold) {
@@ -263,7 +277,12 @@ export const InventoryCtrl = {
 		});
 
 		const updatedProduct = await prisma.products.update({
-			where: { serial_no: serialNo },
+			where: {
+				serial_no_companyId: {
+					serial_no: serialNo,
+					companyId: req.user.company_id,
+				},
+			},
 			data: {
 				sales_status: "SOLD",
 				SoldByUser: { connect: { id: user.id } },
@@ -272,9 +291,10 @@ export const InventoryCtrl = {
 				Customer: {
 					connectOrCreate: {
 						where: {
-							buyer_email_buyer_name: {
+							buyer_email_buyer_name_companyId: {
 								buyer_email,
 								buyer_name,
+                companyId: req.user.company_id,
 							},
 						},
 						create: {
@@ -309,7 +329,6 @@ export const InventoryCtrl = {
 						buyer_name: true,
 						buyer_email: true,
 						buyer_phone_no: true,
-						amount_paid: true,
 					},
 				},
 			},
@@ -342,8 +361,8 @@ export const InventoryCtrl = {
 
 		const outgoingProducts = await prisma.products.findMany({
 			where: {
-				companyId: company.id,
 				serial_no: { in: outgoing },
+				companyId: company_id,
 				sales_status: "NOT_SOLD",
 			},
 		});
@@ -405,7 +424,7 @@ export const InventoryCtrl = {
 		for (const serial of outgoing) {
 			await prisma.products.update({
 				where: {
-					serial_no: serial,
+					serial_no_companyId: { serial_no: serial, companyId: company.id },
 				},
 				data: {
 					SoldByUser: { connect: { id: user.id } }, // Connect SoldByUser for each product
@@ -415,9 +434,10 @@ export const InventoryCtrl = {
 					Customer: {
 						connectOrCreate: {
 							where: {
-								buyer_email_buyer_name: {
+								buyer_email_buyer_name_companyId: {
 									buyer_name: customerInfo.buyer_name,
 									buyer_email: customerInfo.buyer_email || null,
+                  companyId: company.id,
 								},
 							},
 							create: {

@@ -78,7 +78,7 @@ model Products {
   description  String
   type         String
   price        String
-  serial_no    String     @unique
+  serial_no    String
   sales_status SaleStatus @default(NOT_SOLD)
   Company      Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId    String
@@ -94,6 +94,8 @@ model Products {
   updatedAt    DateTime   @updatedAt
   buyerId      String?
   bought_for   String?
+
+  @@unique([serial_no, companyId])
 }
 
 model Supplier {
@@ -107,7 +109,7 @@ model Supplier {
   companyId         String?
   Products          Products[]
 
-  @@unique([supplier_email, supplier_name])
+  @@unique([supplier_email, supplier_name, companyId])
 }
 
 model Buyer {
@@ -121,5 +123,5 @@ model Buyer {
   updatedAt      DateTime   @updatedAt
   Products       Products[]
 
-  @@unique([buyer_email, buyer_name])
+  @@unique([buyer_email, buyer_name, companyId])
 }
