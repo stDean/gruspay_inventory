@@ -224,7 +224,7 @@ interface SwapProductsProps {
 		phone_no: string;
 		amount_paid: string;
 	};
-	outgoing: string[];
+	outgoing: string;
 	incoming: {
 		product_name: string;
 		type: string;
@@ -261,9 +261,9 @@ export const swapProducts = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 400) {
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 

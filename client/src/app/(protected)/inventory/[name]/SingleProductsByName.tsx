@@ -45,7 +45,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 
 	return isPending ? (
 		<Spinner />
-	) : (
+	) : products.length !== 0 ? (
 		<div className="-mt-4">
 			<ItemsHeader
 				addBrand
@@ -57,5 +57,7 @@ export const SingleProductsByName = ({ name }: { name: string }) => {
 
 			<ProductsTable products={products} page={page} />
 		</div>
+	) : (
+		<p>No Product found</p>
 	);
 };

@@ -36,7 +36,7 @@ export const sendMail = (to, token, sub) => {
 		subject: `Gruspay - ${sub}`,
 		generateTextFromHTML: true,
 		html: `
-    <div style=" width: 700px; border: 1px solid #ddd; box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); margin-left: auto; margin-right: auto;">
+    <div style=" width: 700px; margin-left: auto; margin-right: auto;">
       <div style="margin: 0; font-size: 1.5rem; color: #333;">
         <p>Hi, there</p>
       </div>

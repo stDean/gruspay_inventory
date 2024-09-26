@@ -10,7 +10,7 @@ export interface ProductProps {
 	createdAt: string;
 	updatedAt: string;
 	date_sold?: string;
-  bought_for?: string;
+	bought_for?: string;
 	AddedByUser?: { first_name: string; last_name: string; email: string };
 	SoldByUser?: { first_name: string; last_name: string; email: string };
 	Supplier: {
@@ -22,6 +22,20 @@ export interface ProductProps {
 		buyer_name: string;
 		buyer_email?: string;
 		buyer_phone_no: string;
+	};
+	IncomingProducts?: {
+		companyId: string;
+		id: string;
+		swapDate: string;
+		updateAt: string;
+		outgoingProducts: Array<ProductProps>;
+	};
+	OutgoingProduct?: {
+		companyId: string;
+		id: string;
+		swapDate: string;
+		updateAt: string;
+		incomingProducts: Array<ProductProps>;
 	};
 }
 

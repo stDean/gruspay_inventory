@@ -12,7 +12,7 @@ interface swapProductModalStore {
 	onOpen: (item: ItemProps) => void;
 	onClose: () => void;
 	removeItem: (serial_no: string) => void;
-  addItem: (item: ItemProps) => void;
+	addItem: (item: ItemProps) => void;
 }
 
 const useSwapProductModal = create<swapProductModalStore>((set, get) => ({
@@ -28,13 +28,11 @@ const useSwapProductModal = create<swapProductModalStore>((set, get) => ({
 			),
 			isOpen: true,
 		}),
-  addItem: (item: ItemProps) =>
-    set(state => ({
-      isOpen: true,
-      items: state.items.some(i => i.serial_no === item.serial_no)
-        ? state.items
-        : [...state.items, item],
-    })),
+	addItem: (item: ItemProps) =>
+		set(state => ({
+			isOpen: true,
+			items: [item],
+		})),
 }));
 
 export default useSwapProductModal;

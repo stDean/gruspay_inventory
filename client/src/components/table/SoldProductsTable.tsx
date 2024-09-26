@@ -6,6 +6,9 @@ import { useReduxState } from "@/hook/useRedux";
 import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
 import { TableContainer } from "./Table";
+import { getProduct } from "@/actions/inventory";
+import { toast } from "sonner";
+import useShowSoldInfoModal from "@/hook/useShowSoldDetails";
 
 interface InventoryProps {
 	products: ProductProps[];
@@ -15,6 +18,7 @@ interface InventoryProps {
 export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 	const { token } = useReduxState();
 	const dispatch = useAppDispatch();
+	const productDetails = useShowSoldInfoModal();
 
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
@@ -29,7 +33,15 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 	);
 
 	const showProduct = async (serialNo: string) => {
-		console.log("Get Sold Product");
+		const { data, error } = await getProduct({
+			token,
+			serialNo,
+		});
+		if (error) {
+			toast.error("Error", { description: error });
+		}
+
+		productDetails.onOpen(data);
 	};
 
 	const tableHeaders = (
@@ -69,9 +81,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 					<TableCell className="border-r">
 						{item.Customer?.buyer_name!}
 					</TableCell>
-					<TableCell className="border-r">
-						{item?.bought_for!}
-					</TableCell>
+					<TableCell className="border-r">{item?.bought_for!}</TableCell>
 				</TableRow>
 			))}
 		</>

@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  TableCell,
-  TableHead,
-  TableRow
-} from "@/components/ui/table";
+import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { ProductStockProps } from "@/lib/types";
 import Link from "next/link";
 import { TableContainer } from "./Table";
@@ -22,7 +18,7 @@ export const InventorySummaryTable = ({
 	count,
 	linkTo,
 }: InventoryProps) => {
-	const rowsPerPage = 15;
+	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
 
@@ -39,7 +35,7 @@ export const InventorySummaryTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className="px-2 border-r w-36">Type</TableHead>
 			<TableHead className="px-2 border-r w-36">Brand</TableHead>
-			<TableHead className="px-2 border-r w-36">Name</TableHead>
+			<TableHead className="px-2 border-r w-36">Product Name</TableHead>
 			<TableHead className="px-2 w-28">{count} Count</TableHead>
 		</>
 	);

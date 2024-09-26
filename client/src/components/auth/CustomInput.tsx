@@ -78,6 +78,7 @@ export const CustomInput = ({
 										)}
 										type={show ? "text" : "password"}
 										{...field}
+                    disabled={disabled}
 									/>
 
 									<div
@@ -85,9 +86,13 @@ export const CustomInput = ({
 										onClick={handleShow}
 									>
 										{show ? (
-											<Eye className="w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer" />
+											<Eye className={cn("w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer", {
+                        "opacity-50 cursor-not-allowed": disabled
+                      })} />
 										) : (
-											<EyeOff className="w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer" />
+											<EyeOff className={cn("w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer", {
+                        "opacity-50 cursor-not-allowed": disabled
+                      })} />
 										)}
 									</div>
 								</div>

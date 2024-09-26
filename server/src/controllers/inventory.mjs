@@ -221,6 +221,13 @@ export const InventoryCtrl = {
 						supplier_phone_no: true,
 					},
 				},
+				Customer: {
+					select: {
+						buyer_name: true,
+						buyer_email: true,
+						buyer_phone_no: true,
+					},
+				},
 			},
 		});
 		if (!product) {
@@ -294,7 +301,7 @@ export const InventoryCtrl = {
 							buyer_email_buyer_name_companyId: {
 								buyer_email,
 								buyer_name,
-                companyId: req.user.company_id,
+								companyId: req.user.company_id,
 							},
 						},
 						create: {
@@ -331,6 +338,7 @@ export const InventoryCtrl = {
 						buyer_phone_no: true,
 					},
 				},
+				Supplier: true,
 			},
 		});
 		res.status(StatusCodes.OK).json(soldProducts);
@@ -345,115 +353,142 @@ export const InventoryCtrl = {
 		});
 		return res.status(StatusCodes.OK).json(productsByCount);
 	},
+	getSwapProductsByName: async (req, res) => {
+		const { product_name } = req.params;
+		const swapProducts = await prisma.products.findMany({
+			where: {
+				companyId: req.user.company_id,
+				sales_status: "SWAP",
+				product_name,
+			},
+			include: {
+				SoldByUser: {
+					select: { first_name: true, last_name: true, email: true },
+				},
+				Customer: {
+					select: {
+						buyer_name: true,
+						buyer_email: true,
+						buyer_phone_no: true,
+					},
+				},
+				OutgoingProduct: { include: { incomingProducts: true } },
+				Supplier: true,
+			},
+		});
+
+		res.status(StatusCodes.OK).json({ swapProducts });
+	},
+	getCountOfSwapProducts: async (req, res) => {
+		const productsByCount = await prisma.products.groupBy({
+			where: { companyId: req.user.company_id, sales_status: "SWAP" },
+			by: ["type", "brand", "product_name"],
+			_count: {
+				type: true,
+			},
+		});
+		return res.status(StatusCodes.OK).json(productsByCount);
+	},
 	swapProducts: async (req, res) => {
 		const {
 			user: { company_id, email },
 			body: { outgoing, customerInfo, incoming },
 		} = req;
+
 		const { company, user } = await useUserAndCompany({ company_id, email });
 
-		// console.log({ a: req.body.incoming });
-		if (outgoing.length === 0) {
+		// Ensure there are outgoing products
+		if (!outgoing || outgoing.length === 0) {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "No products to swap", success: false });
 		}
 
-		const outgoingProducts = await prisma.products.findMany({
+		// Find outgoing products that match the given serial numbers, belong to the company, and are not yet sold
+		const outgoingProduct = await prisma.products.findUnique({
 			where: {
-				serial_no: { in: outgoing },
-				companyId: company_id,
+				serial_no_companyId: {
+					serial_no: outgoing,
+					companyId: company.id,
+				},
 				sales_status: "NOT_SOLD",
 			},
 		});
 
-		if (!outgoingProducts) {
+		// If no outgoing products are found, return an error
+		if (!outgoingProduct) {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "No products to swap", success: false });
+				.json({ msg: "No valid product to swap", success: false });
 		}
 
-		const errors = [];
-		const results = [];
+		// Validate customer info
+		if (
+			!customerInfo ||
+			!customerInfo.buyer_name ||
+			!customerInfo.amount_paid ||
+			!customerInfo.phone_no
+		) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Customer information is required." });
+		}
 
-		for (const product of incoming) {
-			try {
-				const supplier = await getOrCreateSupplier({
-					supplier_name: customerInfo.buyer_name,
-					supplier_email: customerInfo.buyer_email || null,
-					supplier_phone_no: customerInfo.phone_no,
-					companyId: company.id,
-				});
+		const supplier = await getOrCreateSupplier({
+			supplier_name: customerInfo.buyer_name,
+			supplier_email: customerInfo.buyer_email || null,
+			supplier_phone_no: customerInfo.phone_no,
+			companyId: company.id,
+		});
 
-				// Now create the product with the connected supplier
-				const result = await prisma.products.create({
-					data: {
+		const swap = await prisma.swaps.create({
+			data: {
+				Company: { connect: { id: company.id } },
+				incomingProducts: {
+					create: incoming.map(product => ({
 						product_name: product.product_name,
 						brand: product.brand,
 						description: product.description,
 						type: product.type,
 						price: product.price,
 						serial_no: product.serial_no,
-						Company: {
-							connect: { id: company.id },
-						},
-						AddedByUser: {
-							connect: { id: user.id },
-						},
-						Supplier: {
-							connect: { id: supplier.id },
-						},
-					},
-				});
-
-				results.push(result); // Collect the successful result
-			} catch (error) {
-				errors.push({
-					product: product.serial_no,
-					error: `Error creating product with serial number ${product.serial_no}: ${error.message}`,
-				});
-			}
-		}
-
-		if (errors.length > 0) {
-			return res
-				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: errors.map(e => e.error) });
-		}
-
-		for (const serial of outgoing) {
-			await prisma.products.update({
-				where: {
-					serial_no_companyId: { serial_no: serial, companyId: company.id },
+						Company: { connect: { id: company.id } },
+						AddedByUser: { connect: { id: user.id } },
+						Supplier: { connect: { id: supplier.id } },
+					})),
 				},
-				data: {
-					SoldByUser: { connect: { id: user.id } }, // Connect SoldByUser for each product
-					date_sold: new Date(),
-					sales_status: "SWAP",
-					bought_for: customerInfo.amount_paid,
-					Customer: {
-						connectOrCreate: {
-							where: {
-								buyer_email_buyer_name_companyId: {
-									buyer_name: customerInfo.buyer_name,
-									buyer_email: customerInfo.buyer_email || null,
-                  companyId: company.id,
-								},
-							},
-							create: {
+			},
+		});
+
+		const updateProductWithSwap = await prisma.products.update({
+			where: { id: outgoingProduct.id },
+			data: {
+				sales_status: "SWAP",
+				SoldByUser: { connect: { id: user.id } },
+				date_sold: new Date(),
+				bought_for: customerInfo.amount_paid,
+				Customer: {
+					connectOrCreate: {
+						where: {
+							buyer_email_buyer_name_companyId: {
 								buyer_name: customerInfo.buyer_name,
 								buyer_email: customerInfo.buyer_email || null,
-								buyer_phone_no: customerInfo.phone_no,
 								companyId: company.id,
 							},
 						},
+						create: {
+							buyer_name: customerInfo.buyer_name,
+							buyer_email: customerInfo.buyer_email || null,
+							buyer_phone_no: customerInfo.phone_no,
+							companyId: company.id,
+						},
 					},
 				},
-			});
-		}
+				OutgoingProduct: { connect: { id: swap.id } },
+			},
+		});
 
-		return res
-			.status(StatusCodes.OK)
-			.json({ msg: "Products Swapped successfully" });
+		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
 	},
+	getSoldProductBySerialNo: async (req, res) => {},
 };

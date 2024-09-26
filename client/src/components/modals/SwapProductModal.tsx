@@ -146,7 +146,7 @@ export const SwapProductModal = () => {
 			// Prepare data for the backend request
 			const dataToDb = {
 				incoming: [...products, incoming], // make sure to include the new product
-				outgoing: swapProductModal.items.map(item => item.serial_no),
+				outgoing: swapProductModal.items[0].serial_no,
 				customerInfo: customerInfo,
 			};
 
@@ -155,8 +155,8 @@ export const SwapProductModal = () => {
 			if (error) {
 				toast.error("Error", { description: error });
 			}
-			toast.success("Success", { description: "Transaction successfull"});
 
+			toast.success("Success", { description: data?.msg });
 			// Reset incoming product
 			setIncoming({
 				product_name: "",
@@ -165,6 +165,13 @@ export const SwapProductModal = () => {
 				serial_no: "",
 				description: "",
 				price: "",
+			});
+
+			setCustomerInfo({
+				buyer_name: "",
+				buyer_email: "",
+				phone_no: "",
+				amount_paid: "",
 			});
 
 			swapProductModal.onClose();
@@ -272,12 +279,12 @@ export const SwapProductModal = () => {
 					))}
 				</div>
 
-				{swapProductModal.items.length !== 3 && (
+				{swapProductModal.items.length === 0 && (
 					<p
 						className="border p-1 rounded-lg border-blue-500 w-fit text-xs text-blue-500 cursor-pointer hover:border-blue-400 hover:text-blue-400 flex gap-1 items-center"
 						onClick={() => setSearch({ show: true, value: "" })}
 					>
-						Add another Item <PlusCircle className="h-4 w-4" />
+						Add Outgoing Item <PlusCircle className="h-4 w-4" />
 					</p>
 				)}
 			</div>

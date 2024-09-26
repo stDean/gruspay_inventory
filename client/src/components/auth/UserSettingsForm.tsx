@@ -14,18 +14,19 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { setUser } from "@/state";
 import { useAppDispatch } from "@/app/redux";
+import { Pencil } from "lucide-react";
 
 export const UserSettingsForm = () => {
 	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const { token, user } = useReduxState();
+
+	const [disabled, setDisabled] = useState(true);
 	const [isPending, startTransition] = useTransition();
 	const [show, setShow] = useState<{ password: boolean; cfPassword: boolean }>({
 		password: false,
 		cfPassword: false,
 	});
-
-	console.log({ user });
 
 	const form = useForm<z.infer<typeof UpdateUserSchema>>({
 		resolver: zodResolver(UpdateUserSchema),
@@ -83,6 +84,7 @@ export const UserSettingsForm = () => {
 				description: "Profile has been updated successfully",
 			});
 
+      setDisabled(true);
 			dispatch(setUser(data.updatedUser));
 			router.refresh();
 		});
@@ -95,15 +97,20 @@ export const UserSettingsForm = () => {
 				className=" w-fit md:w-[600px] border rounded-lg bg-white shadow-md"
 			>
 				<div className="flex flex-col gap-4 p-6 ">
-					<h1 className="text-xl md:text-2xl font-semibold mb-2">
-						Update Profile
-					</h1>
+					<div className="flex items-center justify-between">
+						<h1 className="text-xl md:text-2xl font-semibold mb-2">
+							Update Profile
+						</h1>
+
+						<Pencil className="cursor-pointer h-5 w-5" onClick={() => setDisabled(false)} />
+					</div>
 					<div className="flex gap-4 items-center">
 						<CustomInput
 							control={form.control}
 							name="first_name"
 							label="First Name"
 							placeholder="enter first name"
+							disabled={disabled}
 						/>
 
 						<CustomInput
@@ -111,6 +118,7 @@ export const UserSettingsForm = () => {
 							name="last_name"
 							label="Last Name"
 							placeholder="enter last name"
+							disabled={disabled}
 						/>
 					</div>
 
@@ -119,6 +127,7 @@ export const UserSettingsForm = () => {
 						name="email"
 						label="Email"
 						placeholder="enter your email"
+						disabled={disabled}
 					/>
 
 					<div className="flex gap-4 items-center">
@@ -127,6 +136,7 @@ export const UserSettingsForm = () => {
 							name="password"
 							label="Password"
 							placeholder="enter password"
+							disabled={disabled}
 							show={show.password}
 							handleShow={() => setShow({ ...show, password: !show.password })}
 						/>
@@ -136,6 +146,7 @@ export const UserSettingsForm = () => {
 							name="confirmPassword"
 							label="Confirm Password"
 							placeholder="enter confirm password"
+							disabled={disabled}
 							show={show.cfPassword}
 							handleShow={() =>
 								setShow({ ...show, cfPassword: !show.cfPassword })
@@ -145,7 +156,7 @@ export const UserSettingsForm = () => {
 				</div>
 
 				<div className="border-t p-6 flex">
-					<Button disabled={isPending} className={`px-6 py-5 ml-auto`}>
+					<Button disabled={isPending || disabled} className={`px-6 py-5 ml-auto`}>
 						Update
 					</Button>
 				</div>

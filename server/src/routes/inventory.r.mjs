@@ -33,6 +33,13 @@ router
 	.get(AuthMiddleware, InventoryCtrl.getSoldProductsByName);
 
 router
+	.route("/getSwapProductsByCount")
+	.get(AuthMiddleware, InventoryCtrl.getCountOfSwapProducts);
+router
+	.route("/getSwapProducts/:product_name")
+	.get(AuthMiddleware, InventoryCtrl.getSwapProductsByName);
+
+router
 	.route("/updateProduct/:id")
 	.patch([AuthMiddleware, AdminMiddleware], InventoryCtrl.updateProduct);
 router
