@@ -149,6 +149,38 @@ export const createUser = async ({
 	}
 };
 
+export const updateUserRole = async ({
+	token,
+	role,
+	id,
+}: {
+	token: string;
+	role: string;
+	id: string;
+}) => {
+	try {
+		const { data } = await axios.patch(
+			`http://localhost:5001/api/user/updateUserRole/${id}`,
+			{ role },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response.status === 404) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
 // SUPPLIER
 export const getSuppliers = async ({ token }: { token: string }) => {
 	try {

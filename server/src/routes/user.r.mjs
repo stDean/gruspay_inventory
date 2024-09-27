@@ -26,7 +26,7 @@ router
 	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCustomer);
 
 router.route("/updateUser").patch(AuthMiddleware, UserCtrl.updateUser);
-router.route("/updateUserRole").patch(AuthMiddleware, UserCtrl.updateUser);
+router.route("/updateUserRole/:id").patch(AuthMiddleware, UserCtrl.updateUserRole);
 
 router.route("/createUser").post(AuthMiddleware, UserCtrl.createUser);
 

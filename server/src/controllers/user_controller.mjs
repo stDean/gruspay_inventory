@@ -69,7 +69,23 @@ export const UserCtrl = {
 			.status(StatusCodes.OK)
 			.json({ msg: "User created successfully" });
 	},
-	updateUserRole: async (req, res) => {},
+	updateUserRole: async (req, res) => {
+		const { id } = req.params;
+
+		const existingUser = await prisma.users.findUnique({ where: { id } });
+		if (!existingUser) {
+			return res.status(StatusCodes.NOT_FOUND).json({ msg: "User not found" });
+		}
+
+		await prisma.users.update({
+			where: { id },
+			data: { role: req.body.role },
+		});
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "User role updated successfully" });
+	},
 	getUserById: async (req, res) => {
 		const { id } = req.params;
 		const user = await prisma.users.findUnique({

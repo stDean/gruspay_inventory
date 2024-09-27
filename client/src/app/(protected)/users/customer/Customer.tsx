@@ -8,9 +8,12 @@ import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { CustomerTable } from "@/components/table/CustomerTable";
+import { useSearchParams } from "next/navigation";
 
 export const Customer = ({ id }: { id: string }) => {
 	const { token } = useReduxState();
+	const searchParam = useSearchParams();
+	const page = Number(searchParam.get("page"));
 
 	const [isPending, startTransition] = useTransition();
 	const [customer, setCustomer] = useState<CustomerProps | null>(null);
@@ -41,7 +44,7 @@ export const Customer = ({ id }: { id: string }) => {
 					productName="All Products Purchased"
 				/>
 
-				<CustomerTable products={customer!.Products} />
+				<CustomerTable products={customer!.Products} page={page} />
 			</div>
 		)
 	);

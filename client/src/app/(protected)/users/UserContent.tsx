@@ -20,7 +20,7 @@ export const UserContent = () => {
 		<div className="flex flex-col gap-3">
 			<div className="flex justify-between items-center">
 				<div className="space-y-3">
-					<h1 className="font-semibold text-xl md:text-2xl">Users</h1>
+					<h1 className="font-semibold text-xl md:text-2xl">Manage Users</h1>
 
 					<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
 						<Tab

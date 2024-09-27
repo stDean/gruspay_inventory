@@ -5,6 +5,7 @@ import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { useReduxState } from "@/hook/useRedux";
 import { CustomerProps } from "@/lib/types";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../Spinners";
@@ -14,6 +15,19 @@ export const CustomersTable = () => {
 	const { token } = useReduxState();
 	const [isPending, startTransition] = useTransition();
 	const [customers, setCustomers] = useState<Array<CustomerProps>>([]);
+
+	const searchParam = useSearchParams();
+	const rowsPerPage = 20;
+	const totalPages = Math.ceil(customers.length / rowsPerPage);
+	const currentPage = Number(searchParam.get("page")) || 1;
+
+	const indexOfLastTransaction = currentPage * rowsPerPage;
+	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+
+	const customersByPage = customers.slice(
+		indexOfFirstTransaction,
+		indexOfLastTransaction
+	);
 
 	const getAllCustomers = () => {
 		startTransition(async () => {
@@ -42,7 +56,7 @@ export const CustomersTable = () => {
 
 	const bodyContent = (
 		<>
-			{customers.map((customer, idx) => (
+			{customersByPage.map((customer, idx) => (
 				<TableRow key={customer.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell className="px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize">
@@ -67,7 +81,12 @@ export const CustomersTable = () => {
 	return isPending ? (
 		<Spinner />
 	) : customers.length !== 0 ? (
-		<TableContainer tableHeaders={tableHeaders} tableBody={bodyContent} />
+		<TableContainer
+			tableHeaders={tableHeaders}
+			tableBody={bodyContent}
+			totalPages={totalPages}
+			currentPage={currentPage}
+		/>
 	) : (
 		<p>No Customers yet</p>
 	);

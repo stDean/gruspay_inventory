@@ -11,6 +11,7 @@ export interface ProductProps {
 	updatedAt: string;
 	date_sold?: string;
 	bought_for?: string;
+  sales_status?: string;
 	AddedByUser?: { first_name: string; last_name: string; email: string };
 	SoldByUser?: { first_name: string; last_name: string; email: string };
 	Supplier: {

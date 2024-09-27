@@ -1,14 +1,13 @@
 "use client";
 
-import { useAppDispatch } from "@/app/redux";
+import { getProduct } from "@/actions/inventory";
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { useReduxState } from "@/hook/useRedux";
+import useShowSoldInfoModal from "@/hook/useShowSoldDetails";
 import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
-import { TableContainer } from "./Table";
-import { getProduct } from "@/actions/inventory";
 import { toast } from "sonner";
-import useShowSoldInfoModal from "@/hook/useShowSoldDetails";
+import { TableContainer } from "./Table";
 
 interface InventoryProps {
 	products: ProductProps[];
@@ -17,7 +16,6 @@ interface InventoryProps {
 
 export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 	const { token } = useReduxState();
-	const dispatch = useAppDispatch();
 	const productDetails = useShowSoldInfoModal();
 
 	const rowsPerPage = 20;

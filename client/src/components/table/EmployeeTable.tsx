@@ -1,21 +1,38 @@
 "use client";
 
-import { useReduxState } from "@/hook/useRedux";
-import { useTransition, useState, useEffect } from "react";
+import { getUserById, getUsers } from "@/actions/user";
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { getUsers } from "@/actions/user";
-import { toast } from "sonner";
-import { UserProps } from "@/lib/types";
-import { TableContainer } from "./Table";
-import { format } from "date-fns";
-import { Spinner } from "../Spinners";
 import useAddUserModal from "@/hook/useAddUserModal";
+import { useReduxState } from "@/hook/useRedux";
+import useModifyRoleModal from "@/hook/useUpdateRoleModal";
+import { UserProps } from "@/lib/types";
+import { format } from "date-fns";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { Spinner } from "../Spinners";
+import { TableContainer } from "./Table";
 
 export const EmployeeTable = () => {
 	const userModal = useAddUserModal();
+	const modifyModal = useModifyRoleModal();
+
 	const { token } = useReduxState();
 	const [isPending, startTransition] = useTransition();
 	const [users, setUsers] = useState<Array<UserProps>>([]);
+
+	const searchParam = useSearchParams();
+	const rowsPerPage = 20;
+	const totalPages = Math.ceil(users.length / rowsPerPage);
+	const currentPage = Number(searchParam.get("page")) || 1;
+
+	const indexOfLastTransaction = currentPage * rowsPerPage;
+	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+
+	const usersByPage = users.slice(
+		indexOfFirstTransaction,
+		indexOfLastTransaction
+	);
 
 	const getAllUsers = () => {
 		startTransition(async () => {
@@ -30,9 +47,18 @@ export const EmployeeTable = () => {
 		});
 	};
 
+	const handleClick = async (id: string) => {
+		const { data, error } = await getUserById({ token, id });
+		if (error) {
+			toast.error("Error", { description: error });
+		}
+
+		modifyModal.onOpen(data.user);
+	};
+
 	useEffect(() => {
 		getAllUsers();
-	}, [userModal.isOpen]);
+	}, [userModal.isOpen, modifyModal.isOpen]);
 
 	const tableHeaders = (
 		<>
@@ -47,14 +73,13 @@ export const EmployeeTable = () => {
 
 	const bodyContent = (
 		<>
-			{users.map((user, idx) => (
+			{usersByPage.map((user, idx) => (
 				<TableRow key={user.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell
 						className="capitalize cursor-pointer px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4"
 						onClick={() => {
-							// TODO:Show a modal of the selected user, and make it editable
-							console.log({ a: user.id });
+							handleClick(user.id);
 						}}
 					>
 						{user.first_name}
@@ -75,6 +100,11 @@ export const EmployeeTable = () => {
 	return isPending ? (
 		<Spinner />
 	) : (
-		<TableContainer tableHeaders={tableHeaders} tableBody={bodyContent} />
+		<TableContainer
+			tableHeaders={tableHeaders}
+			tableBody={bodyContent}
+			totalPages={totalPages}
+			currentPage={currentPage}
+		/>
 	);
 };

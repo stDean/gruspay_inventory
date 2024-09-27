@@ -3,14 +3,17 @@
 import { getSupplier } from "@/actions/user";
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { Spinner } from "@/components/Spinners";
-import { CustomerTable } from "@/components/table/CustomerTable";
+import { SupplierTable } from "@/components/table/SupplierTable";
 import { useReduxState } from "@/hook/useRedux";
 import { SupplierProps } from "@/lib/types";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const Supplier = ({ id }: { id: string }) => {
 	const { token } = useReduxState();
+  const searchParam = useSearchParams();
+	const page = Number(searchParam.get("page"));
 
 	const [isPending, startTransition] = useTransition();
 	const [supplier, setSupplier] = useState<SupplierProps | null>(null);
@@ -43,8 +46,7 @@ export const Supplier = ({ id }: { id: string }) => {
 					productName="All Products Supplied"
 				/>
 
-				{/* <CustomerTable products={supplier!.Products} /> */}
-				<p>Single Supplier</p>
+				<SupplierTable products={supplier?.Products} page={page} />
 			</div>
 		)
 	);
