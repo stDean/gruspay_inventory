@@ -228,6 +228,7 @@ export const InventoryCtrl = {
 						buyer_phone_no: true,
 					},
 				},
+        OutgoingProduct: { include: { incomingProducts: true } },
 			},
 		});
 		if (!product) {
@@ -490,5 +491,4 @@ export const InventoryCtrl = {
 
 		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
 	},
-	getSoldProductBySerialNo: async (req, res) => {},
 };

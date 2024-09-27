@@ -1,7 +1,13 @@
+"use client";
+
 import { ProductProps } from "@/lib/types";
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { TableContainer } from "./Table";
 import { format } from "date-fns";
+import useSwapProductDetailModal from "@/hook/useSwapProductDetailModal";
+import { getProduct } from "@/actions/inventory";
+import { useReduxState } from "@/hook/useRedux";
+import { toast } from "sonner";
 
 export const SwapProductTable = ({
 	products,
@@ -10,6 +16,9 @@ export const SwapProductTable = ({
 	products: Array<ProductProps>;
 	page?: number;
 }) => {
+	const swapProductDetails = useSwapProductDetailModal();
+	const { token } = useReduxState();
+
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -21,6 +30,15 @@ export const SwapProductTable = ({
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+	const handleClick = async (serialNo: string) => {
+		const { data, error } = await getProduct({ serialNo, token });
+		if (error) {
+			toast.error("Error", { description: error });
+		}
+
+		swapProductDetails.onOpen(data);
+	};
 
 	const tableHeaders = (
 		<>
@@ -42,7 +60,9 @@ export const SwapProductTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell
 						className="px-2 border-r w-5 md:w-10 text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
-						onClick={() => {}}
+						onClick={() => {
+							handleClick(product.serial_no);
+						}}
 					>
 						{product.serial_no}
 					</TableCell>

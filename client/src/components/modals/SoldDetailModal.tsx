@@ -2,6 +2,16 @@
 
 import useShowSoldInfoModal from "@/hook/useShowSoldDetails";
 import { Modal } from "@/components/modals/Modal";
+import { Input } from "@/components/ui/input";
+
+const MyInput = ({ label, value }: { label: string; value: string }) => {
+	return (
+		<div className="flex-1">
+			<p className="text-xs">{label}</p>
+			<Input value={value} disabled />
+		</div>
+	);
+};
 
 export const SoldDetailModal = () => {
 	const productDetails = useShowSoldInfoModal();
@@ -12,13 +22,75 @@ export const SoldDetailModal = () => {
 		</>
 	);
 
-	console.log({ a: productDetails.product });
+	const bodyContent = (
+		<>
+			<div className="p-4 px-6 w-full space-y-3">
+				<h1 className="text-sm font-semibold">Product Information</h1>
+
+				<div className="flex items-center gap-4">
+					<MyInput
+						label="Product Name"
+						value={productDetails.product?.product_name!}
+					/>
+					<MyInput
+						label="Serial Number"
+						value={productDetails.product?.serial_no!}
+					/>
+				</div>
+				<div className="flex items-center gap-4">
+					<MyInput
+						label="Product Price"
+						value={productDetails.product?.price!}
+					/>
+					<MyInput
+						label="Bought For"
+						value={productDetails.product?.bought_for!}
+					/>
+				</div>
+			</div>
+
+			<hr />
+
+			<div className="p-4 px-6 w-full space-y-3">
+				<h1 className="text-sm font-semibold">Supplier Information</h1>
+
+				<div className="flex items-center gap-4 ">
+					<MyInput
+						label="Supplier Name"
+						value={productDetails.product?.Supplier.supplier_name!}
+					/>
+					<MyInput
+						label="Supplier Phone Number"
+						value={productDetails.product?.Supplier.supplier_phone_no!}
+					/>
+				</div>
+			</div>
+
+			<hr />
+
+			<div className="p-4 px-6 w-full space-y-3 mb-2">
+				<h1 className="text-sm font-semibold">Customer Information</h1>
+
+				<div className="flex items-center gap-4 ">
+					<MyInput
+						label="Customer Name"
+						value={productDetails.product?.Customer!.buyer_name!}
+					/>
+					<MyInput
+						label="Customer Number"
+						value={productDetails.product?.Customer!.buyer_phone_no!}
+					/>
+				</div>
+			</div>
+		</>
+	);
 
 	return (
 		<Modal
 			isOpen={productDetails.isOpen}
 			onClose={productDetails.onClose}
 			headerContent={headerContent}
+			body={bodyContent}
 		/>
 	);
 };

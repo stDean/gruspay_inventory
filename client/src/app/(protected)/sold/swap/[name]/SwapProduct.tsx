@@ -41,8 +41,6 @@ export const SwapProduct = ({ name }: { name: string }) => {
 
 	const productName = name.replace(/%20/g, " ");
 
-	console.log({ products });
-
 	return isPending ? (
 		<Spinner />
 	) : (
