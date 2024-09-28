@@ -270,3 +270,16 @@ export const swapProducts = async ({
 		return { error: "something went wrong, try again" };
 	}
 };
+
+export const getInventoryStats = async ({ token }: { token: string }) => {
+	const { data } = await axios.get(
+		"http://localhost:5001/api/inventory/getInventoryStats",
+		{
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}
+	);
+
+	return { data };
+};

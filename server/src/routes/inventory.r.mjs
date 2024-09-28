@@ -24,6 +24,9 @@ router
 router
 	.route("/getProduct/:serialNo")
 	.get(AuthMiddleware, InventoryCtrl.getProduct);
+router
+	.route("/getInventoryStats")
+	.get(AuthMiddleware, InventoryCtrl.getInventoryStats);
 
 router
 	.route("/getSoldProductsByCount")

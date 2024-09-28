@@ -12,6 +12,8 @@ import {
 } from "@/actions/sales";
 import { ProductStockProps } from "@/lib/types";
 import { Spinner } from "@/components/Spinners";
+import { getInventoryStats } from "@/actions/inventory";
+import { SummaryStats } from "@/components/SummaryStats";
 
 export const SoldContent = () => {
 	const searchParam = useSearchParams();
@@ -26,6 +28,17 @@ export const SoldContent = () => {
 		sold: boolean;
 		swapped: boolean;
 	}>({ sold: true, swapped: false });
+	const [stats, setStats] = useState<{
+		allCategory: number;
+		stockCount: number;
+		totalPrice: number;
+		topSeller: string;
+	}>({
+		allCategory: 0,
+		stockCount: 0,
+		totalPrice: 0,
+		topSeller: "No Sales Yet",
+	});
 	const page = Number(searchParam.get("page"));
 
 	const getProducts = useCallback(() => {
@@ -54,15 +67,47 @@ export const SoldContent = () => {
 		});
 	}, [token, tab]);
 
+	const getInventoryStat = useCallback(async () => {
+		const { data } = await getInventoryStats({ token });
+		if (tab.sold) {
+			setStats({
+				allCategory: data.allCategorySold.length,
+				stockCount: data.totalSalesCount,
+				totalPrice: data.totalSoldPrice,
+				topSeller: data.topSoldProduct.product_name,
+			});
+			return;
+		}
+
+		setStats({
+			allCategory: data.allCategorySwap.length,
+			stockCount: data.totalSwapCount,
+			totalPrice: data.totalSwapPrice,
+			topSeller: data.topSoldProduct.product_name,
+		});
+	}, [token, tab]);
+
 	useEffect(() => {
 		getProducts();
-	}, [getProducts]);
+		getInventoryStat();
+	}, [getProducts, tab]);
 
 	return (
-		<div className="flex flex-col gap-3">
-			<div className="flex justify-between items-center">
-				<div className="space-y-3">
+		<div className="flex flex-col gap-3 w-full">
+			<div className="flex justify-between items-center w-full">
+				<div className="space-y-3 w-full">
 					<h1 className="font-semibold text-xl md:text-2xl">Sales History</h1>
+
+					<SummaryStats
+						title={tab.sold ? "Sales Stats" : "Swap Stats"}
+						stockType={tab.sold ? "Sold" : "Swap"}
+						category={stats.allCategory}
+						stockCount={stats.stockCount}
+						topSeller={stats.topSeller}
+						totalPrice={stats.totalPrice}
+						totalText={tab.sold ? "Total Sales" : "Total Amount Received"}
+						addClass="flex-1 w-full"
+					/>
 
 					<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
 						<Tab

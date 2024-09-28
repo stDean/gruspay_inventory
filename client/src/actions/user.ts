@@ -14,9 +14,9 @@ export const getUser = async ({ token }: { token: string }) => {
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -43,9 +43,9 @@ export const getUserById = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -66,9 +66,9 @@ export const getUsers = async ({ token }: { token: string }) => {
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -102,9 +102,9 @@ export const updateUser = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -139,9 +139,9 @@ export const createUser = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -171,9 +171,9 @@ export const updateUserRole = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -195,7 +195,7 @@ export const getSuppliers = async ({ token }: { token: string }) => {
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
 
@@ -222,9 +222,9 @@ export const getSupplier = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 
@@ -246,7 +246,7 @@ export const getCustomers = async ({ token }: { token: string }) => {
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
 
@@ -273,9 +273,9 @@ export const getCustomer = async ({
 
 		return { data };
 	} catch (e: any) {
-		if (e.response.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
-		} else if (e.response.status === 404) {
+		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		}
 

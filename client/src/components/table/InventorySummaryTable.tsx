@@ -18,7 +18,7 @@ export const InventorySummaryTable = ({
 	count,
 	linkTo,
 }: InventoryProps) => {
-	const rowsPerPage = 20;
+	const rowsPerPage = 10;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
 

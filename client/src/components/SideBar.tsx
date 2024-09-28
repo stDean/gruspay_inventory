@@ -162,11 +162,10 @@ export const SideBar = () => {
 
 			{/* FOOTER */}
 			<div className="mb-10">
-				<div className="flex justify-between items-center px-6 mb-4">
+				<div className="flex justify-between gap-2 items-center px-6 mb-4">
 					<div className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
-						<p className="font-semibold text-base truncate">
-							{user?.first_name && `${user?.first_name}`}{" "}
-							{user?.last_name && ` ${user?.last_name}`}
+						<p className="font-semibold text-base truncate w-44">
+							{user?.Company.company_name}
 						</p>
 						<p className="text-sm">{user?.email}</p>
 					</div>

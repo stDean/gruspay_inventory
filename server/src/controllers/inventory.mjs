@@ -228,7 +228,7 @@ export const InventoryCtrl = {
 						buyer_phone_no: true,
 					},
 				},
-        OutgoingProduct: { include: { incomingProducts: true } },
+				OutgoingProduct: { include: { incomingProducts: true } },
 			},
 		});
 		if (!product) {
@@ -490,5 +490,121 @@ export const InventoryCtrl = {
 		});
 
 		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
+	},
+	getInventoryStats: async (req, res) => {
+		const allCategoryNotSold = await prisma.products.groupBy({
+			where: { companyId: req.user.company_id, sales_status: "NOT_SOLD" },
+			by: ["type"],
+			_count: {
+				type: true,
+			},
+		});
+
+		const allCategorySold = await prisma.products.groupBy({
+			where: { companyId: req.user.company_id, sales_status: "SOLD" },
+			by: ["type"],
+			_count: {
+				type: true,
+			},
+		});
+
+    const allCategorySwap = await prisma.products.groupBy({
+			where: { companyId: req.user.company_id, sales_status: "SWAP" },
+			by: ["type"],
+			_count: {
+				type: true,
+			},
+		});
+
+		const totalInventoryCount = await prisma.products.count({
+			where: { companyId: req.user.company_id, sales_status: "NOT_SOLD" },
+		});
+
+		const totalSalesCount = await prisma.products.count({
+			where: { companyId: req.user.company_id, sales_status: "SOLD" },
+		});
+
+    const totalSwapCount = await prisma.products.count({
+			where: { companyId: req.user.company_id, sales_status: "SWAP" },
+		});
+
+		const unsoldProducts = await prisma.products.findMany({
+			where: {
+				companyId: req.user.company_id,
+				sales_status: "NOT_SOLD",
+			},
+			select: {
+				price: true,
+			},
+		});
+
+		// Convert the string prices to numbers and sum them up
+		const totalPrice = unsoldProducts.reduce((sum, product) => {
+			const price = parseFloat(product.price) || 0; // Convert price to a float, fallback to 0 if conversion fails
+			return sum + price;
+		}, 0);
+
+		const soldProducts = await prisma.products.findMany({
+			where: {
+				companyId: req.user.company_id,
+				sales_status: "SOLD",
+			},
+			select: {
+				bought_for: true,
+			},
+		});
+
+		// Convert the string prices to numbers and sum them up
+		const totalSoldPrice = soldProducts.reduce((sum, product) => {
+			const price = parseFloat(product.bought_for) || 0; // Convert price to a float, fallback to 0 if conversion fails
+			return sum + price;
+		}, 0);
+
+    const swapProducts = await prisma.products.findMany({
+			where: {
+				companyId: req.user.company_id,
+				sales_status: "SWAP",
+			},
+			select: {
+				bought_for: true,
+			},
+		});
+
+		// Convert the string prices to numbers and sum them up
+		const totalSwapPrice = swapProducts.reduce((sum, product) => {
+			const price = parseFloat(product.bought_for) || 0; // Convert price to a float, fallback to 0 if conversion fails
+			return sum + price;
+		}, 0);
+
+		const allSoldProduct = await prisma.products.groupBy({
+			by: ["product_name"],
+			where: {
+				companyId: req.user.company_id,
+				sales_status: { not: "NOT_SOLD" },
+			},
+			_count: {
+				product_name: true,
+			},
+		});
+
+		// Now, find the product with the maximum count
+		const topSoldProduct = allSoldProduct.reduce((prev, current) => {
+			return prev._count.product_name > current._count.product_name
+				? prev
+				: current;
+		});
+
+		return res.status(StatusCodes.OK).json({
+			allCategoryNotSold,
+			totalInventoryCount,
+			totalPrice,
+			topSoldProduct,
+			allCategorySold,
+			totalSalesCount,
+			totalSoldPrice,
+      allCategorySwap,
+      totalSwapCount,
+      totalSwapPrice
+		});
 	},
 };
