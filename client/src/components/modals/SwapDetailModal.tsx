@@ -71,15 +71,18 @@ export const SwapDetailModal = () => {
 			<div className="p-2 px-6 space-y-2">
 				<h1 className="text-sm font-semibold">Incoming Product(s)</h1>
 				{swapProductDetails.product?.OutgoingProduct?.incomingProducts.map(
-					product => (
+					(product, idx) => (
 						<div key={product.id} className="w-full space-y-2">
 							<div className="flex items-center gap-4">
-								<MyInput label="Product Name" value={product.product_name} />
-								<MyInput label="Serial Number" value={product.serial_no} />
+								<MyInput
+									label={`Product Name(${idx + 1})`}
+									value={product.product_name}
+								/>
+								<MyInput label={`Serial Number`} value={product.serial_no} />
 							</div>
 							<div className="flex items-center gap-4">
-								<MyInput label="Product Price" value={product.price} />
-								<MyInput label="Brand" value={product.brand} />
+								<MyInput label={`Product Price`} value={product.price} />
+								<MyInput label={`Brand`} value={product.brand} />
 							</div>
 						</div>
 					)
@@ -111,6 +114,8 @@ export const SwapDetailModal = () => {
 			onClose={swapProductDetails.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
+			addStyle="mt-10"
+      lessPadd="!p-4"
 		/>
 	);
 };

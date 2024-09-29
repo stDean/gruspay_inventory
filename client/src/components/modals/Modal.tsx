@@ -16,6 +16,8 @@ interface ModalProps {
 	onSubmit?: () => void;
 	addedStyle?: string;
 	footer?: boolean;
+  addStyle?: string;
+  lessPadd?: string;
 }
 
 export const Modal = ({
@@ -30,6 +32,8 @@ export const Modal = ({
 	onSubmit,
 	addedStyle,
 	footer,
+  addStyle,
+  lessPadd
 }: ModalProps) => {
 	const [showModal, setShowModal] = useState<boolean>(isOpen);
 
@@ -74,9 +78,9 @@ export const Modal = ({
 						} ${showModal ? "opacity-100" : "opacity-0"}
           `}
 					>
-						<div className="translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+						<div className={`translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none ${addStyle}`}>
 							{/* Header */}
-							<div className="flex items-center p-6 rounded-t relative border-b-[1px]">
+							<div className={`flex items-center p-6 rounded-t relative border-b-[1px] ${lessPadd}`}>
 								{headerContent}
 								<button
 									className="p-1 border-0 hover:opacity-70 transition absolute right-4"
