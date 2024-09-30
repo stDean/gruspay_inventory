@@ -27,6 +27,9 @@ router
 router
 	.route("/getInventoryStats")
 	.get(AuthMiddleware, InventoryCtrl.getInventoryStats);
+router
+	.route("/getDashboardStats")
+	.get(AuthMiddleware, InventoryCtrl.getDashboardStats);
 
 router
 	.route("/getSoldProductsByCount")

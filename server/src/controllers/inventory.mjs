@@ -1,5 +1,5 @@
-import { prisma } from "../utils/db.mjs";
 import { StatusCodes } from "http-status-codes";
+import { prisma } from "../utils/db.mjs";
 
 const useUserAndCompany = async ({ company_id, email }) => {
 	const company = await prisma.company.findUnique({
@@ -442,22 +442,22 @@ export const InventoryCtrl = {
 			companyId: company.id,
 		});
 
+		const incomingProductsData = incoming.map(product => ({
+			product_name: product.product_name,
+			brand: product.brand,
+			description: product.description,
+			type: product.type,
+			price: product.price,
+			serial_no: product.serial_no,
+			Company: { connect: { id: company.id } },
+			AddedByUser: { connect: { id: user.id } },
+			Supplier: { connect: { id: supplier.id } },
+		}));
+
 		const swap = await prisma.swaps.create({
 			data: {
 				Company: { connect: { id: company.id } },
-				incomingProducts: {
-					create: incoming.map(product => ({
-						product_name: product.product_name,
-						brand: product.brand,
-						description: product.description,
-						type: product.type,
-						price: product.price,
-						serial_no: product.serial_no,
-						Company: { connect: { id: company.id } },
-						AddedByUser: { connect: { id: user.id } },
-						Supplier: { connect: { id: supplier.id } },
-					})),
-				},
+				incomingProducts: { create: incomingProductsData },
 			},
 		});
 
@@ -492,108 +492,67 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
 	},
 	getInventoryStats: async (req, res) => {
-		const allCategoryNotSold = await prisma.products.groupBy({
-			where: { companyId: req.user.company_id, sales_status: "NOT_SOLD" },
-			by: ["type"],
-			_count: {
-				type: true,
-			},
-		});
+		const companyId = req.user.company_id;
 
-		const allCategorySold = await prisma.products.groupBy({
-			where: { companyId: req.user.company_id, sales_status: "SOLD" },
-			by: ["type"],
-			_count: {
-				type: true,
-			},
-		});
+		// Helper function to get grouped product counts by type and sales status
+		const getCategoryCountByStatus = async status => {
+			return await prisma.products.groupBy({
+				where: { companyId, sales_status: status },
+				by: ["type"],
+				_count: { type: true },
+			});
+		};
 
-    const allCategorySwap = await prisma.products.groupBy({
-			where: { companyId: req.user.company_id, sales_status: "SWAP" },
-			by: ["type"],
-			_count: {
-				type: true,
-			},
-		});
+		// Helper function to get total prices by sales status
+		const getTotalPriceByStatus = async (status, priceField = "price") => {
+			const products = await prisma.products.findMany({
+				where: { companyId, sales_status: status },
+				select: { [priceField]: true },
+			});
+			return products.reduce(
+				(sum, product) => sum + (parseFloat(product[priceField]) || 0),
+				0
+			);
+		};
 
-		const totalInventoryCount = await prisma.products.count({
-			where: { companyId: req.user.company_id, sales_status: "NOT_SOLD" },
-		});
+		// Get grouped product counts for NOT_SOLD, SOLD, and SWAP statuses
+		const [allCategoryNotSold, allCategorySold, allCategorySwap] =
+			await Promise.all([
+				getCategoryCountByStatus("NOT_SOLD"),
+				getCategoryCountByStatus("SOLD"),
+				getCategoryCountByStatus("SWAP"),
+			]);
 
-		const totalSalesCount = await prisma.products.count({
-			where: { companyId: req.user.company_id, sales_status: "SOLD" },
-		});
+		// Get total counts for NOT_SOLD, SOLD, and SWAP statuses
+		const [totalInventoryCount, totalSalesCount, totalSwapCount] =
+			await Promise.all([
+				prisma.products.count({
+					where: { companyId, sales_status: "NOT_SOLD" },
+				}),
+				prisma.products.count({ where: { companyId, sales_status: "SOLD" } }),
+				prisma.products.count({ where: { companyId, sales_status: "SWAP" } }),
+			]);
 
-    const totalSwapCount = await prisma.products.count({
-			where: { companyId: req.user.company_id, sales_status: "SWAP" },
-		});
+		// Get total prices for NOT_SOLD, SOLD, and SWAP products
+		const [totalPrice, totalSoldPrice, totalSwapPrice] = await Promise.all([
+			getTotalPriceByStatus("NOT_SOLD"),
+			getTotalPriceByStatus("SOLD", "bought_for"),
+			getTotalPriceByStatus("SWAP", "bought_for"),
+		]);
 
-		const unsoldProducts = await prisma.products.findMany({
-			where: {
-				companyId: req.user.company_id,
-				sales_status: "NOT_SOLD",
-			},
-			select: {
-				price: true,
-			},
-		});
-
-		// Convert the string prices to numbers and sum them up
-		const totalPrice = unsoldProducts.reduce((sum, product) => {
-			const price = parseFloat(product.price) || 0; // Convert price to a float, fallback to 0 if conversion fails
-			return sum + price;
-		}, 0);
-
-		const soldProducts = await prisma.products.findMany({
-			where: {
-				companyId: req.user.company_id,
-				sales_status: "SOLD",
-			},
-			select: {
-				bought_for: true,
-			},
-		});
-
-		// Convert the string prices to numbers and sum them up
-		const totalSoldPrice = soldProducts.reduce((sum, product) => {
-			const price = parseFloat(product.bought_for) || 0; // Convert price to a float, fallback to 0 if conversion fails
-			return sum + price;
-		}, 0);
-
-    const swapProducts = await prisma.products.findMany({
-			where: {
-				companyId: req.user.company_id,
-				sales_status: "SWAP",
-			},
-			select: {
-				bought_for: true,
-			},
-		});
-
-		// Convert the string prices to numbers and sum them up
-		const totalSwapPrice = swapProducts.reduce((sum, product) => {
-			const price = parseFloat(product.bought_for) || 0; // Convert price to a float, fallback to 0 if conversion fails
-			return sum + price;
-		}, 0);
-
-		const allSoldProduct = await prisma.products.groupBy({
+		// Get all sold products grouped by product_name
+		const allSoldProducts = await prisma.products.groupBy({
 			by: ["product_name"],
-			where: {
-				companyId: req.user.company_id,
-				sales_status: { not: "NOT_SOLD" },
-			},
-			_count: {
-				product_name: true,
-			},
+			where: { companyId, sales_status: { not: "NOT_SOLD" } },
+			_count: { product_name: true },
 		});
 
-		// Now, find the product with the maximum count
-		const topSoldProduct = allSoldProduct.reduce((prev, current) => {
-			return prev._count.product_name > current._count.product_name
-				? prev
-				: current;
-		});
+		// Find the product with the highest sold count
+		const topSoldProduct = allSoldProducts.reduce((prev, current) =>
+			prev._count.product_name > current._count.product_name ? prev : current
+		);
 
+		// Return the aggregated inventory statistics
 		return res.status(StatusCodes.OK).json({
 			allCategoryNotSold,
 			totalInventoryCount,
@@ -602,9 +561,153 @@ export const InventoryCtrl = {
 			allCategorySold,
 			totalSalesCount,
 			totalSoldPrice,
-      allCategorySwap,
-      totalSwapCount,
-      totalSwapPrice
+			allCategorySwap,
+			totalSwapCount,
+			totalSwapPrice,
+		});
+	},
+	getDashboardStats: async (req, res) => {
+		const companyId = req.user.company_id;
+
+		// 1. Get total sales amount and convert prices from string to float
+		const soldProducts = await prisma.products.findMany({
+			where: { companyId, sales_status: "SOLD" },
+			select: { bought_for: true },
+		});
+		const totalSoldPrice = soldProducts.reduce(
+			(sum, product) => sum + (parseFloat(product.bought_for) || 0),
+			0
+		);
+
+		// 2. Get total item sold count
+		const totalSalesCount = await prisma.products.count({
+			where: { companyId, sales_status: "SOLD" },
+		});
+
+		// 3. Get total purchases and purchase price
+		const allProductsPrice = await prisma.products.findMany({
+			where: { companyId },
+			select: { price: true },
+		});
+		const totalPurchasePrice = allProductsPrice.reduce(
+			(sum, product) => sum + (parseFloat(product.price) || 0),
+			0
+		);
+		const totalPurchasesCount = allProductsPrice.length;
+
+		// 4. Get top seller based on sold product count
+		const topSoldProductAndUser = await prisma.products.groupBy({
+			by: ["sold_by"],
+			where: { companyId, sales_status: { not: "NOT_SOLD" } },
+			_count: { sold_by: true },
+		});
+		const topSellerUserId = topSoldProductAndUser.reduce((prev, current) =>
+			prev._count.sold_by > current._count.sold_by ? prev : current
+		);
+
+		// 5. Get top seller user info and total price of products sold by them
+		const topSeller = await prisma.users.findUnique({
+			where: { companyId, id: topSellerUserId.sold_by },
+			include: { Sold_Products: { select: { id: true } } },
+		});
+		const topSellerProducts = await prisma.products.findMany({
+			where: {
+				companyId,
+				id: { in: topSeller.Sold_Products.map(product => product.id) },
+			},
+			select: { bought_for: true },
+		});
+		const topSellerPrice = topSellerProducts.reduce(
+			(sum, product) => sum + (parseFloat(product.bought_for) || 0),
+			0
+		);
+
+		// 6. Get business summary: stock count, total unsold price, suppliers, customers
+		const stockCount = await prisma.products.count({
+			where: { companyId, sales_status: "NOT_SOLD" },
+		});
+		const unsoldProducts = await prisma.products.findMany({
+			where: { companyId, sales_status: "NOT_SOLD" },
+			select: { price: true, product_name: true, id: true },
+		});
+		const totalUnsoldPrice = unsoldProducts.reduce(
+			(sum, product) => sum + (parseFloat(product.price) || 0),
+			0
+		);
+		const suppliersCount = await prisma.supplier.count({
+			where: { companyId },
+		});
+		const customersCount = await prisma.buyer.count({ where: { companyId } });
+
+		// 7. Get low quantity products (less than 5 items)
+		const productCounts = unsoldProducts.reduce((acc, product) => {
+			acc[product.product_name] = (acc[product.product_name] || 0) + 1;
+			return acc;
+		}, {});
+		const lowQuantityProducts = Object.entries(productCounts)
+			.filter(([_, count]) => count < 5)
+			.sort((a, b) => a[1] - b[1])
+			.slice(0, 5)
+			.map(([product_name, count]) => ({ product_name, count }));
+
+		// 8. Get top-selling products and remaining unsold quantity
+		const topSellingProducts = await prisma.products.groupBy({
+			by: ["product_name"],
+			where: { companyId, sales_status: "SOLD" },
+			_count: { product_name: true },
+			orderBy: { _count: { product_name: "desc" } },
+			take: 5,
+		});
+		const topSellingWithDetails = await Promise.all(
+			topSellingProducts.map(async product => {
+				const soldProducts = await prisma.products.findMany({
+					where: {
+						product_name: product.product_name,
+						companyId,
+						sales_status: "SOLD",
+					},
+					select: { bought_for: true },
+				});
+				const totalSoldPrice = soldProducts.reduce(
+					(sum, p) => sum + (parseFloat(p.bought_for) || 0),
+					0
+				);
+				const remainingQuantity = await prisma.products.count({
+					where: {
+						product_name: product.product_name,
+						companyId,
+						sales_status: "NOT_SOLD",
+					},
+				});
+				return {
+					product_name: product.product_name,
+					total_sold: product._count.product_name,
+					total_sold_price: totalSoldPrice,
+					remaining_quantity: remainingQuantity,
+				};
+			})
+		);
+
+		// Return all gathered stats
+		return res.status(200).json({
+			totalSoldPrice,
+			totalSalesCount,
+			totalPurchasesCount,
+			totalPurchasePrice,
+			topSellerDetail: {
+				first_name: topSeller.first_name,
+				last_name: topSeller.last_name,
+				count: topSellerUserId._count.sold_by,
+				totalPrice: topSellerPrice,
+			},
+			businessSummary: {
+				stockCount,
+				totalUnsoldPrice,
+				suppliers: suppliersCount,
+				customers: customersCount,
+			},
+			lowQuantityProducts,
+			topSellingWithDetails,
 		});
 	},
 };
