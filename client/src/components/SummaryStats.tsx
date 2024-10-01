@@ -27,24 +27,24 @@ export const SummaryStats = ({
 
 			<div className="flex justify-between items-center">
 				<div className="space-y-1">
-					<p className="text-2xl md:text-4xl font-semibold">{category}</p>
+					<p className="text-xl md:text-4xl font-semibold">{category}</p>
 					<p className="text-xs md:text-sm font-semibold">Categories</p>
 				</div>
 
 				<div className="space-y-1">
-					<p className="text-2xl md:text-4xl font-semibold">{stockCount}</p>
+					<p className="text-xl md:text-4xl font-semibold">{stockCount}</p>
 					<p className="text-xs md:text-sm font-semibold">
 						Total Stock {stockType}
 					</p>
 				</div>
 
 				<div className="space-y-1">
-					<p className="text-2xl md:text-4xl font-semibold">{totalPrice}</p>
+					<p className="text-xl md:text-4xl font-semibold">{totalPrice}</p>
 					<p className="text-xs md:text-sm font-semibold">{totalText}</p>
 				</div>
 
 				<div className="space-y-1">
-					<p className="text-2xl md:text-4xl font-semibold">{topSeller}</p>
+					<p className="text-xl md:text-4xl font-semibold">{topSeller}</p>
 					<p className="text-xs md:text-sm font-semibold">
 						Top Selling Product
 					</p>

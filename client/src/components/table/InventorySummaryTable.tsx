@@ -43,12 +43,12 @@ export const InventorySummaryTable = ({
 	const tableBody = (
 		<>
 			{productsByPage.map((item, idx) => (
-				<TableRow key={item.product_name} className="hover:!bg-none">
+				<TableRow key={item.product_name + idx} className="hover:!bg-none">
 					<TableCell className="border-r">{idx + 1}</TableCell>
 					<TableCell className="border-r capitalize">{item.type}</TableCell>
 					<TableCell className="border-r capitalize">{item.brand}</TableCell>
 					<TableCell className="border-r capitalize hover:underline hover:underline-offset-3 text-blue-500 hover:text-blue-400">
-						<Link href={`/${linkTo}/${item.product_name}`}>
+						<Link href={`/${linkTo}/${item.type}/${item.brand}/${item.product_name}`}>
 							{item.product_name}
 						</Link>
 					</TableCell>

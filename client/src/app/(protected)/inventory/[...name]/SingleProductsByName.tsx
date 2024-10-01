@@ -1,32 +1,47 @@
 "use client";
 
-import { getSwapProductsByName } from "@/actions/sales";
+import { getProductsByName } from "@/actions/inventory";
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { Spinner } from "@/components/Spinners";
-import { SwapProductTable } from "@/components/table/SwapProductTable";
+import { ProductsTable } from "@/components/table/ProductsTable";
 import { useReduxState } from "@/hook/useRedux";
+import useShowProductModal from "@/hook/useShowProduct";
 import { ProductProps } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useTransition, useState, useEffect } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const SwapProduct = ({ name }: { name: string }) => {
+export const SingleProductsByName = ({
+	name,
+	type,
+	brand,
+}: {
+	name: string;
+	type: string;
+	brand: string;
+}) => {
 	const [products, setProducts] = useState<ProductProps[]>([]);
 	const { token } = useReduxState();
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
+	const showProductModal = useShowProductModal();
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getSwapProductsByName({ name, token });
+			const { error, data } = await getProductsByName({
+				name,
+				token,
+				type,
+				brand,
+			});
 			if (error) {
 				toast.error("Error", { description: error });
 				return;
 			}
-			setProducts(data.swapProducts);
+			setProducts(data);
 		});
-	}, [token, name]);
+	}, [token, name, showProductModal.isOpen]);
 
 	useEffect(() => {
 		getProducts();
@@ -43,19 +58,19 @@ export const SwapProduct = ({ name }: { name: string }) => {
 
 	return isPending ? (
 		<Spinner />
-	) : (
-		products && (
-			<div className="-mt-4">
-				<ItemsHeader
-					addBrand
-					brands={brands}
-					routeTo="/sold"
-					types={types}
-					productName={productName}
-				/>
+	) : products.length !== 0 ? (
+		<div className="-mt-4">
+			<ItemsHeader
+				addBrand
+				brands={brands}
+				routeTo="/inventory"
+				types={types}
+				productName={productName}
+			/>
 
-				<SwapProductTable products={products} page={page} />
-			</div>
-		)
+			<ProductsTable products={products} page={page} />
+		</div>
+	) : (
+		<p>No Product found</p>
 	);
 };

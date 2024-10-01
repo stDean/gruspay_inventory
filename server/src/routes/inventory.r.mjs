@@ -13,7 +13,7 @@ router
 	.post(AuthMiddleware, InventoryCtrl.createProducts);
 
 router
-	.route("/getProducts/:product_name")
+	.route("/getProducts/:type/:brand/:product_name")
 	.get(AuthMiddleware, InventoryCtrl.getProducts);
 router
 	.route("/getAllProducts")
@@ -30,20 +30,21 @@ router
 router
 	.route("/getDashboardStats")
 	.get(AuthMiddleware, InventoryCtrl.getDashboardStats);
-
 router
 	.route("/getSoldProductsByCount")
 	.get(AuthMiddleware, InventoryCtrl.getCountOfSoldProducts);
 router
-	.route("/getSoldProducts/:product_name")
+	.route("/getSoldProducts/:type/:brand/:product_name")
 	.get(AuthMiddleware, InventoryCtrl.getSoldProductsByName);
-
 router
 	.route("/getSwapProductsByCount")
 	.get(AuthMiddleware, InventoryCtrl.getCountOfSwapProducts);
 router
-	.route("/getSwapProducts/:product_name")
+	.route("/getSwapProducts/:type/:brand/:product_name")
 	.get(AuthMiddleware, InventoryCtrl.getSwapProductsByName);
+router
+	.route("/getBarChartData")
+	.get(AuthMiddleware, InventoryCtrl.getMonthlySalesAndPurchases);
 
 router
 	.route("/updateProduct/:id")

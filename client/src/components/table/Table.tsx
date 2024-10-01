@@ -16,7 +16,7 @@ export const TableContainer = ({
 	currentPage,
 }: TableContainerProps) => {
 	return (
-		<div className="rounded-md border w-fit md:w-full shadow-md">
+		<div className="rounded-md border w-full shadow-md">
 			<Table>
 				<TableHeader className="bg-[#f3f4f4]">
 					<TableRow>{tableHeaders}</TableRow>

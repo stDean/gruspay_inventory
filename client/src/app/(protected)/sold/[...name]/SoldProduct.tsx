@@ -10,7 +10,15 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export const SoldProduct = ({ name }: { name: string }) => {
+export const SoldProduct = ({
+	name,
+	type,
+	brand,
+}: {
+	name: string;
+	type: string;
+	brand: string;
+}) => {
 	const [products, setProducts] = useState<ProductProps[]>([]);
 	const { token } = useReduxState();
 	const searchParams = useSearchParams();
@@ -19,7 +27,7 @@ export const SoldProduct = ({ name }: { name: string }) => {
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getSoldProductsByName({ name, token });
+			const { error, data } = await getSoldProductsByName({ name, token, type, brand });
 			if (error) {
 				toast.error("Error", { description: error });
 				return;

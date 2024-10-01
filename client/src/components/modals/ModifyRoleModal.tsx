@@ -40,8 +40,6 @@ export const ModifyRoleModal = () => {
 		modifyModal.onClose();
 	};
 
-	console.log({ role, b: modifyModal?.user!?.role, c: modifyModal?.user });
-
 	const bodyContent = (
 		<>
 			<div className="flex items-center p-6 w-full gap-4">

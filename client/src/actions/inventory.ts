@@ -30,11 +30,17 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 export const getProductsByName = async ({
 	name,
 	token,
+	type,
+	brand,
 }: {
 	name: string;
 	token: string;
+	type: string;
+	brand: string;
 }) => {
-	const URI = `http://localhost:5001/api/inventory/getProducts/${name}`;
+	console.log({ name, type, brand });
+
+	const URI = `http://localhost:5001/api/inventory/getProducts/${type}/${brand}/${name}`;
 	try {
 		const { data } = await axios.get(URI, {
 			headers: {
@@ -278,6 +284,28 @@ export const getInventoryStats = async ({ token }: { token: string }) => {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
+		}
+	);
+
+	return { data };
+};
+
+export const getDashboardStats = async ({ token }: { token: string }) => {
+	const { data } = await axios.get(
+		"http://localhost:5001/api/inventory/getDashboardStats",
+		{
+			headers: { Authorization: `Bearer ${token}` },
+		}
+	);
+
+	return { data };
+};
+
+export const getBarChartData = async ({ token }: { token: string }) => {
+	const { data } = await axios.get(
+		"http://localhost:5001/api/inventory/getBarChartData",
+		{
+			headers: { Authorization: `Bearer ${token}` },
 		}
 	);
 

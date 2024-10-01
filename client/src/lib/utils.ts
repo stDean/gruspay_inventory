@@ -34,3 +34,12 @@ export const AddProductsType = {
     },
   ],
 } as const;
+
+export const formatCurrency = (val: number, symbol: string = "₦") => {
+  const formattedNumber = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+  })
+
+  return formattedNumber.format(val)
+}

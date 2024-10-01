@@ -92,3 +92,35 @@ export interface SupplierProps {
 	supplier_phone_no: string;
 	updatedAt: string;
 }
+
+export interface DashboardProps {
+	businessSummary: {
+		stockCount: number;
+		totalUnsoldPrice: number;
+		suppliers: number;
+		customers: number;
+	};
+	lowQuantityProducts: { product_name: string; count: number }[];
+	topSellerDetail: {
+		first_name: string;
+		last_name: string;
+		count: number;
+		totalPrice: number;
+	};
+	topSellingWithDetails: {
+		product_name: string;
+		remaining_quantity: number;
+		total_sold: number;
+		total_sold_price: number;
+	}[];
+	totalPurchasePrice: number;
+	totalPurchasesCount: number;
+	totalSalesCount: number;
+	totalSoldPrice: number;
+}
+
+export interface BarChartProps {
+	month: string;
+	"monthly sale": number;
+	"monthly purchase": number;
+}

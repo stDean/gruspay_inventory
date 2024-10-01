@@ -167,12 +167,14 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json(products);
 	},
 	getProducts: async (req, res) => {
-		const { product_name } = req.params;
+		const { product_name, type, brand } = req.params;
 		const products = await prisma.products.findMany({
 			where: {
 				companyId: req.user.company_id,
 				product_name,
 				sales_status: "NOT_SOLD",
+				type,
+				brand,
 			},
 			include: {
 				Supplier: {
@@ -321,12 +323,14 @@ export const InventoryCtrl = {
 			.json({ msg: "Successfully sold", updatedProduct });
 	},
 	getSoldProductsByName: async (req, res) => {
-		const { product_name } = req.params;
+		const { product_name, type, brand } = req.params;
 		const soldProducts = await prisma.products.findMany({
 			where: {
 				companyId: req.user.company_id,
 				sales_status: "SOLD",
 				product_name,
+				type,
+				brand,
 			},
 			include: {
 				SoldByUser: {
@@ -355,12 +359,14 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json(productsByCount);
 	},
 	getSwapProductsByName: async (req, res) => {
-		const { product_name } = req.params;
+		const { product_name, type, brand } = req.params;
 		const swapProducts = await prisma.products.findMany({
 			where: {
 				companyId: req.user.company_id,
 				sales_status: "SWAP",
 				product_name,
+				type,
+				brand,
 			},
 			include: {
 				SoldByUser: {
@@ -571,7 +577,7 @@ export const InventoryCtrl = {
 
 		// 1. Get total sales amount and convert prices from string to float
 		const soldProducts = await prisma.products.findMany({
-			where: { companyId, sales_status: "SOLD" },
+			where: { companyId, sales_status: { not: "NOT_SOLD" } },
 			select: { bought_for: true },
 		});
 		const totalSoldPrice = soldProducts.reduce(
@@ -581,7 +587,7 @@ export const InventoryCtrl = {
 
 		// 2. Get total item sold count
 		const totalSalesCount = await prisma.products.count({
-			where: { companyId, sales_status: "SOLD" },
+			where: { companyId, sales_status: { not: "NOT_SOLD" } },
 		});
 
 		// 3. Get total purchases and purchase price
@@ -709,5 +715,97 @@ export const InventoryCtrl = {
 			lowQuantityProducts,
 			topSellingWithDetails,
 		});
+	},
+	getMonthlySalesAndPurchases: async (req, res) => {
+		const { company_id } = req.user;
+
+		// Step 1: Fetch sold products grouped by month
+		const soldProducts = await prisma.products.findMany({
+			where: {
+				companyId: company_id,
+				sales_status: { not: "NOT_SOLD" },
+			},
+			select: {
+				bought_for: true,
+				date_sold: true, // Assuming you have a date_sold field
+			},
+		});
+
+		// Step 2: Fetch purchased products grouped by month
+		const purchasedProducts = await prisma.products.findMany({
+			where: { companyId: company_id },
+			select: {
+				price: true,
+				createdAt: true, // Assuming the purchase date is the createdAt field
+			},
+		});
+
+		// Helper function to get month name from date
+		const getMonthName = date => {
+			const monthNames = [
+				"January",
+				"February",
+				"March",
+				"April",
+				"May",
+				"June",
+				"July",
+				"August",
+				"September",
+				"October",
+				"November",
+				"December",
+			];
+			return monthNames[date.getMonth()]; // getMonth() returns 0-11 index
+		};
+
+		// Helper function to group products by month and year
+		const groupByMonth = (products, dateField) => {
+			return products.reduce((acc, product) => {
+				const date = new Date(product[dateField]);
+				const monthKey = getMonthName(date); // Just the month name
+
+				if (!acc[monthKey]) {
+					acc[monthKey] = [];
+				}
+				acc[monthKey].push(product);
+				return acc;
+			}, {});
+		};
+
+		// Step 3: Group sold and purchased products by month
+		const groupedSoldProducts = groupByMonth(soldProducts, "date_sold");
+		const groupedPurchasedProducts = groupByMonth(
+			purchasedProducts,
+			"createdAt"
+		);
+
+		// Step 4: Sum up sales and purchases for each month
+		const calculateTotalForMonth = (products, priceField) => {
+			return products.reduce((sum, product) => {
+				const price = parseFloat(product[priceField]) || 0;
+				return sum + price;
+			}, 0);
+		};
+
+		// Step 5: Merge sales and purchases into a single dataset
+		const allMonths = new Set([
+			...Object.keys(groupedSoldProducts),
+			...Object.keys(groupedPurchasedProducts),
+		]);
+
+		const data = Array.from(allMonths).map(month => ({
+			month,
+			"monthly sale": calculateTotalForMonth(
+				groupedSoldProducts[month] || [],
+				"bought_for"
+			),
+			"monthly purchase": calculateTotalForMonth(
+				groupedPurchasedProducts[month] || [],
+				"price"
+			),
+		}));
+
+		return res.status(200).json({ data });
 	},
 };
