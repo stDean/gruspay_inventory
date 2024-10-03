@@ -801,12 +801,19 @@ export const InventoryCtrl = {
 
 	getMonthlySalesAndPurchases: async (req, res) => {
 		const { company_id } = req.user;
+		const { barYear } = req.query;
+
+		const selectedYear = Number(barYear) || new Date().getFullYear();
 
 		// Fetch sold products grouped by month
 		const soldProducts = await prisma.products.findMany({
 			where: {
 				companyId: company_id,
 				sales_status: { not: "NOT_SOLD" },
+				createdAt: {
+					gte: new Date(`${selectedYear}-01-01T00:00:00.000Z`), // Start of the year
+					lt: new Date(`${Number(selectedYear) + 1}-01-01T00:00:00.000Z`), // Start of the next year
+				},
 			},
 			select: {
 				bought_for: true,
@@ -816,7 +823,13 @@ export const InventoryCtrl = {
 
 		// Fetch purchased products grouped by month
 		const purchasedProducts = await prisma.products.findMany({
-			where: { companyId: company_id },
+			where: {
+				companyId: company_id,
+				createdAt: {
+					gte: new Date(`${selectedYear}-01-01T00:00:00.000Z`), // Start of the year
+					lt: new Date(`${Number(selectedYear) + 1}-01-01T00:00:00.000Z`), // Start of the next year
+				},
+			},
 			select: {
 				price: true,
 				createdAt: true, // Assuming the purchase date is the createdAt field
