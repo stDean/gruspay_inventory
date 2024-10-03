@@ -9,10 +9,10 @@ const DashBoardLayout = ({ children }: { children: ReactNode }) => {
 	const { isSidebarCollapsed } = useReduxState();
 
 	return (
-		<div className={` flex bg-gray-50 text-gray-900 w-full min-h-screen`}>
+		<div className="flex bg-gray-50 text-gray-900 w-full min-h-screen">
 			<SideBar />
 			<main
-				className={`flex flex-col w-full h-full py-7 px-4 bg-gray-50 ${
+				className={`flex flex-col w-full h-full py-7 px-2 md:px-4 bg-gray-50 ${
 					isSidebarCollapsed ? "md:pl-24" : "md:pl-72"
 				}`}
 			>

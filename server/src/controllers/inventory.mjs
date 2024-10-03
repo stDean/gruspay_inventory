@@ -574,125 +574,207 @@ export const InventoryCtrl = {
 	},
 	getDashboardStats: async (req, res) => {
 		const companyId = req.user.company_id;
+		const { soldYear, soldMonth, sellerMonth, sellerYear, tssYear, tssMonth } =
+			req.query;
 
-		// 1. Get total sales amount and convert prices from string to float
+		const currentYear = new Date().getFullYear();
+		const currentMonth = new Date().getMonth() + 1;
+
+		// Helper function for generating date filters
+		const getDateRange = (year, month) => ({
+			gte: new Date(
+				`${Number(year)}-${month.toString().padStart(2, "0")}-01T00:00:00.000Z`
+			), // Start of the month
+			lt: new Date(
+				`${Number(year)}-${(Number(soldFilter.soldMonth) + 1)
+					.toString()
+					.padStart(2, "0")}-01T00:00:00.000Z`
+			), // Start of the next month
+		});
+
+		// SOLD AND PURCHASE LOGIC
+		const soldFilter = {
+			soldYear: soldYear || currentYear,
+			soldMonth: soldMonth || currentMonth,
+		};
+
+		// Get total sales amount and convert prices from string to float
 		const soldProducts = await prisma.products.findMany({
-			where: { companyId, sales_status: { not: "NOT_SOLD" } },
+			where: {
+				companyId,
+				sales_status: { not: "NOT_SOLD" },
+				date_sold: getDateRange(soldFilter.soldYear, soldFilter.soldMonth),
+			},
 			select: { bought_for: true },
 		});
+
 		const totalSoldPrice = soldProducts.reduce(
 			(sum, product) => sum + (parseFloat(product.bought_for) || 0),
 			0
 		);
 
-		// 2. Get total item sold count
+		// Get total item sold count
 		const totalSalesCount = await prisma.products.count({
-			where: { companyId, sales_status: { not: "NOT_SOLD" } },
+			where: {
+				companyId,
+				sales_status: { not: "NOT_SOLD" },
+				date_sold: getDateRange(soldFilter.soldYear, soldFilter.soldMonth),
+			},
 		});
 
-		// 3. Get total purchases and purchase price
+		// Get total purchases and purchase price
 		const allProductsPrice = await prisma.products.findMany({
-			where: { companyId },
+			where: {
+				companyId,
+				createdAt: getDateRange(soldFilter.soldYear, soldFilter.soldMonth),
+			},
 			select: { price: true },
 		});
+
 		const totalPurchasePrice = allProductsPrice.reduce(
 			(sum, product) => sum + (parseFloat(product.price) || 0),
 			0
 		);
 		const totalPurchasesCount = allProductsPrice.length;
 
-		// 4. Get top seller based on sold product count
+		// TOP SELLER LOGIC
+		const topSellerFilter = {
+			sellerYear: sellerYear || currentYear,
+			sellerMonth: sellerMonth || currentMonth,
+		};
+
+		// Get top seller based on sold product count
 		const topSoldProductAndUser = await prisma.products.groupBy({
 			by: ["sold_by"],
-			where: { companyId, sales_status: { not: "NOT_SOLD" } },
-			_count: { sold_by: true },
-		});
-		const topSellerUserId = topSoldProductAndUser.reduce((prev, current) =>
-			prev._count.sold_by > current._count.sold_by ? prev : current
-		);
-
-		// 5. Get top seller user info and total price of products sold by them
-		const topSeller = await prisma.users.findUnique({
-			where: { companyId, id: topSellerUserId.sold_by },
-			include: { Sold_Products: { select: { id: true } } },
-		});
-		const topSellerProducts = await prisma.products.findMany({
 			where: {
 				companyId,
-				id: { in: topSeller.Sold_Products.map(product => product.id) },
+				sales_status: { not: "NOT_SOLD" },
+				date_sold: getDateRange(
+					topSellerFilter.sellerYear,
+					topSellerFilter.sellerMonth
+				),
 			},
-			select: { bought_for: true },
+			_count: { sold_by: true },
 		});
-		const topSellerPrice = topSellerProducts.reduce(
-			(sum, product) => sum + (parseFloat(product.bought_for) || 0),
-			0
-		);
 
-		// 6. Get business summary: stock count, total unsold price, suppliers, customers
+		const topSellerUserId =
+			topSoldProductAndUser.length !== 0
+				? topSoldProductAndUser.reduce((prev, current) =>
+						prev._count.sold_by > current._count.sold_by ? prev : current
+				  )
+				: null;
+
+		const topSeller =
+			topSellerUserId &&
+			(await prisma.users.findUnique({
+				where: { companyId, id: topSellerUserId.sold_by },
+				include: { Sold_Products: { select: { id: true } } },
+			}));
+
+		const topSellerProducts =
+			topSeller &&
+			(await prisma.products.findMany({
+				where: {
+					companyId,
+					id: { in: topSeller.Sold_Products.map(product => product.id) },
+					date_sold: getDateRange(
+						topSellerFilter.sellerYear,
+						topSellerFilter.sellerMonth
+					),
+				},
+				select: { bought_for: true },
+			}));
+
+		const topSellerPrice =
+			topSellerProducts &&
+			topSellerProducts.reduce(
+				(sum, product) => sum + (parseFloat(product.bought_for) || 0),
+				0
+			);
+
+		// BUSINESS SUMMARY LOGIC
 		const stockCount = await prisma.products.count({
 			where: { companyId, sales_status: "NOT_SOLD" },
 		});
+
 		const unsoldProducts = await prisma.products.findMany({
 			where: { companyId, sales_status: "NOT_SOLD" },
 			select: { price: true, product_name: true, id: true },
 		});
+
 		const totalUnsoldPrice = unsoldProducts.reduce(
 			(sum, product) => sum + (parseFloat(product.price) || 0),
 			0
 		);
+
 		const suppliersCount = await prisma.supplier.count({
 			where: { companyId },
 		});
 		const customersCount = await prisma.buyer.count({ where: { companyId } });
 
-		// 7. Get low quantity products (less than 5 items)
 		const productCounts = unsoldProducts.reduce((acc, product) => {
 			acc[product.product_name] = (acc[product.product_name] || 0) + 1;
 			return acc;
 		}, {});
+
 		const lowQuantityProducts = Object.entries(productCounts)
 			.filter(([_, count]) => count < 5)
 			.sort((a, b) => a[1] - b[1])
 			.slice(0, 5)
 			.map(([product_name, count]) => ({ product_name, count }));
 
-		// 8. Get top-selling products and remaining unsold quantity
+		// TOP SELLING STOCK LOGIC
+		const tssFilter = {
+			tssMonth: tssMonth || currentMonth,
+			tssYear: tssYear || currentYear,
+		};
+
 		const topSellingProducts = await prisma.products.groupBy({
 			by: ["product_name"],
-			where: { companyId, sales_status: "SOLD" },
+			where: {
+				companyId,
+				sales_status: "SOLD",
+				date_sold: getDateRange(tssFilter.tssYear, tssFilter.tssMonth),
+			},
 			_count: { product_name: true },
 			orderBy: { _count: { product_name: "desc" } },
 			take: 5,
 		});
-		const topSellingWithDetails = await Promise.all(
-			topSellingProducts.map(async product => {
-				const soldProducts = await prisma.products.findMany({
-					where: {
-						product_name: product.product_name,
-						companyId,
-						sales_status: "SOLD",
-					},
-					select: { bought_for: true },
-				});
-				const totalSoldPrice = soldProducts.reduce(
-					(sum, p) => sum + (parseFloat(p.bought_for) || 0),
-					0
-				);
-				const remainingQuantity = await prisma.products.count({
-					where: {
-						product_name: product.product_name,
-						companyId,
-						sales_status: "NOT_SOLD",
-					},
-				});
-				return {
-					product_name: product.product_name,
-					total_sold: product._count.product_name,
-					total_sold_price: totalSoldPrice,
-					remaining_quantity: remainingQuantity,
-				};
-			})
-		);
+
+		const topSellingWithDetails = topSellingProducts
+			? await Promise.all(
+					topSellingProducts.map(async product => {
+						const soldProducts = await prisma.products.findMany({
+							where: {
+								product_name: product.product_name,
+								companyId,
+								sales_status: "SOLD",
+							},
+							select: { bought_for: true },
+						});
+
+						const totalSoldPrice = soldProducts.reduce(
+							(sum, p) => sum + (parseFloat(p.bought_for) || 0),
+							0
+						);
+
+						const remainingQuantity = await prisma.products.count({
+							where: {
+								product_name: product.product_name,
+								companyId,
+								sales_status: "NOT_SOLD",
+							},
+						});
+
+						return {
+							product_name: product.product_name,
+							total_sold: product._count.product_name,
+							total_sold_price: totalSoldPrice,
+							remaining_quantity: remainingQuantity,
+						};
+					})
+			  )
+			: [];
 
 		// Return all gathered stats
 		return res.status(200).json({
@@ -701,10 +783,10 @@ export const InventoryCtrl = {
 			totalPurchasesCount,
 			totalPurchasePrice,
 			topSellerDetail: {
-				first_name: topSeller.first_name,
-				last_name: topSeller.last_name,
-				count: topSellerUserId._count.sold_by,
-				totalPrice: topSellerPrice,
+				first_name: topSeller ? topSeller.first_name : "",
+				last_name: topSeller ? topSeller.last_name : "",
+				count: topSellerUserId ? topSellerUserId._count.sold_by : 0,
+				totalPrice: topSellerPrice ? topSellerPrice : 0,
 			},
 			businessSummary: {
 				stockCount,
@@ -716,10 +798,11 @@ export const InventoryCtrl = {
 			topSellingWithDetails,
 		});
 	},
+
 	getMonthlySalesAndPurchases: async (req, res) => {
 		const { company_id } = req.user;
 
-		// Step 1: Fetch sold products grouped by month
+		// Fetch sold products grouped by month
 		const soldProducts = await prisma.products.findMany({
 			where: {
 				companyId: company_id,
@@ -731,7 +814,7 @@ export const InventoryCtrl = {
 			},
 		});
 
-		// Step 2: Fetch purchased products grouped by month
+		// Fetch purchased products grouped by month
 		const purchasedProducts = await prisma.products.findMany({
 			where: { companyId: company_id },
 			select: {
@@ -741,21 +824,22 @@ export const InventoryCtrl = {
 		});
 
 		// Helper function to get month name from date
+		const monthNames = [
+			"January",
+			"February",
+			"March",
+			"April",
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December",
+		];
+
 		const getMonthName = date => {
-			const monthNames = [
-				"January",
-				"February",
-				"March",
-				"April",
-				"May",
-				"June",
-				"July",
-				"August",
-				"September",
-				"October",
-				"November",
-				"December",
-			];
 			return monthNames[date.getMonth()]; // getMonth() returns 0-11 index
 		};
 
@@ -773,14 +857,14 @@ export const InventoryCtrl = {
 			}, {});
 		};
 
-		// Step 3: Group sold and purchased products by month
+		// Group sold and purchased products by month
 		const groupedSoldProducts = groupByMonth(soldProducts, "date_sold");
 		const groupedPurchasedProducts = groupByMonth(
 			purchasedProducts,
 			"createdAt"
 		);
 
-		// Step 4: Sum up sales and purchases for each month
+		// Sum up sales and purchases for each month
 		const calculateTotalForMonth = (products, priceField) => {
 			return products.reduce((sum, product) => {
 				const price = parseFloat(product[priceField]) || 0;
@@ -788,7 +872,7 @@ export const InventoryCtrl = {
 			}, 0);
 		};
 
-		// Step 5: Merge sales and purchases into a single dataset
+		// Merge sales and purchases into a single dataset
 		const allMonths = new Set([
 			...Object.keys(groupedSoldProducts),
 			...Object.keys(groupedPurchasedProducts),
@@ -805,6 +889,10 @@ export const InventoryCtrl = {
 				"price"
 			),
 		}));
+
+		data.sort(
+			(a, b) => monthNames.indexOf(a.month) - monthNames.indexOf(b.month)
+		);
 
 		return res.status(200).json({ data });
 	},

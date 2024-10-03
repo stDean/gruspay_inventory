@@ -19,6 +19,10 @@ body,
   @apply text-gray-900;
 }
 
+body::-webkit-scrollbar {
+  width: 1px;
+}
+
 @media (min-width: 768px) {
   .custom-grid-rows {
     grid-template-rows: repeat(8, 20vh);

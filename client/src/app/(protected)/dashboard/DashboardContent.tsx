@@ -1,14 +1,16 @@
 "use client";
 
-import { getDashboardStats } from "@/actions/inventory";
+import { getBarChartData, getDashboardStats } from "@/actions/inventory";
 import { getUser } from "@/actions/user";
 import { useAppDispatch } from "@/app/redux";
+import { BarChartContent } from "@/components/BarChartContent";
+import { MonthsDropDown } from "@/components/MonthsDropDown";
 import { Spinner } from "@/components/Spinners";
+import { YearSelect } from "@/components/YearSelect";
 import { useReduxState } from "@/hook/useRedux";
-import { DashboardProps } from "@/lib/types";
+import { BarChartProps, DashboardProps } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { setUser } from "@/state";
-import { BarChartContent } from "@/components/BarChartContent";
 import { useCallback, useEffect, useState, useTransition } from "react";
 
 export const DashboardContent = () => {
@@ -17,6 +19,7 @@ export const DashboardContent = () => {
 	const [isPending, startTransition] = useTransition();
 
 	const [dashboardStat, setDashboardStat] = useState<DashboardProps>();
+	const [data, setData] = useState<BarChartProps[]>();
 
 	const setUserState = useCallback(async () => {
 		const { data } = await getUser({ token });
@@ -30,49 +33,121 @@ export const DashboardContent = () => {
 		});
 	};
 
+	const getBarData = useCallback(() => {
+		startTransition(async () => {
+			const { data } = await getBarChartData({ token });
+			setData(data.data);
+		});
+	}, [token]);
+
 	useEffect(() => {
 		setUserState();
 		dashboardStats();
+		getBarData();
 	}, []);
 
-	console.log({ dashboardStat });
+	// filters
+	const [selectedYears, setSelectedYears] = useState<{
+		[key: string]: number;
+	}>();
+
+	const handleYearChange = (componentKey: string, value: number) => {
+		setSelectedYears(prevState => ({
+			...prevState,
+			[componentKey]: value, // Update the selected value for the specific component
+		}));
+	};
+
+	const [selectedMonths, setSelectedMonths] = useState<{
+		[key: string]: string;
+	}>();
+
+	const handleMonthChange = (componentKey: string, value: string) => {
+		setSelectedMonths(prevState => ({
+			...prevState,
+			[componentKey]: value, // Update the selected value for the specific component
+		}));
+	};
+
+	console.log({ selectedYears, selectedMonths });
 
 	return isPending ? (
 		<Spinner />
 	) : (
-		<div className="space-y-4 md:grid md:grid-cols-12 gap-4 xl:gap-16 md:overflow-hidden md:mx-4">
+		<div className="space-y-4 md:space-y-0 md:grid md:grid-cols-12 md:gap-10 md:mx-4">
 			<div className="col-span-7 flex flex-col gap-4">
-				<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between">
+				<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between overflow-x-hidden">
 					<div className="space-y-2">
-						<p className="font-semibold text-lg">Total Sales</p>
-						<h1 className="font-semibold text-3xl lg:text-5xl">
+						<p className="font-semibold text-base lg:text-lg">Total Sales</p>
+						<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
 							{formatCurrency(Number(dashboardStat?.totalSoldPrice || 0))}
 						</h1>
-						<p className="font-semibold text-lg">
+						<p className="font-semibold md:text-lg">
 							{dashboardStat?.totalSalesCount || 0} item(s)
 						</p>
 					</div>
 
 					<div className="space-y-2">
-						<p className="font-semibold text-lg">Total Purchases</p>
-						<h1 className="font-semibold text-3xl lg:text-5xl">
+						<p className="font-semibold text-base lg:text-lg">
+							Total Purchases
+						</p>
+						<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
 							{formatCurrency(Number(dashboardStat?.totalPurchasePrice || 0))}
 						</h1>
-						<p className="font-semibold text-lg">
+						<p className="font-semibold md:text-lg">
 							{dashboardStat?.totalPurchasesCount || 0} item(s)
 						</p>
 					</div>
+
+					<div className="space-y-4">
+						<MonthsDropDown
+							onMonthChange={handleMonthChange}
+							componentKey="dashMonth"
+						/>
+						<YearSelect
+							onYearChange={handleYearChange}
+							startYear={2024}
+							endYear={2034}
+							componentKey="dashYear"
+						/>
+					</div>
 				</div>
 
-				<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between">
-					<BarChartContent />
+				<div className="border rounded-lg shadow-md p-6 pt-4 bg-white/70 ">
+					<div className="flex justify-end mb-2">
+						<YearSelect
+							onYearChange={handleYearChange}
+							startYear={2024}
+							endYear={2034}
+							style="w-fit"
+							key="bar"
+							componentKey="bar"
+						/>
+					</div>
+
+					<BarChartContent data={data!} />
 				</div>
 
 				<div className="border rounded-lg shadow-md p-6 bg-white/70 space-y-4">
-					<p className="font-semibold text-xl">Top Selling Stock</p>
+					<div className="flex justify-between items-center">
+						<p className="font-semibold text-xl">Top Selling Stock</p>
+
+						<div className="flex gap-4">
+							<MonthsDropDown
+								onMonthChange={handleMonthChange}
+								componentKey="stockMonth"
+							/>
+							<YearSelect
+								onYearChange={handleYearChange}
+								startYear={2024}
+								endYear={2034}
+								componentKey="stockYear"
+							/>
+						</div>
+					</div>
 
 					<div className="">
-						<div className="flex justify-between border-t py-2 text-lg">
+						<div className="flex justify-between border-t py-2 lg:text-lg">
 							<p className="font-semibold">Product Name</p>
 							<p className="font-semibold">Sold Quantity</p>
 							<p className="font-semibold">Remaining Quantity</p>
@@ -81,7 +156,7 @@ export const DashboardContent = () => {
 						{dashboardStat?.topSellingWithDetails.map(product => (
 							<div
 								key={product.product_name}
-								className="flex justify-between border-t py-2 text-base font-semibold"
+								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
 								<p className="flex-1">{product.product_name}</p>
 								<p className="flex-1 flex justify-center">
@@ -91,7 +166,7 @@ export const DashboardContent = () => {
 									{product.remaining_quantity}
 								</p>
 								<p className="flex-1 flex justify-end">
-									{product.total_sold_price}
+									{formatCurrency(Number(product.total_sold_price) || 0)}
 								</p>
 							</div>
 						))}
@@ -117,6 +192,19 @@ export const DashboardContent = () => {
 							<span>{dashboardStat?.topSellerDetail.count} item(s)</span>
 						</p>
 					</div>
+
+					<div className="flex flex-col lg:flex-row gap-4">
+						<MonthsDropDown
+							onMonthChange={handleMonthChange}
+							componentKey="topSellerMonth"
+						/>
+						<YearSelect
+							onYearChange={handleYearChange}
+							startYear={2024}
+							endYear={2034}
+							componentKey="topSellerYear"
+						/>
+					</div>
 				</div>
 
 				{/* Business summary */}
@@ -135,7 +223,9 @@ export const DashboardContent = () => {
 
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.totalUnsoldPrice}
+								{formatCurrency(
+									Number(dashboardStat?.businessSummary.totalUnsoldPrice) || 0
+								)}
 							</span>
 							<span className="font-semibold">Inventory Value</span>
 						</p>
@@ -161,14 +251,14 @@ export const DashboardContent = () => {
 					<p className="font-semibold text-xl">Low Quantity Stock</p>
 
 					<div className="">
-						<div className="flex justify-between border-t py-2 text-lg">
+						<div className="flex justify-between border-t py-2 text-sm lg:text-base">
 							<p className="font-semibold">Product Name</p>
 							<p className="font-semibold mr-7">Remaining Quantity</p>
 						</div>
 						{dashboardStat?.lowQuantityProducts.map(product => (
 							<div
 								key={product.product_name}
-								className="flex justify-between border-t py-2 text-base font-semibold"
+								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
 								<p>{product.product_name}</p>
 								<p className="mr-36">{product.count}</p>
