@@ -50,6 +50,9 @@ router
 	.route("/updateProduct/:id")
 	.patch([AuthMiddleware, AdminMiddleware], InventoryCtrl.updateProduct);
 router
+	.route("/updateBalance/:id")
+	.patch([AuthMiddleware, AdminMiddleware], InventoryCtrl.updateSoldProduct);
+router
 	.route("/sellProduct/:serialNo")
 	.patch(AuthMiddleware, InventoryCtrl.sellProduct);
 

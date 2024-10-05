@@ -12,6 +12,7 @@ export interface ProductProps {
 	date_sold?: string;
 	bought_for?: string;
 	sales_status?: string;
+	balance_owed?: string;
 	AddedByUser?: { first_name: string; last_name: string; email: string };
 	SoldByUser?: { first_name: string; last_name: string; email: string };
 	Supplier: {
@@ -38,6 +39,11 @@ export interface ProductProps {
 		updateAt: string;
 		incomingProducts: Array<ProductProps>;
 	};
+  Creditor?: {
+    creditor_name: string;
+		creditor_email?: string;
+		creditor_phone_no: string;
+  }
 }
 
 export interface ProductStockProps {
@@ -80,6 +86,19 @@ export interface CustomerProps {
 	createdAt: string;
 	id: string;
 	updatedAt: string;
+  creditor: boolean;
+}
+
+export interface CreditorProps {
+	Products: Array<ProductProps>;
+	creditor_email: string;
+	creditor_name: string;
+	creditor_phone_no: string;
+	companyId: string;
+	createdAt: string;
+	id: string;
+	updatedAt: string;
+  creditor: boolean;
 }
 
 export interface SupplierProps {

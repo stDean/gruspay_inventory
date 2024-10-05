@@ -3,6 +3,7 @@ import { AddMultipleProductsModal } from "@/components/modals/AddMultipleProduct
 import { AddProductsModal } from "@/components/modals/AddProductsModal";
 import { AddSingleProductModal } from "@/components/modals/AddSingleProductModal";
 import { AddUserModal } from "@/components/modals/AddUserModal";
+import { CompletePayModal } from "@/components/modals/CompletePayModal";
 import { ModifyRoleModal } from "@/components/modals/ModifyRoleModal";
 import { ShowProductModal } from "@/components/modals/ShowProductModal";
 import { SoldDetailModal } from "@/components/modals/SoldDetailModal";
@@ -25,6 +26,8 @@ export default function RootLayout({
 			<SoldDetailModal />
 			<SwapDetailModal />
 			<ModifyRoleModal />
+			<CompletePayModal />
+
 			<DashboardWrapper>{children}</DashboardWrapper>
 		</>
 	);

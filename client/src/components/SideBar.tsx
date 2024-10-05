@@ -91,6 +91,8 @@ export const SideBar = () => {
 		isSidebarCollapsed ? "w-0 md:w-20" : "w-72 md:w-64"
 	} bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
+  const year = new Date().getFullYear();  
+
 	return (
 		<div className={sidebarClassNames}>
 			{/* TOP LOGO */}
@@ -165,7 +167,7 @@ export const SideBar = () => {
 				<div className="flex justify-between gap-2 items-center px-6 mb-4">
 					<div className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
 						<p className="font-semibold text-base truncate w-44">
-							{user?.Company.company_name}
+							{user?.Company?.company_name}
 						</p>
 						<p className="text-sm">{user?.email}</p>
 					</div>
@@ -179,7 +181,7 @@ export const SideBar = () => {
 						isSidebarCollapsed ? "hidden" : "block"
 					}`}
 				>
-					&copy; 2024 Gruspay
+					&copy; {year} Gruspay
 				</p>
 			</div>
 		</div>

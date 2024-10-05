@@ -53,7 +53,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
 			<TableHead className="px-2 border-r">Date Added</TableHead>
 			<TableHead className="px-2 border-r">Specifications</TableHead>
-			<TableHead className="px-2 border-r">Value</TableHead>
+			<TableHead className="px-2 border-r">Value(₦)</TableHead>
 			<TableHead className="px-2">Supplied By</TableHead>
 		</>
 	);

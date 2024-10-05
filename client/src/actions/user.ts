@@ -282,3 +282,54 @@ export const getCustomer = async ({
 		return { error: "Something went wrong, try again." };
 	}
 };
+
+// CREDITOR
+export const getCreditors = async ({ token }: { token: string }) => {
+	try {
+		const { data } = await axios.get(
+			"http://localhost:5001/api/user/getCreditors",
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+export const getCreditor = async ({
+	token,
+	id,
+}: {
+	token: string;
+	id: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`http://localhost:5001/api/user/getCreditor/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: "the redirect" };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};

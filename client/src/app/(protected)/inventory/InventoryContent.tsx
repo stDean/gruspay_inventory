@@ -40,7 +40,6 @@ export const InventoryContent = () => {
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
 			const { error, data } = await getProductsByStock({ token });
-			console.log({ error });
 			if (error) {
 				toast.error("Error", { description: error });
 				return;
@@ -50,7 +49,17 @@ export const InventoryContent = () => {
 	}, [token, addSingleProductModal.isOpen, addMultipleProductModal.isOpen]);
 
 	const getInventoryStat = async () => {
-		const { data } = await getInventoryStats({ token });
+		const { data, error } = await getInventoryStats({ token });
+		if (error) {
+			setStats({
+				allCategory: 0,
+				stockCount: 0,
+				totalPrice: 0,
+				topSeller: "No Sales Yet",
+			});
+			return;
+		}
+
 		setStats({
 			allCategory: data.allCategoryNotSold.length,
 			stockCount: data.totalInventoryCount,

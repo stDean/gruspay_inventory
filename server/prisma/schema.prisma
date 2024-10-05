@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = []
 }
 
 datasource db {
@@ -46,6 +47,7 @@ model Company {
   suppliers     Supplier[]
   customers     Buyer[]
   swaps         Swaps[]
+  creditors     Creditor[]
 }
 
 model Otp {
@@ -99,6 +101,9 @@ model Products {
   swapsInId        String?
   OutgoingProduct  Swaps?     @relation(fields: [swapsOutId], references: [id])
   swapsOutId       String?
+  balance_owed     String?
+  Creditor         Creditor?  @relation(fields: [creditorId], references: [id])
+  creditorId       String?
 
   @@unique([serial_no, companyId])
 }
@@ -132,7 +137,6 @@ model Buyer {
   buyer_name     String
   buyer_email    String?
   buyer_phone_no String
-  // TODO:Add a balance_owed column
   Company        Company?   @relation(fields: [companyId], references: [id])
   companyId      String?
   createdAt      DateTime   @default(now())
@@ -140,4 +144,18 @@ model Buyer {
   Products       Products[]
 
   @@unique([buyer_email, buyer_name, companyId])
+}
+
+model Creditor {
+  id                String     @id @default(uuid())
+  creditor_name     String
+  creditor_email    String
+  creditor_phone_no String
+  Company           Company?   @relation(fields: [companyId], references: [id])
+  companyId         String?
+  Products          Products[]
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  @@unique([creditor_email, creditor_name, companyId])
 }

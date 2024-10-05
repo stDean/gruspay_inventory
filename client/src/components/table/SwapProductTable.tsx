@@ -45,11 +45,11 @@ export const SwapProductTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
 			<TableHead className="px-2 border-r">Date Swapped</TableHead>
-			<TableHead className="px-2 border-r">Value</TableHead>
+			<TableHead className="px-2 border-r">Value(₦)</TableHead>
 			<TableHead className="px-2">Swap By</TableHead>
 			<TableHead className="px-2">Swap To</TableHead>
 			<TableHead className="px-2">Swap Count</TableHead>
-			<TableHead className="px-2">Amount Included</TableHead>
+			<TableHead className="px-2">Amount Included(₦)</TableHead>
 		</>
 	);
 

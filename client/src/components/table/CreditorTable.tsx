@@ -2,14 +2,19 @@ import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
 import { TableContainer } from "./Table";
+import useCompletePayModal from "@/hook/useCompletePayModal";
+import { useEffect } from "react";
 
-export const CustomerTable = ({
+export const CreditorTable = ({
 	products,
 	page,
 }: {
 	products: Array<ProductProps>;
 	page: number;
 }) => {
+	console.log({ products });
+
+	const completeModal = useCompletePayModal();
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -39,7 +44,12 @@ export const CustomerTable = ({
 			{productsByPage.map((product, idx) => (
 				<TableRow key={product.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell
+						className="px-2 border-r w-5 md:w-10 text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize"
+						onClick={() => {
+							completeModal.onOpen(product);
+						}}
+					>
 						{product.product_name}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">

@@ -24,9 +24,17 @@ router
 router
 	.route("/getCustomer/:id")
 	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCustomer);
+router
+	.route("/getCreditors")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCreditors);
+router
+	.route("/getCreditor/:id")
+	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCreditor);
 
 router.route("/updateUser").patch(AuthMiddleware, UserCtrl.updateUser);
-router.route("/updateUserRole/:id").patch(AuthMiddleware, UserCtrl.updateUserRole);
+router
+	.route("/updateUserRole/:id")
+	.patch(AuthMiddleware, UserCtrl.updateUserRole);
 
 router.route("/createUser").post(AuthMiddleware, UserCtrl.createUser);
 

@@ -142,7 +142,7 @@ export const SoldContent = () => {
 						count="Sales"
 					/>
 				) : (
-					<p>No Products Sold Yet!</p>
+					<p className="text-center font-semibold text-2xl mt-20">No Products Sold Yet!</p>
 				))}
 
 			{tab.swapped &&
@@ -156,7 +156,7 @@ export const SoldContent = () => {
 						count="Swap"
 					/>
 				) : (
-					<p>No Products Swapped Yet!</p>
+					<p className="text-center font-semibold text-2xl mt-20">No Products Swapped Yet!</p>
 				))}
 		</div>
 	);

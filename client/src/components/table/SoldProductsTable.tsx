@@ -50,7 +50,8 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 			<TableHead className="px-2 border-r">Value</TableHead>
 			<TableHead className="px-2">Sold By</TableHead>
 			<TableHead className="px-2">Sold To</TableHead>
-			<TableHead className="px-2">Amount Sold</TableHead>
+			<TableHead className="px-2">Amount Paid(₦)</TableHead>
+			<TableHead className="px-2">Balance Owed(₦)</TableHead>
 		</>
 	);
 
@@ -80,6 +81,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 						{item.Customer?.buyer_name!}
 					</TableCell>
 					<TableCell className="border-r">{item?.bought_for!}</TableCell>
+					<TableCell className="border-r">{item?.balance_owed!}</TableCell>
 				</TableRow>
 			))}
 		</>

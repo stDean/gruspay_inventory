@@ -23,23 +23,24 @@ export const ShowProductModal = () => {
 	const [isPending, startTransition] = useTransition();
 	const [sold, setSold] = useState<boolean>(false);
 
-  const [customerInfo, setCustomerInfo] = useState<{
+	const [customerInfo, setCustomerInfo] = useState<{
 		buyer_name: string;
 		buyer_email?: string;
 		phone_no: string;
 		amount_paid: string;
+		balance_owed?: string;
 	}>({
 		buyer_name: "",
 		buyer_email: "",
 		phone_no: "",
 		amount_paid: "",
+		balance_owed: "",
 	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setCustomerInfo(prev => ({ ...prev, [name]: value }));
 	};
-
 
 	const handleClose = () => {
 		showProductModal.onClose();
@@ -50,9 +51,9 @@ export const ShowProductModal = () => {
 			buyer_email: "",
 			phone_no: "",
 			amount_paid: "",
+			balance_owed: "",
 		});
 	};
-
 
 	const handleSold = () => {
 		if (sold) {
@@ -175,7 +176,11 @@ export const ShowProductModal = () => {
 			{sold && (
 				<>
 					<div className="p-4 pt-0 space-y-4">
-						<CustomerInfo customerInfo={customerInfo} handleChange={handleChange} />
+						<CustomerInfo
+							customerInfo={customerInfo}
+							handleChange={handleChange}
+							balance_owed
+						/>
 					</div>
 
 					<hr />
@@ -190,18 +195,21 @@ export const ShowProductModal = () => {
 				>
 					{sold ? "Confirm Sale" : "Mark as Sold"}
 				</Button>
-				<Button
-					className="w-full py-5"
-					onClick={() =>
-						handleSwap({
-							product_name: singleData?.product_name!,
-							serial_no: singleData?.serial_no!,
-							price: singleData?.price!,
-						})
-					}
-				>
-					Swap
-				</Button>
+
+				{!sold && (
+					<Button
+						className="w-full py-5"
+						onClick={() =>
+							handleSwap({
+								product_name: singleData?.product_name!,
+								serial_no: singleData?.serial_no!,
+								price: singleData?.price!,
+							})
+						}
+					>
+						Swap
+					</Button>
+				)}
 			</div>
 		</>
 	);

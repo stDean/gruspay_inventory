@@ -27,7 +27,7 @@ export const SupplierTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
 			<TableHead className="px-2 border-r">Serial Number</TableHead>
-			<TableHead className="px-2 border-r">Price</TableHead>
+			<TableHead className="px-2 border-r">Price(₦)</TableHead>
 			<TableHead className="px-2 border-r">Sale Status</TableHead>
 			<TableHead className="px-2 border-r">Supply Date</TableHead>
 		</>
@@ -46,6 +46,8 @@ export const SupplierTable = ({
 					<TableCell className="px-2 border-r">
 						{product?.sales_status === "SWAP"
 							? "SWAPPED"
+							: product?.sales_status === "NOT_SOLD"
+							? "AVAILABLE"
 							: product?.sales_status}
 					</TableCell>
 					<TableCell className="px-2 border-r">

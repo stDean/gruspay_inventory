@@ -1,6 +1,7 @@
 "use client";
 
 import { Tab } from "@/components/Tab";
+import { CreditorsTable } from "@/components/table/CreditorsTable";
 import { CustomersTable } from "@/components/table/CustomersTable";
 import { EmployeeTable } from "@/components/table/EmployeeTable";
 import { SuppliersTable } from "@/components/table/SuppliersTable";
@@ -14,7 +15,8 @@ export const UserContent = () => {
 		employees: boolean;
 		customers: boolean;
 		suppliers: boolean;
-	}>({ employees: true, customers: false, suppliers: false });
+		creditors: boolean;
+	}>({ employees: true, customers: false, suppliers: false, creditors: false });
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -27,7 +29,12 @@ export const UserContent = () => {
 							first
 							title="Employee"
 							handleTab={() => {
-								setTab({ employees: true, customers: false, suppliers: false });
+								setTab({
+									employees: true,
+									customers: false,
+									suppliers: false,
+									creditors: false,
+								});
 							}}
 							val={tab.employees}
 							styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r rounded-l-md"
@@ -35,15 +42,38 @@ export const UserContent = () => {
 						<Tab
 							title="Customers"
 							handleTab={() => {
-								setTab({ customers: true, employees: false, suppliers: false });
+								setTab({
+									customers: true,
+									employees: false,
+									suppliers: false,
+									creditors: false,
+								});
 							}}
 							val={tab.customers}
 							styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r"
 						/>
 						<Tab
+							title="Creditors"
+							handleTab={() => {
+								setTab({
+									customers: false,
+									employees: false,
+									suppliers: false,
+									creditors: true,
+								});
+							}}
+							val={tab.creditors}
+							styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r"
+						/>
+						<Tab
 							title="Suppliers"
 							handleTab={() => {
-								setTab({ suppliers: true, customers: false, employees: false });
+								setTab({
+									suppliers: true,
+									customers: false,
+									employees: false,
+									creditors: false,
+								});
 							}}
 							val={tab.suppliers}
 							styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] rounded-r-md"
@@ -66,6 +96,7 @@ export const UserContent = () => {
 			{tab.employees && <EmployeeTable />}
 			{tab.customers && <CustomersTable />}
 			{tab.suppliers && <SuppliersTable />}
+			{tab.creditors && <CreditorsTable />}
 		</div>
 	);
 };

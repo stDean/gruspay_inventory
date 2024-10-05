@@ -263,16 +263,26 @@ export const InventoryCtrl = {
 	},
 	sellProduct: async (req, res) => {
 		const { serialNo } = req.params;
-		const { buyer_name, buyer_email, amount_paid, buyer_phone_no } = req.body;
+		const {
+			buyer_name,
+			buyer_email,
+			amount_paid,
+			buyer_phone_no,
+			balance_owed,
+		} = req.body;
+		const { company_id, email } = req.user;
 
 		const product = await prisma.products.findUnique({
 			where: {
-				serial_no_companyId: {
-					serial_no: serialNo,
-					companyId: req.user.company_id,
-				},
+				serial_no_companyId: { serial_no: serialNo, companyId: company_id },
 			},
 		});
+
+		if (!product) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Product not found", success: false });
+		}
 
 		if (product.sold) {
 			return res
@@ -280,45 +290,62 @@ export const InventoryCtrl = {
 				.json({ msg: "Product already sold", success: false });
 		}
 
-		const user = await prisma.users.findUnique({
-			where: {
-				email: req.user.email,
-			},
-		});
+		const user = await prisma.users.findUnique({ where: { email } });
+
+		const updateData = {
+			sales_status: "SOLD",
+			SoldByUser: { connect: { id: user.id } },
+			date_sold: new Date(),
+			bought_for: amount_paid,
+			balance_owed: balance_owed || "0",
+		};
+
+		if (balance_owed) {
+			updateData["Creditor"] = {
+				connectOrCreate: {
+					where: {
+						creditor_email_creditor_name_companyId: {
+							creditor_name: buyer_name,
+							creditor_email: buyer_email,
+							companyId: company_id,
+						},
+					},
+					create: {
+						creditor_name: buyer_name,
+						creditor_email: buyer_email,
+						creditor_phone_no: buyer_phone_no,
+						companyId: company_id,
+					},
+				},
+			};
+		} else {
+			updateData["Customer"] = {
+				connectOrCreate: {
+					where: {
+						buyer_email_buyer_name_companyId: {
+							buyer_email,
+							buyer_name,
+							companyId: company_id,
+						},
+					},
+					create: {
+						buyer_name,
+						buyer_email: buyer_email || null,
+						buyer_phone_no,
+						companyId: company_id,
+					},
+				},
+			};
+		}
 
 		const updatedProduct = await prisma.products.update({
 			where: {
-				serial_no_companyId: {
-					serial_no: serialNo,
-					companyId: req.user.company_id,
-				},
+				serial_no_companyId: { serial_no: serialNo, companyId: company_id },
 			},
-			data: {
-				sales_status: "SOLD",
-				SoldByUser: { connect: { id: user.id } },
-				date_sold: new Date(),
-				bought_for: amount_paid,
-				Customer: {
-					connectOrCreate: {
-						where: {
-							buyer_email_buyer_name_companyId: {
-								buyer_email,
-								buyer_name,
-								companyId: req.user.company_id,
-							},
-						},
-						create: {
-							buyer_name,
-							buyer_email: buyer_email || null,
-							buyer_phone_no,
-							companyId: req.user.company_id,
-						},
-					},
-				},
-			},
+			data: updateData,
 		});
 
-		res
+		return res
 			.status(StatusCodes.OK)
 			.json({ msg: "Successfully sold", updatedProduct });
 	},
@@ -554,9 +581,14 @@ export const InventoryCtrl = {
 		});
 
 		// Find the product with the highest sold count
-		const topSoldProduct = allSoldProducts.reduce((prev, current) =>
-			prev._count.product_name > current._count.product_name ? prev : current
-		);
+		const topSoldProduct =
+			allSoldProducts.length !== 0
+				? allSoldProducts.reduce((prev, current) =>
+						prev._count.product_name > current._count.product_name
+							? prev
+							: current
+				  )
+				: 0;
 
 		// Return the aggregated inventory statistics
 		return res.status(StatusCodes.OK).json({
@@ -610,10 +642,13 @@ export const InventoryCtrl = {
 			select: { bought_for: true },
 		});
 
-		const totalSoldPrice = soldProducts.reduce(
-			(sum, product) => sum + (parseFloat(product.bought_for) || 0),
-			0
-		);
+		const totalSoldPrice =
+			soldProducts.length !== 0
+				? soldProducts.reduce(
+						(sum, product) => sum + (parseFloat(product.bought_for) || 0),
+						0
+				  )
+				: 0;
 
 		// Get total item sold count
 		const totalSalesCount = await prisma.products.count({
@@ -633,10 +668,13 @@ export const InventoryCtrl = {
 			select: { price: true },
 		});
 
-		const totalPurchasePrice = allProductsPrice.reduce(
-			(sum, product) => sum + (parseFloat(product.price) || 0),
-			0
-		);
+		const totalPurchasePrice =
+			allProductsPrice.length !== 0
+				? allProductsPrice.reduce(
+						(sum, product) => sum + (parseFloat(product.price) || 0),
+						0
+				  )
+				: 0;
 		const totalPurchasesCount = allProductsPrice.length;
 
 		// TOP SELLER LOGIC
@@ -690,12 +728,12 @@ export const InventoryCtrl = {
 				select: { bought_for: true },
 			}));
 
-		const topSellerPrice =
-			topSellerProducts &&
-			topSellerProducts.reduce(
-				(sum, product) => sum + (parseFloat(product.bought_for) || 0),
-				0
-			);
+		const topSellerPrice = topSellerProducts
+			? topSellerProducts.reduce(
+					(sum, product) => sum + (parseFloat(product.bought_for) || 0),
+					0
+			  )
+			: 0;
 
 		// BUSINESS SUMMARY LOGIC
 		const stockCount = await prisma.products.count({
@@ -707,20 +745,26 @@ export const InventoryCtrl = {
 			select: { price: true, product_name: true, id: true },
 		});
 
-		const totalUnsoldPrice = unsoldProducts.reduce(
-			(sum, product) => sum + (parseFloat(product.price) || 0),
-			0
-		);
+		const totalUnsoldPrice =
+			unsoldProducts.length !== 0
+				? unsoldProducts.reduce(
+						(sum, product) => sum + (parseFloat(product.price) || 0),
+						0
+				  )
+				: 0;
 
 		const suppliersCount = await prisma.supplier.count({
 			where: { companyId },
 		});
 		const customersCount = await prisma.buyer.count({ where: { companyId } });
 
-		const productCounts = unsoldProducts.reduce((acc, product) => {
-			acc[product.product_name] = (acc[product.product_name] || 0) + 1;
-			return acc;
-		}, {});
+		const productCounts =
+			unsoldProducts.length !== 0
+				? unsoldProducts.reduce((acc, product) => {
+						acc[product.product_name] = (acc[product.product_name] || 0) + 1;
+						return acc;
+				  }, {})
+				: 0;
 
 		const lowQuantityProducts = Object.entries(productCounts)
 			.filter(([_, count]) => count < 5)
@@ -803,7 +847,6 @@ export const InventoryCtrl = {
 			topSellingWithDetails,
 		});
 	},
-
 	getMonthlySalesAndPurchases: async (req, res) => {
 		const { company_id } = req.user;
 		const { barYear } = req.query;
@@ -914,5 +957,100 @@ export const InventoryCtrl = {
 		);
 
 		return res.status(200).json({ data });
+	},
+	updateSoldProduct: async (req, res) => {
+		const {
+			user: { company_id },
+			params: { id },
+			body: { amount },
+		} = req;
+
+		// Find the sold product with a balance owed
+		const product = await prisma.products.findFirst({
+			where: {
+				companyId: company_id,
+				id: id,
+				sales_status: "SOLD",
+				balance_owed: { not: "0" },
+			},
+			include: { Creditor: { include: { Products: true } } },
+		});
+
+		// If product not found, return error
+		if (!product) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Product not found", success: false });
+		}
+
+		// Calculate the updated balance
+		const balance = Number(product.balance_owed) - Number(amount);
+
+		// Prevent overpayment
+		if (balance < 0) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Cannot pay more than balance owed", success: false });
+		}
+
+		// Update product when there's still balance owed
+		const updatedData = {
+			balance_owed: String(balance),
+			date_sold: new Date(),
+			bought_for: String(Number(amount) + Number(product.bought_for)),
+		};
+
+		// When balance is fully paid, update customer information
+		if (balance === 0) {
+			updatedData["Customer"] = {
+				connectOrCreate: {
+					where: {
+						buyer_email_buyer_name_companyId: {
+							buyer_email: product.Creditor.creditor_email,
+							buyer_name: product.Creditor.creditor_name,
+							companyId: product.companyId,
+						},
+					},
+					create: {
+						buyer_email: product.Creditor.creditor_email,
+						buyer_name: product.Creditor.creditor_name,
+						buyer_phone_no: product.Creditor.creditor_phone_no,
+						companyId: product.companyId,
+					},
+				},
+			};
+		}
+
+		// Update product with the new balance and customer info
+		await prisma.products.update({
+			where: { id: product.id },
+			data: updatedData,
+		});
+
+		// If balance is zero, disconnect the product from the creditor
+		if (balance === 0) {
+			await prisma.creditor.update({
+				where: { id: product.Creditor.id },
+				data: {
+					Products: { disconnect: { id: product.id } },
+				},
+			});
+
+			// Check if the creditor has no more products, and delete if empty
+			const creditorProducts = await prisma.products.findMany({
+				where: { Creditor: { id: product.Creditor.id } },
+			});
+
+			if (creditorProducts.length === 0) {
+				await prisma.creditor.delete({
+					where: { id: product.Creditor.id },
+				});
+			}
+		}
+
+		// Return success message
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Product sold successfully", success: true });
 	},
 };

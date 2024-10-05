@@ -38,8 +38,10 @@ export const UserCtrl = {
 				.json({ msg: "No user with that email" });
 		}
 
-		if (req.body.password) {
+		if (req.body.password !== "") {
 			req.body.password = await hashPassword(req.body.password);
+		} else {
+			delete req.body.password;
 		}
 
 		const updatedUser = await prisma.users.update({
@@ -104,14 +106,17 @@ export const UserCtrl = {
 		const { user } = req;
 		const customers = await prisma.buyer.findMany({
 			where: { companyId: user.company_id },
-			include: { Products: true },
+			include: { Products: { where: { balance_owed: "0" } } },
 		});
 
 		return res.status(StatusCodes.OK).json({ customers });
 	},
 	getCustomer: async (req, res) => {
 		const customer = await prisma.buyer.findUnique({
-			where: { id: req.params.id, companyId: req.user.company_id },
+			where: {
+				id: req.params.id,
+				companyId: req.user.company_id,
+			},
 			include: { Products: true },
 		});
 
@@ -122,6 +127,46 @@ export const UserCtrl = {
 		}
 
 		return res.status(StatusCodes.OK).json({ customer });
+	},
+	getCreditors: async (req, res) => {
+		const { user } = req;
+		const creditors = await prisma.creditor.findMany({
+			where: { companyId: user.company_id },
+			include: { Products: true },
+		});
+
+		return res.status(StatusCodes.OK).json({ creditors });
+	},
+	getCreditor: async (req, res) => {
+		const creditor = await prisma.creditor.findUnique({
+			where: {
+				id: req.params.id,
+				companyId: req.user.company_id,
+			},
+			include: {
+				Products: {
+					select: {
+						product_name: true,
+						serial_no: true,
+						price: true,
+						bought_for: true,
+						balance_owed: true,
+						date_sold: true,
+						Creditor: true,
+						id: true,
+						date_sold: true,
+					},
+				},
+			},
+		});
+
+		if (!creditor) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "No creditor with that id" });
+		}
+
+		return res.status(StatusCodes.OK).json({ creditor });
 	},
 	getSuppliers: async (req, res) => {
 		const suppliers = await prisma.supplier.findMany({

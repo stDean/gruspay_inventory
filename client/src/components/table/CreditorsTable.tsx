@@ -1,0 +1,95 @@
+"use client";
+
+import { getCreditors } from "@/actions/user";
+import { TableCell, TableHead, TableRow } from "@/components/ui/table";
+import { useReduxState } from "@/hook/useRedux";
+import { CreditorProps } from "@/lib/types";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { Spinner } from "../Spinners";
+import { TableContainer } from "./Table";
+
+export const CreditorsTable = () => {
+	const { token } = useReduxState();
+	const [isPending, startTransition] = useTransition();
+	const [creditors, setCreditors] = useState<Array<CreditorProps>>([]);
+
+	const searchParam = useSearchParams();
+	const rowsPerPage = 20;
+	const totalPages = Math.ceil(creditors.length / rowsPerPage);
+	const currentPage = Number(searchParam.get("page")) || 1;
+
+	const indexOfLastTransaction = currentPage * rowsPerPage;
+	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+
+	const creditorsByPage = creditors.slice(
+		indexOfFirstTransaction,
+		indexOfLastTransaction
+	);
+
+	const getAllCreditors = () => {
+		startTransition(async () => {
+			const { error, data } = await getCreditors({ token });
+			if (error) {
+				toast.error("Error", { description: error });
+				return;
+			}
+			setCreditors(data.creditors);
+		});
+	};
+
+	useEffect(() => {
+		getAllCreditors();
+	}, []);
+
+	console.log({ creditors });
+
+	const tableHeaders = (
+		<>
+			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
+			<TableHead className={`px-2 border-r`}>Customer Name</TableHead>
+			<TableHead className="px-2 border-r">Email Address</TableHead>
+			<TableHead className="px-2 border-r">Phone Number</TableHead>
+			<TableHead className="px-2 border-r">Bought Count</TableHead>
+		</>
+	);
+
+	const bodyContent = (
+		<>
+			{creditorsByPage.map((creditor, idx) => (
+				<TableRow key={creditor.id}>
+					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
+					<TableCell className="px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize">
+						<Link href={`/users/creditor/${creditor.id}`}>
+							{creditor.creditor_name}
+						</Link>
+					</TableCell>
+					<TableCell className="px-2 border-r">
+						{creditor.creditor_email}
+					</TableCell>
+					<TableCell className="px-2 border-r">
+						{creditor.creditor_phone_no}
+					</TableCell>
+					<TableCell className="px-2 border-r">
+						{creditor.Products.length}
+					</TableCell>
+				</TableRow>
+			))}
+		</>
+	);
+
+	return isPending ? (
+		<Spinner />
+	) : creditors.length !== 0 ? (
+		<TableContainer
+			tableHeaders={tableHeaders}
+			tableBody={bodyContent}
+			totalPages={totalPages}
+			currentPage={currentPage}
+		/>
+	) : (
+		<p>No Creditors yet</p>
+	);
+};

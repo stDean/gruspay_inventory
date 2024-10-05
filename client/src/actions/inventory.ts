@@ -210,16 +210,20 @@ export const sellProduct = async ({
 };
 
 export const getAllProductsNotSold = async ({ token }: { token: string }) => {
-	const { data } = await axios.get(
-		"http://localhost:5001/api/inventory/getAllProducts",
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}
-	);
+	try {
+		const { data } = await axios.get(
+			"http://localhost:5001/api/inventory/getAllProducts",
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
 
-	return { data };
+		return { data };
+	} catch (e) {
+		return { error: "Something went wrong..." };
+	}
 };
 
 interface SwapProductsProps {
@@ -278,16 +282,20 @@ export const swapProducts = async ({
 };
 
 export const getInventoryStats = async ({ token }: { token: string }) => {
-	const { data } = await axios.get(
-		"http://localhost:5001/api/inventory/getInventoryStats",
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}
-	);
+	try {
+		const { data } = await axios.get(
+			"http://localhost:5001/api/inventory/getInventoryStats",
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
 
-	return { data };
+		return { data };
+	} catch (e) {
+		return { error: "Something went Wrong..." };
+	}
 };
 
 export const getDashboardStats = async ({
@@ -307,23 +315,70 @@ export const getDashboardStats = async ({
 	tssYear?: string;
 	tssMonth?: string;
 }) => {
-	const { data } = await axios.get(
-		`http://localhost:5001/api/inventory/getDashboardStats?soldYear=${soldYear}&soldMonth=${soldMonth}&sellerMonth=${sellerMonth}&sellerYear=${sellerYear}&tssYear=${tssYear}&tssMonth=${tssMonth}`,
-		{
-			headers: { Authorization: `Bearer ${token}` },
-		}
-	);
+	try {
+		const { data } = await axios.get(
+			`http://localhost:5001/api/inventory/getDashboardStats?soldYear=${soldYear}&soldMonth=${soldMonth}&sellerMonth=${sellerMonth}&sellerYear=${sellerYear}&tssYear=${tssYear}&tssMonth=${tssMonth}`,
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
 
-	return { data };
+		return { data };
+	} catch (e) {
+		return { error: "Something went wrong..." };
+	}
 };
 
-export const getBarChartData = async ({ token, barYear }: { token: string; barYear?: string; }) => {
-	const { data } = await axios.get(
-		`http://localhost:5001/api/inventory/getBarChartData?barYear=${barYear}`,
-		{
-			headers: { Authorization: `Bearer ${token}` },
-		}
-	);
+export const getBarChartData = async ({
+	token,
+	barYear,
+}: {
+	token: string;
+	barYear?: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`http://localhost:5001/api/inventory/getBarChartData?barYear=${barYear}`,
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
 
-	return { data };
+		return { data };
+	} catch (e) {
+		return { error: "Something went wrong..." };
+	}
+};
+
+export const updateSoldProduct = async ({
+	token,
+	amount,
+	id,
+}: {
+	token: string;
+	amount: string;
+	id: string;
+}) => {
+	try {
+		const { data } = await axios.patch(
+			`http://localhost:5001/api/inventory/updateBalance/${id}`,
+			{ amount },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Something went wrong, try again" };
+	}
 };
