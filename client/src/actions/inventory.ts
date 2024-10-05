@@ -290,9 +290,25 @@ export const getInventoryStats = async ({ token }: { token: string }) => {
 	return { data };
 };
 
-export const getDashboardStats = async ({ token }: { token: string }) => {
+export const getDashboardStats = async ({
+	token,
+	soldYear,
+	soldMonth,
+	sellerMonth,
+	sellerYear,
+	tssYear,
+	tssMonth,
+}: {
+	token: string;
+	soldYear?: string;
+	soldMonth?: string;
+	sellerMonth?: string;
+	sellerYear?: string;
+	tssYear?: string;
+	tssMonth?: string;
+}) => {
 	const { data } = await axios.get(
-		"http://localhost:5001/api/inventory/getDashboardStats",
+		`http://localhost:5001/api/inventory/getDashboardStats?soldYear=${soldYear}&soldMonth=${soldMonth}&sellerMonth=${sellerMonth}&sellerYear=${sellerYear}&tssYear=${tssYear}&tssMonth=${tssMonth}`,
 		{
 			headers: { Authorization: `Bearer ${token}` },
 		}
@@ -301,9 +317,9 @@ export const getDashboardStats = async ({ token }: { token: string }) => {
 	return { data };
 };
 
-export const getBarChartData = async ({ token }: { token: string }) => {
+export const getBarChartData = async ({ token, barYear }: { token: string; barYear?: string; }) => {
 	const { data } = await axios.get(
-		"http://localhost:5001/api/inventory/getBarChartData",
+		`http://localhost:5001/api/inventory/getBarChartData?barYear=${barYear}`,
 		{
 			headers: { Authorization: `Bearer ${token}` },
 		}

@@ -12,6 +12,7 @@ export const YearSelect = ({
 	style2,
 	componentKey,
 	onYearChange,
+	initialYear,
 }: {
 	startYear: number;
 	endYear: number;
@@ -19,18 +20,18 @@ export const YearSelect = ({
 	addCaret?: boolean;
 	style2?: string;
 	componentKey: string;
-	onYearChange: (key: string, value: number) => void;
+	initialYear: string;
+	onYearChange: (key: string, value: string) => void;
 }) => {
-	const currentYear = new Date().getFullYear();
 	const years = Array.from(
 		{ length: endYear - startYear + 1 },
 		(_, index) => startYear + index
 	);
 
-	const [selectedYear, setSelectedYear] = useState(currentYear);
+	const [selectedYear, setSelectedYear] = useState(initialYear);
 
 	const handleYearChange = (val: string) => {
-		const newYear = Number(val);
+		const newYear = val;
 		setSelectedYear(newYear);
 		onYearChange(componentKey, newYear); // Pass selected value and key to parent
 	};

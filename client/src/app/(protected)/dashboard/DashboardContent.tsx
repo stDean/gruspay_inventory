@@ -12,6 +12,7 @@ import { BarChartProps, DashboardProps } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { setUser } from "@/state";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { months } from "@/lib/utils";
 
 export const DashboardContent = () => {
 	const dispatch = useAppDispatch();
@@ -26,50 +27,93 @@ export const DashboardContent = () => {
 		dispatch(setUser(data.userInDb));
 	}, [token, user]);
 
-	const dashboardStats = () => {
-		startTransition(async () => {
-			const { data } = await getDashboardStats({ token });
-			setDashboardStat(data);
-		});
-	};
-
-	const getBarData = useCallback(() => {
-		startTransition(async () => {
-			const { data } = await getBarChartData({ token });
-			setData(data.data);
-		});
-	}, [token]);
-
-	useEffect(() => {
-		setUserState();
-		dashboardStats();
-		getBarData();
-	}, []);
-
 	// filters
 	const [selectedYears, setSelectedYears] = useState<{
-		[key: string]: number;
-	}>();
+		dashYear: string;
+		stockYear: string;
+		topSellerYear: string;
+		bar: string;
+	}>({ dashYear: "", stockYear: "", topSellerYear: "", bar: "" });
 
-	const handleYearChange = (componentKey: string, value: number) => {
+	const handleYearChange = (componentKey: string, value: string) => {
 		setSelectedYears(prevState => ({
 			...prevState,
 			[componentKey]: value, // Update the selected value for the specific component
 		}));
+
+		dashboardStats();
 	};
 
 	const [selectedMonths, setSelectedMonths] = useState<{
-		[key: string]: string;
-	}>();
+		dashMonth: string;
+		stockMonth: string;
+		topSellerMonth: string;
+	}>({ dashMonth: "", stockMonth: "", topSellerMonth: "" });
 
 	const handleMonthChange = (componentKey: string, value: string) => {
 		setSelectedMonths(prevState => ({
 			...prevState,
 			[componentKey]: value, // Update the selected value for the specific component
 		}));
+
+		dashboardStats();
 	};
 
-	console.log({ selectedYears, selectedMonths });
+	console.log({ selectedMonths });
+
+	const dashboardStats = useCallback(async () => {
+		startTransition(async () => {
+			const { data } = await getDashboardStats({
+				token,
+				soldYear: selectedYears!["dashYear"],
+				soldMonth:
+					selectedMonths["dashMonth"] !== ""
+						? String(months.indexOf(selectedMonths["dashMonth"]) + 1)
+						: "",
+				sellerYear: selectedYears!["topSellerYear"],
+				sellerMonth:
+					selectedMonths["topSellerMonth"] !== ""
+						? String(months.indexOf(selectedMonths["topSellerMonth"]) + 1)
+						: "",
+				tssYear: selectedYears!["stockYear"],
+				tssMonth:
+					selectedMonths["stockMonth"] !== ""
+						? String(months.indexOf(selectedMonths["stockMonth"]) + 1)
+						: "",
+			});
+
+			setDashboardStat(data);
+		});
+	}, [token, selectedYears, selectedMonths]);
+
+	// Bar data only fetched when needed, no need to trigger on filter change
+	const getBarData = useCallback(async () => {
+		startTransition(async () => {
+			const { data } = await getBarChartData({
+				token,
+				barYear: selectedYears["bar"],
+			});
+			setData(data.data);
+		});
+	}, [token, selectedYears]);
+
+	// Update to avoid re-rendering the entire page
+	useEffect(() => {
+		setUserState(); // This only runs once when the component mounts
+	}, []);
+
+	// Fetch dashboard stats only when filters change
+	useEffect(() => {
+		dashboardStats(); // Runs only when selectedMonths or selectedYears change
+	}, [dashboardStats]);
+
+	// Fetch bar chart data only when component mounts
+	useEffect(() => {
+		getBarData(); // This can run once on mount and not every time filters are updated
+	}, [getBarData]);
+
+	const index = new Date().getMonth();
+	const currentYear = new Date().getFullYear();
 
 	return isPending ? (
 		<Spinner />
@@ -101,6 +145,7 @@ export const DashboardContent = () => {
 
 					<div className="space-y-4">
 						<MonthsDropDown
+							initialMonth={selectedMonths["dashMonth"] || months[index]}
 							onMonthChange={handleMonthChange}
 							componentKey="dashMonth"
 						/>
@@ -109,6 +154,7 @@ export const DashboardContent = () => {
 							startYear={2024}
 							endYear={2034}
 							componentKey="dashYear"
+							initialYear={selectedYears["dashYear"] || String(currentYear)}
 						/>
 					</div>
 				</div>
@@ -122,6 +168,7 @@ export const DashboardContent = () => {
 							style="w-fit"
 							key="bar"
 							componentKey="bar"
+							initialYear={selectedYears["bar"] || String(currentYear)}
 						/>
 					</div>
 
@@ -134,6 +181,7 @@ export const DashboardContent = () => {
 
 						<div className="flex gap-4">
 							<MonthsDropDown
+								initialMonth={selectedMonths["stockMonth"] || months[index]}
 								onMonthChange={handleMonthChange}
 								componentKey="stockMonth"
 							/>
@@ -142,6 +190,7 @@ export const DashboardContent = () => {
 								startYear={2024}
 								endYear={2034}
 								componentKey="stockYear"
+								initialYear={selectedYears["stockYear"] || String(currentYear)}
 							/>
 						</div>
 					</div>
@@ -195,6 +244,7 @@ export const DashboardContent = () => {
 
 					<div className="flex flex-col lg:flex-row gap-4">
 						<MonthsDropDown
+							initialMonth={selectedMonths["topSellerMonth"] || months[index]}
 							onMonthChange={handleMonthChange}
 							componentKey="topSellerMonth"
 						/>
@@ -203,6 +253,7 @@ export const DashboardContent = () => {
 							startYear={2024}
 							endYear={2034}
 							componentKey="topSellerYear"
+							initialYear={selectedYears["topSellerYear"] || String(currentYear)}
 						/>
 					</div>
 				</div>

@@ -43,3 +43,18 @@ export const formatCurrency = (val: number, symbol: string = "₦") => {
 
   return formattedNumber.format(val)
 }
+
+export const months = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+];

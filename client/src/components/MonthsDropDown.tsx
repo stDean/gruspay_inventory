@@ -1,35 +1,28 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SelectContainer } from "./SelectContainer";
 import { SelectItem } from "./ui/select";
-
-const months = [
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-];
+import { months } from "@/lib/utils";
 
 export const MonthsDropDown = ({
 	style,
 	componentKey,
 	onMonthChange,
+	initialMonth, // Pass the selected month from parent
 }: {
 	style?: string;
 	componentKey: string;
 	onMonthChange: (key: string, value: string) => void;
+	initialMonth: string; // new prop to control the initial month
 }) => {
-	const index = new Date().getMonth();
-	const [selectedMonth, setSelectedMonth] = useState<string>(months[index]);
+	// Initialize state with the passed prop (initialMonth)
+	const [selectedMonth, setSelectedMonth] = useState<string>(initialMonth);
+
+	// Update local state when the parent-provided month changes
+	useEffect(() => {
+		if (initialMonth !== selectedMonth) {
+			setSelectedMonth(initialMonth);
+		}
+	}, [initialMonth]);
 
 	const handleMonthChange = (val: string) => {
 		setSelectedMonth(val);
@@ -42,7 +35,7 @@ export const MonthsDropDown = ({
 			handleChange={handleMonthChange}
 			style={style}
 		>
-			{months.map(month => (
+			{months.map((month) => (
 				<SelectItem value={month.toString()} key={month}>
 					{month}
 				</SelectItem>

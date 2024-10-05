@@ -64,8 +64,6 @@ export const InventoryContent = () => {
 		getInventoryStat();
 	}, [getProducts]);
 
-	console.log({ stats });
-
 	return isPending ? (
 		<Spinner />
 	) : products.length === 0 ? (

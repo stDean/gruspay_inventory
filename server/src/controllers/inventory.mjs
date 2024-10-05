@@ -583,10 +583,12 @@ export const InventoryCtrl = {
 		// Helper function for generating date filters
 		const getDateRange = (year, month) => ({
 			gte: new Date(
-				`${Number(year)}-${month.toString().padStart(2, "0")}-01T00:00:00.000Z`
+				`${Number(year)}-${Number(month)
+					.toString()
+					.padStart(2, "0")}-01T00:00:00.000Z`
 			), // Start of the month
 			lt: new Date(
-				`${Number(year)}-${(Number(soldFilter.soldMonth) + 1)
+				`${Number(year)}-${(Number(month) + 1)
 					.toString()
 					.padStart(2, "0")}-01T00:00:00.000Z`
 			), // Start of the next month
@@ -594,8 +596,8 @@ export const InventoryCtrl = {
 
 		// SOLD AND PURCHASE LOGIC
 		const soldFilter = {
-			soldYear: soldYear || currentYear,
-			soldMonth: soldMonth || currentMonth,
+			soldYear: soldYear ? soldYear : currentYear,
+			soldMonth: soldMonth ? soldMonth : currentMonth,
 		};
 
 		// Get total sales amount and convert prices from string to float
@@ -639,8 +641,8 @@ export const InventoryCtrl = {
 
 		// TOP SELLER LOGIC
 		const topSellerFilter = {
-			sellerYear: sellerYear || currentYear,
-			sellerMonth: sellerMonth || currentMonth,
+			sellerYear: sellerYear ? sellerYear : currentYear,
+			sellerMonth: sellerMonth ? sellerMonth : currentMonth,
 		};
 
 		// Get top seller based on sold product count
@@ -659,16 +661,18 @@ export const InventoryCtrl = {
 
 		const topSellerUserId =
 			topSoldProductAndUser.length !== 0
-				? topSoldProductAndUser.reduce((prev, current) =>
-						prev._count.sold_by > current._count.sold_by ? prev : current
-				  )
+				? topSoldProductAndUser.reduce((prev, current) => {
+						console.log({ prev, current });
+						return prev._count.sold_by > current._count.sold_by
+							? prev
+							: current;
+				  })
 				: null;
 
 		const topSeller =
 			topSellerUserId &&
 			(await prisma.users.findUnique({
 				where: { companyId, id: topSellerUserId.sold_by },
-				include: { Sold_Products: { select: { id: true } } },
 			}));
 
 		const topSellerProducts =
@@ -676,7 +680,8 @@ export const InventoryCtrl = {
 			(await prisma.products.findMany({
 				where: {
 					companyId,
-					id: { in: topSeller.Sold_Products.map(product => product.id) },
+					sold_by: topSeller.id,
+					sales_status: { not: "NOT_SOLD" },
 					date_sold: getDateRange(
 						topSellerFilter.sellerYear,
 						topSellerFilter.sellerMonth
@@ -725,15 +730,15 @@ export const InventoryCtrl = {
 
 		// TOP SELLING STOCK LOGIC
 		const tssFilter = {
-			tssMonth: tssMonth || currentMonth,
-			tssYear: tssYear || currentYear,
+			tssMonth: tssMonth ? tssMonth : currentMonth,
+			tssYear: tssYear ? tssYear : currentYear,
 		};
 
 		const topSellingProducts = await prisma.products.groupBy({
 			by: ["product_name"],
 			where: {
 				companyId,
-				sales_status: "SOLD",
+				sales_status: { not: "NOT_SOLD" },
 				date_sold: getDateRange(tssFilter.tssYear, tssFilter.tssMonth),
 			},
 			_count: { product_name: true },
@@ -803,8 +808,9 @@ export const InventoryCtrl = {
 		const { company_id } = req.user;
 		const { barYear } = req.query;
 
-		const selectedYear = Number(barYear) || new Date().getFullYear();
+		const selectedYear = barYear ? Number(barYear) : new Date().getFullYear();
 
+		console.log({ barYear, selectedYear });
 		// Fetch sold products grouped by month
 		const soldProducts = await prisma.products.findMany({
 			where: {
