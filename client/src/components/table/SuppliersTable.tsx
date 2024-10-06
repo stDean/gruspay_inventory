@@ -1,15 +1,15 @@
 "use client";
 
 import { getSuppliers } from "@/actions/user";
-import { useReduxState } from "@/hook/useRedux";
-import { useTransition, useState, useEffect } from "react";
-import { toast } from "sonner";
-import { Spinner } from "../Spinners";
-import { CustomerProps, SupplierProps } from "@/lib/types";
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { TableContainer } from "./Table";
+import { useReduxState } from "@/hook/useRedux";
+import { SupplierProps } from "@/lib/types";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { Spinner } from "../Spinners";
+import { TableContainer } from "./Table";
 
 export const SuppliersTable = () => {
 	const { token } = useReduxState();
@@ -23,11 +23,16 @@ export const SuppliersTable = () => {
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+	const [filter, setFilter] = useState<string>("");
 
 	const suppliersByPage = suppliers.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+	const filterBySearch = suppliersByPage.filter(item => {
+		return item.supplier_name.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const getAllSuppliers = () => {
 		startTransition(async () => {
@@ -56,7 +61,7 @@ export const SuppliersTable = () => {
 
 	const bodyContent = (
 		<>
-			{suppliersByPage.map((supplier, idx) => (
+			{filterBySearch.map((supplier, idx) => (
 				<TableRow key={supplier.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell className="px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize">
@@ -86,6 +91,11 @@ export const SuppliersTable = () => {
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+			search
+			placeHolder="Search name..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+      handleClear={() => setFilter("")}
 		/>
 	) : (
 		<p>No Suppliers yet</p>

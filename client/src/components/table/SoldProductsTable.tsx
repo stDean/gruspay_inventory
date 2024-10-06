@@ -8,6 +8,7 @@ import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { TableContainer } from "./Table";
+import { useState } from "react";
 
 interface InventoryProps {
 	products: ProductProps[];
@@ -24,11 +25,16 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+	const [filter, setFilter] = useState<string>("");
 
 	const productsByPage = products.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+	const filterBySearch = productsByPage.filter(item => {
+		return item.serial_no.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const showProduct = async (serialNo: string) => {
 		const { data, error } = await getProduct({
@@ -57,7 +63,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 
 	const tableBody = (
 		<>
-			{productsByPage.map((item, idx) => (
+			{filterBySearch.map((item, idx) => (
 				<TableRow key={`${item.id}`} className="hover:!bg-none">
 					<TableCell className="border-r">{idx + 1}</TableCell>
 					<TableCell
@@ -93,6 +99,11 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 			totalPages={totalPages}
 			tableHeaders={tableHeaders}
 			tableBody={tableBody}
+      search
+			placeHolder="Search serial no..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+      handleClear={() => setFilter("")}
 		/>
 	);
 };

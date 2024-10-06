@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useCompletePayModal from "@/hook/useCompletePayModal";
 import { useReduxState } from "@/hook/useRedux";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useState, useTransition, useEffect } from "react";
 import { toast } from "sonner";
 
 const MyInput = ({ label, value }: { label: string; value: string }) => {
@@ -24,7 +24,9 @@ export const CompletePayModal = () => {
 	const [amount, setAmount] = useState("");
 	const [isPending, startTransition] = useTransition();
 
-	console.log({ a: completeModal.product });
+	useEffect(() => {
+		setAmount("");
+	}, [completeModal.isOpen]);
 
 	const handlePay = useCallback((id: string, amount: string) => {
 		startTransition(async () => {
@@ -40,6 +42,7 @@ export const CompletePayModal = () => {
 			}
 
 			toast.success("Success", { description: "Balance payment successful" });
+			setAmount("");
 			completeModal.onClose();
 		});
 	}, []);

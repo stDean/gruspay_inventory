@@ -8,6 +8,7 @@ import useSwapProductDetailModal from "@/hook/useSwapProductDetailModal";
 import { getProduct } from "@/actions/inventory";
 import { useReduxState } from "@/hook/useRedux";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export const SwapProductTable = ({
 	products,
@@ -25,11 +26,16 @@ export const SwapProductTable = ({
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+	const [filter, setFilter] = useState<string>("");
 
 	const productsByPage = products.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+  const filterBySearch = productsByPage.filter(item => {
+		return item.serial_no.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const handleClick = async (serialNo: string) => {
 		const { data, error } = await getProduct({ serialNo, token });
@@ -55,7 +61,7 @@ export const SwapProductTable = ({
 
 	const bodyContent = (
 		<>
-			{productsByPage.map((product, idx) => (
+			{filterBySearch.map((product, idx) => (
 				<TableRow key={product.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell
@@ -97,6 +103,11 @@ export const SwapProductTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+      search
+			placeHolder="Search serial no..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+      handleClear={() => setFilter("")}
 		/>
 	);
 };

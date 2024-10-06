@@ -23,11 +23,16 @@ export const CustomersTable = () => {
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+  const [filter, setFilter] = useState<string>("");
 
 	const customersByPage = customers.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+  const filterBySearch = customersByPage.filter(item => {
+		return item.buyer_name.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const getAllCustomers = () => {
 		startTransition(async () => {
@@ -56,7 +61,7 @@ export const CustomersTable = () => {
 
 	const bodyContent = (
 		<>
-			{customersByPage.map((customer, idx) => (
+			{filterBySearch.map((customer, idx) => (
 				<TableRow key={customer.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell className="px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize">
@@ -86,6 +91,11 @@ export const CustomersTable = () => {
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+      search
+      placeHolder="Search name..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+      handleClear={() => setFilter("")}
 		/>
 	) : (
 		<p>No Customers yet</p>

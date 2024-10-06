@@ -2,6 +2,7 @@ import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
 import { TableContainer } from "./Table";
+import { useState } from "react";
 
 export const CustomerTable = ({
 	products,
@@ -16,11 +17,16 @@ export const CustomerTable = ({
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+	const [filter, setFilter] = useState<string>("");
 
 	const productsByPage = products.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+	const filterBySearch = productsByPage.filter(item => {
+		return item.serial_no.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const headerContent = (
 		<>
@@ -36,7 +42,7 @@ export const CustomerTable = ({
 
 	const bodyContent = (
 		<>
-			{productsByPage.map((product, idx) => (
+			{filterBySearch.map((product, idx) => (
 				<TableRow key={product.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
@@ -67,6 +73,11 @@ export const CustomerTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+      search
+			placeHolder="Search serial no..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+      handleClear={() => setFilter("")}
 		/>
 	);
 };

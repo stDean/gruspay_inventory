@@ -1,9 +1,9 @@
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
+import useCompletePayModal from "@/hook/useCompletePayModal";
 import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
+import { useState } from "react";
 import { TableContainer } from "./Table";
-import useCompletePayModal from "@/hook/useCompletePayModal";
-import { useEffect } from "react";
 
 export const CreditorTable = ({
 	products,
@@ -21,11 +21,16 @@ export const CreditorTable = ({
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+  const [filter, setFilter] = useState<string>("");
 
 	const productsByPage = products.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+  const filterBySearch = productsByPage.filter(item => {
+		return item.serial_no.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const headerContent = (
 		<>
@@ -41,7 +46,7 @@ export const CreditorTable = ({
 
 	const bodyContent = (
 		<>
-			{productsByPage.map((product, idx) => (
+			{filterBySearch.map((product, idx) => (
 				<TableRow key={product.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell
@@ -77,6 +82,11 @@ export const CreditorTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+      search
+			placeHolder="Search serial no..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+      handleClear={() => setFilter("")}
 		/>
 	);
 };

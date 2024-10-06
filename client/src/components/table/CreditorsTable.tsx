@@ -23,11 +23,16 @@ export const CreditorsTable = () => {
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+	const [filter, setFilter] = useState<string>("");
 
 	const creditorsByPage = creditors.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
+
+	const filterBySearch = creditorsByPage.filter(item => {
+		return item.creditor_name.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const getAllCreditors = () => {
 		startTransition(async () => {
@@ -58,7 +63,7 @@ export const CreditorsTable = () => {
 
 	const bodyContent = (
 		<>
-			{creditorsByPage.map((creditor, idx) => (
+			{filterBySearch.map((creditor, idx) => (
 				<TableRow key={creditor.id}>
 					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
 					<TableCell className="px-2 border-r text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize">
@@ -88,6 +93,11 @@ export const CreditorsTable = () => {
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+			search
+			placeHolder="Search name..."
+			value={filter}
+			handleChange={e => setFilter(e.target.value)}
+			handleClear={() => setFilter("")}
 		/>
 	) : (
 		<p>No Creditors yet</p>

@@ -6,6 +6,7 @@ import { UrlQueryParams } from "./types";
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
+
 export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 	const currentUrl = qs.parse(params);
 

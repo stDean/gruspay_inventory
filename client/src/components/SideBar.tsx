@@ -4,23 +4,21 @@ import { Logout } from "@/actions/logout";
 import { useAppDispatch } from "@/app/redux";
 import { useReduxState } from "@/hook/useRedux";
 import {
-	setEmail,
-	setIsSidebarCollapsed,
-	setLoggedInUser,
-	setToken,
-	setUser,
+  setEmail,
+  setIsSidebarCollapsed,
+  setLoggedInUser,
+  setToken,
+  setUser,
 } from "@/state";
 import {
-	Archive,
-	CircleDollarSign,
-	Clipboard,
-	Layout,
-	LogOut,
-	LucideIcon,
-	Menu,
-	SlidersHorizontal,
-	Users,
-	ClipboardCheck,
+  Archive,
+  ClipboardCheck,
+  Layout,
+  LogOut,
+  LucideIcon,
+  Menu,
+  SlidersHorizontal,
+  Users
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
