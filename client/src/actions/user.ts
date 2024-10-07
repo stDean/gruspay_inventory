@@ -70,6 +70,8 @@ export const getUsers = async ({ token }: { token: string }) => {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -143,6 +145,8 @@ export const createUser = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -197,6 +201,8 @@ export const getSuppliers = async ({ token }: { token: string }) => {
 	} catch (e: any) {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -226,6 +232,8 @@ export const getSupplier = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -247,6 +255,8 @@ export const getCustomers = async ({ token }: { token: string }) => {
 		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -277,6 +287,8 @@ export const getCustomer = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -298,6 +310,8 @@ export const getCreditors = async ({ token }: { token: string }) => {
 		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -328,6 +342,8 @@ export const getCreditor = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: "the redirect" };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };

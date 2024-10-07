@@ -1,5 +1,5 @@
+import { StatusCodes } from "http-status-codes";
 import { prisma } from "../utils/db.mjs";
-import UnauthenticatedError from "../errors/unauthenticated.error.mjs";
 
 export const AdminMiddleware = async (req, res, next) => {
 	const { email } = req.user;
@@ -9,7 +9,9 @@ export const AdminMiddleware = async (req, res, next) => {
 	});
 
 	if (user.role !== "ADMIN")
-		throw new UnauthenticatedError("Invalid Authorization");
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			msg: "You are not authorized to perform this action",
+		});
 
 	next();
 };

@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { SendOTP } from "@/actions/registration";
 import Link from "next/link";
 
-const PAYMENT_PLANS = ["Free", "Basic", "Standard", "Premium"];
+const PAYMENT_PLANS = ["Personal", "Team", "Enterprise"];
 
 export const AuthForm = () => {
 	const dispatch = useAppDispatch();
@@ -34,7 +34,7 @@ export const AuthForm = () => {
 		password: false,
 		cfPassword: false,
 	});
-	const [payment, setPayment] = useState<string>("Free");
+	const [payment, setPayment] = useState<string>("Personal");
 
 	const form = useForm<z.infer<typeof AuthSchema>>({
 		resolver: zodResolver(AuthSchema),
@@ -49,7 +49,7 @@ export const AuthForm = () => {
 			if (pathname === "/") {
 				const values = {
 					...data,
-					payment_plan: payment,
+					payment_plan: payment.toUpperCase(),
 					country: country?.label,
 				};
 
@@ -91,7 +91,7 @@ export const AuthForm = () => {
 				dispatch(setLoggedInUser(true));
 				dispatch(setToken(success.jwtToken));
 
-        // TODO:get user by email and dispatch the user into the state
+				// TODO:get user by email and dispatch the user into the state
 				toast.success("Success", {
 					description: "Login successfully",
 				});

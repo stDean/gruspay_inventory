@@ -6,7 +6,8 @@ import { sendMail } from "../utils/sendMail.mjs";
 
 export const AuthController = {
 	sendOtp: async (req, res) => {
-		const { company_name, company_email, password, country } = req.body;
+		const { company_name, company_email, password, country } =
+			req.body;
 
 		if (!company_email || !company_name || !password || !country) {
 			return res
@@ -62,7 +63,7 @@ export const AuthController = {
 		// create company
 		const hashedPassword = await hashPassword(password);
 		const company = await prisma.company.create({
-			data: { company_name, company_email, password: hashedPassword, country },
+			data: { ...req.body, password: hashedPassword },
 		});
 
 		// Store email and hashed password temporarily

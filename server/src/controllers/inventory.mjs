@@ -4,6 +4,7 @@ import { prisma } from "../utils/db.mjs";
 const useUserAndCompany = async ({ company_id, email }) => {
 	const company = await prisma.company.findUnique({
 		where: { id: company_id },
+		include: { Products: { where: { sales_status: "NOT_SOLD" } } },
 	});
 	const user = await prisma.users.findUnique({
 		where: { email },
@@ -40,6 +41,74 @@ const getOrCreateSupplier = async supplierData => {
 	);
 };
 
+// check product length based on the payment plan
+const checkProductLength = (company, products) => {
+	const length = products.length;
+
+	switch (company.payment_plan) {
+		case "PERSONAL":
+			if (length > 70) {
+				return {
+					error: true,
+					msg: "Cannot have more than 70 products, update plan to add more products.",
+				};
+			}
+			break;
+		case "TEAM":
+			if (length > 150) {
+				return {
+					error: true,
+					msg: "Cannot have more than 150 products, update plan to add more products.",
+				};
+			}
+			break;
+		case "ENTERPRISE":
+			if (length > 250) {
+				return {
+					error: true,
+					msg: "Cannot have more than 250 products, update plan to add more products.",
+				};
+			}
+			break;
+		default:
+			return { error: true, msg: "Update plan to perform this action." };
+	}
+
+	// No issues, return an empty object
+	return {};
+};
+
+const checkToAddSingleProduct = company => {
+	if (company.payment_plan === "PERSONAL") {
+		if (company.Products.length >= 70) {
+			return {
+				error: true,
+				msg: "Maximum limit of 70 products reached. Upgrade your plan to add more.",
+			};
+		}
+	}
+
+	if (company.payment_plan === "TEAM") {
+		if (company.Products.length >= 150) {
+			return {
+				error: true,
+				msg: "Maximum limit of 150 products reached. Upgrade your plan to add more.",
+			};
+		}
+	}
+
+	if (company.payment_plan === "ENTERPRISE") {
+		if (company.Products.length >= 250) {
+			return {
+				error: true,
+				msg: "Maximum limit of 250 products reached. Upgrade your plan to add more.",
+			};
+		}
+	}
+
+	return {};
+};
+
 export const InventoryCtrl = {
 	createProduct: async (req, res) => {
 		const {
@@ -66,6 +135,13 @@ export const InventoryCtrl = {
 				.json({ msg: "Product already exists" });
 
 		const { company, user } = await useUserAndCompany({ company_id, email });
+
+		const productLengthCheck = checkToAddSingleProduct(company);
+		if (productLengthCheck.error) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				msg: productLengthCheck.msg,
+			});
+		}
 
 		const supplier = await getOrCreateSupplier({
 			supplier_email: supplier_email || null,
@@ -102,6 +178,14 @@ export const InventoryCtrl = {
 
 		const errors = [];
 		const results = [];
+
+		// Check the product length synchronously (handle errors via return)
+		const productLengthCheck = checkProductLength(company, req.body);
+		if (productLengthCheck.error) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				msg: productLengthCheck.msg,
+			});
+		}
 
 		for (const product of req.body) {
 			try {
@@ -147,6 +231,12 @@ export const InventoryCtrl = {
 
 		if (errors.length > 0) {
 			const serialNo = errors.map(error => error.product);
+			if (serialNo.length > 10) {
+				return res.status(StatusCodes.BAD_REQUEST).json({
+					msg: "Some of the products already exists",
+				});
+			}
+
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				msg: `Products with serial number ${serialNo.join(
 					", "

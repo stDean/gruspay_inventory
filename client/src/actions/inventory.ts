@@ -138,6 +138,8 @@ export const addMultipleProduct = async ({
 	} catch (e: any) {
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong." };
@@ -221,7 +223,11 @@ export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e) {
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
 		return { error: "Something went wrong..." };
 	}
 };
@@ -293,7 +299,11 @@ export const getInventoryStats = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e) {
+	} catch (e: any) {
+		if (e?.response?.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
 		return { error: "Something went Wrong..." };
 	}
 };
@@ -324,7 +334,11 @@ export const getDashboardStats = async ({
 		);
 
 		return { data };
-	} catch (e) {
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
 		return { error: "Something went wrong..." };
 	}
 };
@@ -345,7 +359,11 @@ export const getBarChartData = async ({
 		);
 
 		return { data };
-	} catch (e) {
+	} catch (e: any) {
+    if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		}
+
 		return { error: "Something went wrong..." };
 	}
 };

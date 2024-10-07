@@ -16,9 +16,9 @@ datasource db {
 
 enum Payment_Plan {
   FREE
-  BASIC
-  STANDARD
-  PREMIUM
+  PERSONAL
+  TEAM
+  ENTERPRISE
 }
 
 enum Role {
@@ -39,6 +39,7 @@ model Company {
   password      String
   country       String
   payment_plan  Payment_Plan @default(FREE)
+  // TODO:Add a paid boolean so when the user has paid then turn true
   Users         Users[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt

@@ -69,7 +69,7 @@ export const AddUser = () => {
 						control={form.control}
 						name="last_name"
 						label="User Last Name (optional)"
-						placeholder="enter user email"
+						placeholder="enter user last name"
 					/>
 
 					<CustomInput

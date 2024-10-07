@@ -2,6 +2,11 @@ import { Router } from "express";
 import { UserCtrl } from "../controllers/user_controller.mjs";
 import { AuthMiddleware } from "../middlewares/auth.m.mjs";
 import { AdminMiddleware } from "../middlewares/admin.m.mjs";
+import {
+	AddUserMiddleware,
+	CustomerAndCreditorMiddleware,
+	SupplierMiddleware,
+} from "../middlewares/plans.m.mjs";
 
 const router = Router();
 
@@ -14,28 +19,51 @@ router
 	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getUserById);
 router
 	.route("/getSuppliers")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getSuppliers);
+	.get(
+		[AuthMiddleware, AdminMiddleware, SupplierMiddleware],
+		UserCtrl.getSuppliers
+	);
 router
 	.route("/getSupplier/:id")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getSupplier);
+	.get(
+		[AuthMiddleware, AdminMiddleware, SupplierMiddleware],
+		UserCtrl.getSupplier
+	);
 router
 	.route("/getCustomers")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCustomers);
+	.get(
+		[AuthMiddleware, AdminMiddleware, CustomerAndCreditorMiddleware],
+		UserCtrl.getCustomers
+	);
 router
 	.route("/getCustomer/:id")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCustomer);
+	.get(
+		[AuthMiddleware, AdminMiddleware, CustomerAndCreditorMiddleware],
+		UserCtrl.getCustomer
+	);
 router
 	.route("/getCreditors")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCreditors);
+	.get(
+		[AuthMiddleware, AdminMiddleware, CustomerAndCreditorMiddleware],
+		UserCtrl.getCreditors
+	);
 router
 	.route("/getCreditor/:id")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getCreditor);
+	.get(
+		[AuthMiddleware, AdminMiddleware, CustomerAndCreditorMiddleware],
+		UserCtrl.getCreditor
+	);
 
 router.route("/updateUser").patch(AuthMiddleware, UserCtrl.updateUser);
 router
 	.route("/updateUserRole/:id")
 	.patch(AuthMiddleware, UserCtrl.updateUserRole);
 
-router.route("/createUser").post(AuthMiddleware, UserCtrl.createUser);
+router
+	.route("/createUser")
+	.post(
+		[AuthMiddleware, AdminMiddleware, AddUserMiddleware],
+		UserCtrl.createUser
+	);
 
 export default router;
