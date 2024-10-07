@@ -1,9 +1,5 @@
-import { UserSettingsForm } from "@/components/auth/UserSettingsForm";
+import { SettingsContent } from "./SettingsContent";
 
 export default function page() {
-	return (
-		<div className="flex justify-center items-center h-[80vh]">
-			<UserSettingsForm />
-		</div>
-	);
+	return <SettingsContent />;
 }

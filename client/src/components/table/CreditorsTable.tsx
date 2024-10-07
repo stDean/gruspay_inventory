@@ -49,8 +49,6 @@ export const CreditorsTable = () => {
 		getAllCreditors();
 	}, []);
 
-	console.log({ creditors });
-
 	const tableHeaders = (
 		<>
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>

@@ -21,29 +21,53 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 	);
 }
 
-export const AddProductsType = {
-  name: "add_products",
-  options: [
-    {
-      title: "Add an Item",
-      subTitle: "Add one product at a time",
-    },
+export const formatCurrency = (val: number, symbol: string = "₦") => {
+	const formattedNumber = new Intl.NumberFormat("en-NG", {
+		style: "currency",
+		currency: "NGN",
+	});
 
-    {
-      title: "Bulk items upload",
-      subTitle: "Add multiple products at once",
-    },
-  ],
+	return formattedNumber.format(val);
+};
+
+export const AddProductsType = {
+	name: "add_products",
+	options: [
+		{
+			title: "Add an Item",
+			subTitle: "Add one product at a time",
+		},
+
+		{
+			title: "Bulk items upload",
+			subTitle: "Add multiple products at once",
+		},
+	],
 } as const;
 
-export const formatCurrency = (val: number, symbol: string = "₦") => {
-  const formattedNumber = new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-  })
+export const BillingPlanType = {
+	name: "billingPlan",
+	options: [
+		{
+			title: "Personal Plan",
+			amount: formatCurrency(18500),
+			subTitle: "Includes access to 1 user, 70 inventory items.",
+		},
 
-  return formattedNumber.format(val)
-}
+		{
+			title: "Team Plan",
+			amount: formatCurrency(24000),
+			subTitle:
+				"Includes access to 3 user, 150 inventory items and suppliers information.",
+		},
+		{
+			title: "Enterprise Plan",
+			amount: formatCurrency(36500),
+			subTitle:
+				"Includes access to 5 user, 250 inventory items, suppliers, customers and creditor information.",
+		},
+	],
+} as const;
 
 export const months = [
 	"January",

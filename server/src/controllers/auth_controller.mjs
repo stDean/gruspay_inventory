@@ -6,8 +6,7 @@ import { sendMail } from "../utils/sendMail.mjs";
 
 export const AuthController = {
 	sendOtp: async (req, res) => {
-		const { company_name, company_email, password, country } =
-			req.body;
+		const { company_name, company_email, password, country } = req.body;
 
 		if (!company_email || !company_name || !password || !country) {
 			return res
@@ -266,5 +265,5 @@ export const AuthController = {
 		res
 			.status(StatusCodes.OK)
 			.json({ message: "Password updated successfully", success: true });
-	},
+	}
 };

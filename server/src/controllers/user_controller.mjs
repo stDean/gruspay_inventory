@@ -192,4 +192,26 @@ export const UserCtrl = {
 
 		return res.status(StatusCodes.OK).json({ supplier });
 	},
+	updateCompanyPlan: async (req, res) => {
+		const { company_id } = req.user;
+		const { payment_plan } = req.body;
+
+		const company = await prisma.company.findUnique({
+			where: { id: company_id },
+		});
+		if (!company) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Company not found" });
+		}
+
+		await prisma.company.update({
+			where: { id: company_id },
+			data: { payment_plan },
+		});
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Payment plan updated successfully" });
+	},
 };

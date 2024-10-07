@@ -58,6 +58,9 @@ router.route("/updateUser").patch(AuthMiddleware, UserCtrl.updateUser);
 router
 	.route("/updateUserRole/:id")
 	.patch(AuthMiddleware, UserCtrl.updateUserRole);
+router
+	.route("/updateCompanyPlan")
+	.patch([AuthMiddleware, AdminMiddleware], UserCtrl.updateCompanyPlan);
 
 router
 	.route("/createUser")

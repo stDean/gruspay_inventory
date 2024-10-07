@@ -349,3 +349,32 @@ export const getCreditor = async ({
 		return { error: "Something went wrong, try again." };
 	}
 };
+
+// Company
+export const updateCompanyPlan = async ({
+	token,
+	payment_plan,
+}: {
+	token: string;
+	payment_plan: string;
+}) => {
+	try {
+		const { data } = await axios.patch(
+			"http://localhost:5001/api/user/updateCompanyPlan",
+			{ payment_plan },
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
