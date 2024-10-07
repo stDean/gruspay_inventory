@@ -8,10 +8,11 @@ import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { CustomerTable } from "@/components/table/CustomerTable";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export const Customer = ({ id }: { id: string }) => {
-	const { token } = useReduxState();
+	const { token, companyDetails } = useReduxState();
+	const router = useRouter();
 	const searchParam = useSearchParams();
 	const page = Number(searchParam.get("page"));
 
@@ -31,21 +32,29 @@ export const Customer = ({ id }: { id: string }) => {
 
 	useEffect(() => {
 		getCustomerData();
-	}, []);
+	}, [id]);
 
-	return isPending ? (
-		<Spinner />
+	// Early redirect if the company is on the PERSONAL plan
+	if (companyDetails?.payment_plan !== "ENTERPRISE") {
+		router.push("/users");
+		return null; // Ensure nothing renders if the redirect happens
+	}
+
+	// Loading state
+	if (isPending) return <Spinner />;
+
+	// Render supplier details if available
+	return customer ? (
+		<div className="-mt-4">
+			<ItemsHeader
+				routeTo="/users"
+				types={customer!.buyer_name}
+				productName="All Products Purchased"
+			/>
+
+			<CustomerTable products={customer!.Products} page={page} />
+		</div>
 	) : (
-		customer && (
-			<div className="-mt-4">
-				<ItemsHeader
-					routeTo="/users"
-					types={customer!.buyer_name}
-					productName="All Products Purchased"
-				/>
-
-				<CustomerTable products={customer!.Products} page={page} />
-			</div>
-		)
+		<div>No customer data available.</div> // Handle case where customer is null
 	);
 };

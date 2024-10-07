@@ -59,8 +59,6 @@ export const DashboardContent = () => {
 		dashboardStats();
 	};
 
-	console.log({ selectedMonths });
-
 	const dashboardStats = useCallback(async () => {
 		startTransition(async () => {
 			const { data } = await getDashboardStats({
@@ -253,7 +251,9 @@ export const DashboardContent = () => {
 							startYear={2024}
 							endYear={2034}
 							componentKey="topSellerYear"
-							initialYear={selectedYears["topSellerYear"] || String(currentYear)}
+							initialYear={
+								selectedYears["topSellerYear"] || String(currentYear)
+							}
 						/>
 					</div>
 				</div>

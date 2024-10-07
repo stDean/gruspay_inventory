@@ -14,7 +14,7 @@ import { toast } from "sonner";
 export const Creditor = ({ id }: { id: string }) => {
 	const router = useRouter();
 	const completeModal = useCompletePayModal();
-	const { token } = useReduxState();
+	const { token, companyDetails } = useReduxState();
 	const searchParam = useSearchParams();
 	const page = Number(searchParam.get("page"));
 
@@ -43,19 +43,27 @@ export const Creditor = ({ id }: { id: string }) => {
 		getCreditorData();
 	}, [completeModal.isOpen]);
 
-	return isPending ? (
-		<Spinner />
-	) : (
-		creditor && (
-			<div className="-mt-4">
-				<ItemsHeader
-					routeTo="/users"
-					types={creditor!.creditor_name}
-					productName="All Products Purchased"
-				/>
+	// Early redirect if the company is on the PERSONAL plan
+	if (companyDetails?.payment_plan !== "ENTERPRISE") {
+		router.push("/users");
+		return null; // Ensure nothing renders if the redirect happens
+	}
 
-				<CreditorTable products={creditor!.Products} page={page} />
-			</div>
-		)
+	// Loading state
+	if (isPending) return <Spinner />;
+
+	// Render supplier details if available
+	return creditor ? (
+		<div className="-mt-4">
+			<ItemsHeader
+				routeTo="/users"
+				types={creditor!.creditor_name}
+				productName="All Products Purchased"
+			/>
+
+			<CreditorTable products={creditor!.Products} page={page} />
+		</div>
+	) : (
+		<div>No creditor data available.</div> // Handle case where creditor is null
 	);
 };

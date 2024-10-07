@@ -202,7 +202,7 @@ export const getSuppliers = async ({ token }: { token: string }) => {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -233,7 +233,7 @@ export const getSupplier = async ({
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -257,7 +257,7 @@ export const getCustomers = async ({ token }: { token: string }) => {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -288,7 +288,7 @@ export const getCustomer = async ({
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -312,7 +312,7 @@ export const getCreditors = async ({ token }: { token: string }) => {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -343,7 +343,7 @@ export const getCreditor = async ({
 		} else if (e.response?.status === 404) {
 			return { error: "the redirect" };
 		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		}
 
 		return { error: "Something went wrong, try again." };

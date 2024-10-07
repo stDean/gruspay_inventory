@@ -42,68 +42,40 @@ const getOrCreateSupplier = async supplierData => {
 };
 
 // check product length based on the payment plan
-const checkProductLength = (company, products) => {
-	const length = products.length;
+const checkProductLength = (company, newProductsCount) => {
+	const productLimits = {
+		PERSONAL: 70,
+		TEAM: 150,
+		ENTERPRISE: 250,
+	};
 
-	switch (company.payment_plan) {
-		case "PERSONAL":
-			if (length > 70) {
-				return {
-					error: true,
-					msg: "Cannot have more than 70 products, update plan to add more products.",
-				};
-			}
-			break;
-		case "TEAM":
-			if (length > 150) {
-				return {
-					error: true,
-					msg: "Cannot have more than 150 products, update plan to add more products.",
-				};
-			}
-			break;
-		case "ENTERPRISE":
-			if (length > 250) {
-				return {
-					error: true,
-					msg: "Cannot have more than 250 products, update plan to add more products.",
-				};
-			}
-			break;
-		default:
-			return { error: true, msg: "Update plan to perform this action." };
+	const limit = productLimits[company.payment_plan];
+	const currentProductCount = company.Products.length; // Assuming this is the list of current products in the company
+
+	// Check if adding the new products will exceed the limit
+	if (limit && currentProductCount + newProductsCount > limit) {
+		return {
+			error: true,
+			msg: `Cannot add more products. Your plan allows a maximum of ${limit} products, and you currently have ${currentProductCount}. Please upgrade your plan.`,
+		};
 	}
 
-	// No issues, return an empty object
 	return {};
 };
 
 const checkToAddSingleProduct = company => {
-	if (company.payment_plan === "PERSONAL") {
-		if (company.Products.length >= 70) {
-			return {
-				error: true,
-				msg: "Maximum limit of 70 products reached. Upgrade your plan to add more.",
-			};
-		}
-	}
+	const productLimits = {
+		PERSONAL: 70,
+		TEAM: 150,
+		ENTERPRISE: 250,
+	};
 
-	if (company.payment_plan === "TEAM") {
-		if (company.Products.length >= 150) {
-			return {
-				error: true,
-				msg: "Maximum limit of 150 products reached. Upgrade your plan to add more.",
-			};
-		}
-	}
-
-	if (company.payment_plan === "ENTERPRISE") {
-		if (company.Products.length >= 250) {
-			return {
-				error: true,
-				msg: "Maximum limit of 250 products reached. Upgrade your plan to add more.",
-			};
-		}
+	const limit = productLimits[company.payment_plan];
+	if (limit && company.Products.length >= limit) {
+		return {
+			error: true,
+			msg: `Maximum limit of ${limit} products reached. Upgrade your plan to add more.`,
+		};
 	}
 
 	return {};
@@ -180,7 +152,7 @@ export const InventoryCtrl = {
 		const results = [];
 
 		// Check the product length synchronously (handle errors via return)
-		const productLengthCheck = checkProductLength(company, req.body);
+		const productLengthCheck = checkProductLength(company, req.body.length);
 		if (productLengthCheck.error) {
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				msg: productLengthCheck.msg,
@@ -229,20 +201,14 @@ export const InventoryCtrl = {
 			}
 		}
 
-		if (errors.length > 0) {
-			const serialNo = errors.map(error => error.product);
-			if (serialNo.length > 10) {
-				return res.status(StatusCodes.BAD_REQUEST).json({
-					msg: "Some of the products already exists",
-				});
-			}
-
-			return res.status(StatusCodes.BAD_REQUEST).json({
-				msg: `Products with serial number ${serialNo.join(
-					", "
-				)} already exists`,
-			});
-		}
+		// Handle errors if any
+	if (errors.length > 0) {
+		const serialNo = errors.map(error => error.product);
+		const errorMsg = serialNo.length > 10
+			? "Some of the products already exist."
+			: `Products with serial numbers ${serialNo.join(", ")} already exist.`;
+		return res.status(StatusCodes.BAD_REQUEST).json({ msg: errorMsg });
+	}
 
 		res.status(StatusCodes.OK).json({ msg: "Products created" });
 	},
@@ -1032,11 +998,11 @@ export const InventoryCtrl = {
 
 		const data = Array.from(allMonths).map(month => ({
 			month,
-			"monthly sale": calculateTotalForMonth(
+			"monthly sales": calculateTotalForMonth(
 				groupedSoldProducts[month] || [],
 				"bought_for"
 			),
-			"monthly purchase": calculateTotalForMonth(
+			"monthly purchases": calculateTotalForMonth(
 				groupedPurchasedProducts[month] || [],
 				"price"
 			),

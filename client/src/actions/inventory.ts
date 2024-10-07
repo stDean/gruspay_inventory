@@ -107,7 +107,7 @@ export const addSingleProduct = async ({
 		return data;
 	} catch (e: any) {
 		if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
@@ -360,7 +360,7 @@ export const getBarChartData = async ({
 
 		return { data };
 	} catch (e: any) {
-    if (e.response?.status === 401) {
+		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		}
 

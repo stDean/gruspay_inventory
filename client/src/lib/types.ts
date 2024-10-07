@@ -74,7 +74,7 @@ export interface UserProps {
 	password: string;
 	role: string;
 	updatedAt: string;
-	Company: { company_name: string };
+	Company: { company_name: string, payment_plan: string };
 }
 
 export interface CustomerProps {
@@ -140,6 +140,6 @@ export interface DashboardProps {
 
 export interface BarChartProps {
 	month: string;
-	"monthly sale": number;
-	"monthly purchase": number;
+	"monthly sales": number;
+	"monthly purchases": number;
 }

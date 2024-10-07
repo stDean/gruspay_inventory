@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/lib/utils";
 import React from "react";
 
 interface SummaryStatsProps {
@@ -8,7 +9,7 @@ interface SummaryStatsProps {
 	totalPrice: number;
 	totalText: string;
 	topSeller: string;
-  addClass?:string
+	addClass?: string;
 }
 
 export const SummaryStats = ({
@@ -19,10 +20,12 @@ export const SummaryStats = ({
 	title,
 	totalText,
 	topSeller,
-  addClass
+	addClass,
 }: SummaryStatsProps) => {
 	return (
-		<div className={`flex flex-col gap-4 border rounded-lg p-3 px-6 mb-3 shadow-lg ${addClass}`}>
+		<div
+			className={`flex flex-col gap-4 border rounded-lg p-3 px-6 mb-3 shadow-lg ${addClass}`}
+		>
 			<h1 className="font-semibold text-lg">{title}</h1>
 
 			<div className="flex justify-between items-center">
@@ -39,7 +42,9 @@ export const SummaryStats = ({
 				</div>
 
 				<div className="space-y-1">
-					<p className="text-xl md:text-4xl font-semibold">{totalPrice}</p>
+					<p className="text-xl md:text-4xl font-semibold">
+						{formatCurrency(Number(totalPrice) || 0)}
+					</p>
 					<p className="text-xs md:text-sm font-semibold">{totalText}</p>
 				</div>
 

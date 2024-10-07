@@ -35,11 +35,25 @@ export const AddProductForm = () => {
 	});
 	const handleAddProduct = (data: z.infer<typeof AddProductSchema>) => {
 		startTransition(async () => {
-			const { data: success, error } = await addSingleProduct({ val: data, token });
+			const {
+				data: success,
+				error,
+				status,
+			} = await addSingleProduct({ val: data, token });
+      if (status === 400 && error) {
+        toast.error("Error", { description: error });
+        setTimeout(() => {
+          addSingleProductModal.onClose();
+          form.reset();
+        }, 300);
+        return;
+      }
+
 			if (error) {
 				toast.error("Error", { description: error });
 				return;
 			}
+
 
 			toast.success("Success", {
 				description: "Product added successfully",

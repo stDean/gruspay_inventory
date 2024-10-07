@@ -5,12 +5,12 @@ import { useAppDispatch } from "@/app/redux";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
 } from "@/components/ui/table";
 import { useReduxState } from "@/hook/useRedux";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ import { setPreviewProducts } from "@/state";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/Spinners";
 
 const PreviewTableData = ({
 	products,
@@ -106,7 +107,7 @@ export const PreviewTable = () => {
 
 			if (error) {
 				toast.error("Error", { description: error });
-        dispatch(setPreviewProducts([]));
+				dispatch(setPreviewProducts([]));
 				setTimeout(() => {
 					router.push("/inventory");
 				}, 300);
@@ -122,14 +123,16 @@ export const PreviewTable = () => {
 	};
 
 	const handleCancel = () => {
-		dispatch(setPreviewProducts([]));
 		router.push("/inventory");
+		dispatch(setPreviewProducts([]));
 	};
 
-	return (
+	return isPending ? (
+		<Spinner />
+	) : (
 		<div className="flex flex-col justify-between items-center mb-3 -mt-4">
 			<div className="flex justify-between items-center w-full mb-4">
-				<h1 className="text-2xl font-semibold">Inventory</h1>
+				<h1 className="text-2xl font-semibold">Preview Inventory</h1>
 				<div className="flex gap-4">
 					<Button
 						onClick={handleCancel}

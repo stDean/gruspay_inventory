@@ -8,8 +8,9 @@ export const useReduxState = () => {
 		token,
 		previewProducts,
 		singleData,
-    user
+		user,
 	} = useAppSelector(({ global }) => global);
+	const companyDetails = user?.Company;
 
 	return {
 		email,
@@ -18,6 +19,7 @@ export const useReduxState = () => {
 		token,
 		previewProducts,
 		singleData,
-    user
+		user,
+		companyDetails,
 	};
 };

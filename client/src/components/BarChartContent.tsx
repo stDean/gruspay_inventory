@@ -21,8 +21,8 @@ export const BarChartContent = ({ data }: { data: BarChartProps[] }) => {
 				<YAxis />
 				<Tooltip />
 				<Legend />
-				<Bar dataKey="monthly sale" fill="#8884d8" />
-				<Bar dataKey="monthly purchase" fill="#82ca9d" />
+				<Bar dataKey="monthly sales" fill="#8884d8" />
+				<Bar dataKey="monthly purchases" fill="#82ca9d" />
 			</BarChart>
 		</ResponsiveContainer>
 	);

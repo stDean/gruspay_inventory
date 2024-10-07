@@ -6,13 +6,14 @@ import { Spinner } from "@/components/Spinners";
 import { SupplierTable } from "@/components/table/SupplierTable";
 import { useReduxState } from "@/hook/useRedux";
 import { SupplierProps } from "@/lib/types";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const Supplier = ({ id }: { id: string }) => {
-	const { token } = useReduxState();
-  const searchParam = useSearchParams();
+	const router = useRouter();
+	const { token, companyDetails } = useReduxState();
+	const searchParam = useSearchParams();
 	const page = Number(searchParam.get("page"));
 
 	const [isPending, startTransition] = useTransition();
@@ -31,23 +32,29 @@ export const Supplier = ({ id }: { id: string }) => {
 
 	useEffect(() => {
 		getSupplierData();
-	}, []);
+	}, [id]);
 
-	console.log({ supplier });
+	// Early redirect if the company is on the PERSONAL plan
+	if (companyDetails?.payment_plan === "PERSONAL") {
+		router.push("/users");
+		return null; // Ensure nothing renders if the redirect happens
+	}
 
-	return isPending ? (
-		<Spinner />
+	// Loading state
+	if (isPending) return <Spinner />;
+
+	// Render supplier details if available
+	return supplier ? (
+		<div className="-mt-4">
+			<ItemsHeader
+				routeTo="/users"
+				types={supplier.supplier_name}
+				productName="All Products Supplied"
+			/>
+
+			<SupplierTable products={supplier.Products || []} page={page} />
+		</div>
 	) : (
-		supplier && (
-			<div className="-mt-4">
-				<ItemsHeader
-					routeTo="/users"
-					types={supplier!.supplier_name}
-					productName="All Products Supplied"
-				/>
-
-				<SupplierTable products={supplier?.Products} page={page} />
-			</div>
-		)
+		<div>No supplier data available.</div> // Handle case where supplier is null
 	);
 };

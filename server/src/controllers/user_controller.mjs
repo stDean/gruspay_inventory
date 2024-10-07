@@ -7,7 +7,9 @@ export const UserCtrl = {
 		const { user } = req;
 		const userInDb = await prisma.users.findUnique({
 			where: { email: user.email },
-			include: { Company: { select: { company_name: true } } },
+			include: {
+				Company: { select: { company_name: true, payment_plan: true } },
+			},
 		});
 
 		if (!userInDb) {
