@@ -5,7 +5,7 @@ interface WelcomeLayoutProps {
 }
 
 const WelcomeLayout: FC<WelcomeLayoutProps> = ({ children }) => {
-	return <main className="min-h-screen light bg-gray-50">{children}</main>;
+	return <main className="min-h-screen bg-gray-100">{children}</main>;
 };
 
 export default WelcomeLayout;

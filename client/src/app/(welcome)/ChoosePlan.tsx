@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const Card = ({
@@ -25,8 +26,17 @@ const Card = ({
 	supplier?: boolean;
 	supplierText?: string;
 }) => {
+	const router = useRouter();
+	const handleGetPerAndPlan = () => {
+		if (typeof localStorage !== "undefined") {
+			localStorage.setItem("plan", JSON.stringify({ plan, per }));
+		}
+
+		router.push("/register");
+	};
+
 	return (
-		<div className="p-6 rounded-lg border flex-1 bg-white flex flex-col hover:shadow-xl transition-shadow ease-in-out">
+		<div className="p-6 rounded-lg border border-gray-200 flex-1 bg-gray-50 flex flex-col hover:shadow-xl transition-shadow ease-in-out cursor-pointer">
 			<div className="space-y-6 border-b pb-4">
 				<p className="px-4 py-2 font-semibold text-white rounded-3xl bg-blue-500 border w-fit">
 					{plan}
@@ -66,7 +76,11 @@ const Card = ({
 
 			<div className="pt-6">
 				{/* TODO:Onclick of this send to register page then set the plan in local-storage so you can get it on the register page */}
-				<Button variant="outline" className="w-full py-6 font-semibold">
+				<Button
+					variant="outline"
+					className="w-full py-6 font-semibold"
+					onClick={handleGetPerAndPlan}
+				>
 					Get Started
 				</Button>
 			</div>

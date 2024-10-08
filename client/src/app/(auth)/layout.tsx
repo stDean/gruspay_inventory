@@ -5,7 +5,7 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
-	return <main className="min-h-screen light bg-gray-50 flex justify-center items-center">{children}</main>;
+	return <main className="min-h-screen bg-gray-50 flex justify-center items-center">{children}</main>;
 };
 
 export default AuthLayout;

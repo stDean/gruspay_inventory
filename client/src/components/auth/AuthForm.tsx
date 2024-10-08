@@ -34,7 +34,13 @@ export const AuthForm = () => {
 		password: false,
 		cfPassword: false,
 	});
-	const [payment, setPayment] = useState<string>("Personal");
+
+	const plan =
+		typeof localStorage !== "undefined" &&
+		JSON.parse(localStorage.getItem("plan")!);
+
+	const selectedPlan = plan ? plan.plan : "Personal";
+	const [payment, setPayment] = useState<string>(selectedPlan);
 
 	const form = useForm<z.infer<typeof AuthSchema>>({
 		resolver: zodResolver(AuthSchema),
@@ -113,7 +119,7 @@ export const AuthForm = () => {
 						// onClick={() => router.push("/dashboard")}
 					/>
 
-					<p className="text-xl md:text-2xl font-semibold">
+					<p className="text-xl md:text-2xl mt-1 font-semibold">
 						{pathname === "/register" ? "Register" : "Log In"}
 					</p>
 
