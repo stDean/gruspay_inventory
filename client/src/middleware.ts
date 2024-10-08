@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { authRoutes, DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
-
 export function middleware(request: NextRequest) {
 	const { nextUrl } = request;
 
@@ -14,7 +13,7 @@ export function middleware(request: NextRequest) {
 	}
 
 	if (!isLoggedIn && !isAuthRoute) {
-		return Response.redirect(new URL("/login", nextUrl));
+		return Response.redirect(new URL("/", nextUrl));
 	}
 
 	return;

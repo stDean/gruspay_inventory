@@ -46,7 +46,7 @@ export const AuthForm = () => {
 
 	const handleSubmit = (data: z.infer<typeof AuthSchema>) => {
 		startTransition(async () => {
-			if (pathname === "/") {
+			if (pathname === "/register") {
 				const values = {
 					...data,
 					payment_plan: payment.toUpperCase(),
@@ -114,19 +114,19 @@ export const AuthForm = () => {
 					/>
 
 					<p className="text-xl md:text-2xl font-semibold">
-						{pathname === "/" ? "Register" : "Log In"}
+						{pathname === "/register" ? "Register" : "Log In"}
 					</p>
 
 					<CustomInput
 						control={form.control}
 						name="email"
-						label={pathname !== "/" ? "Email" : "Company Email"}
+						label={pathname !== "/register" ? "Email" : "Company Email"}
 						placeholder={
-							pathname !== "/" ? "Enter email" : "Enter company email"
+							pathname !== "/register" ? "Enter email" : "Enter company email"
 						}
 					/>
 
-					{pathname === "/" && (
+					{pathname === "/register" && (
 						<>
 							<CustomInput
 								control={form.control}
@@ -181,7 +181,7 @@ export const AuthForm = () => {
 						handleShow={() => setShow({ ...show, password: !show.password })}
 					/>
 
-					{pathname === "/" && (
+					{pathname === "/register" && (
 						<>
 							<CustomInput
 								control={form.control}
@@ -208,7 +208,7 @@ export const AuthForm = () => {
 						</p>
 					)}
 
-					{pathname === "/" ? (
+					{pathname === "/register" ? (
 						<p className="text-center text-base">
 							Have an account?{" "}
 							<Link
@@ -222,7 +222,7 @@ export const AuthForm = () => {
 						<p className="text-center text-base">
 							Don't have an account?{" "}
 							<Link
-								href="/"
+								href="/register"
 								className="font-semibold text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
 							>
 								Register Now

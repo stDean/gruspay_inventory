@@ -82,7 +82,7 @@ export const SideBar = () => {
 		dispatch(setEmail(""));
 		dispatch(setUser({}));
 		await Logout();
-		router.push("/login");
+		router.push("/welcome");
 	};
 
 	const sidebarClassNames = `fixed flex flex-col ${

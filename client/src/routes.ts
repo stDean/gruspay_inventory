@@ -3,7 +3,14 @@
  * These routes redirects logged in users to /settings.
  * @type {string[]}
  */
-export const authRoutes = ["/login", "/", "/code", "/reset", "/update-password"];
+export const authRoutes = [
+	"/login",
+	"/",
+	"/register",
+	"/code",
+	"/reset",
+	"/update-password",
+];
 
 /**
  * Route to redirect when a users successfully logs in

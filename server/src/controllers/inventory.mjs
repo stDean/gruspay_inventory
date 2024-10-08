@@ -202,13 +202,16 @@ export const InventoryCtrl = {
 		}
 
 		// Handle errors if any
-	if (errors.length > 0) {
-		const serialNo = errors.map(error => error.product);
-		const errorMsg = serialNo.length > 10
-			? "Some of the products already exist."
-			: `Products with serial numbers ${serialNo.join(", ")} already exist.`;
-		return res.status(StatusCodes.BAD_REQUEST).json({ msg: errorMsg });
-	}
+		if (errors.length > 0) {
+			const serialNo = errors.map(error => error.product);
+			const errorMsg =
+				serialNo.length > 10
+					? "Some of the products already exist."
+					: `Products with serial numbers ${serialNo.join(
+							", "
+					  )} already exist.`;
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: errorMsg });
+		}
 
 		res.status(StatusCodes.OK).json({ msg: "Products created" });
 	},
@@ -909,7 +912,6 @@ export const InventoryCtrl = {
 
 		const selectedYear = barYear ? Number(barYear) : new Date().getFullYear();
 
-		console.log({ barYear, selectedYear });
 		// Fetch sold products grouped by month
 		const soldProducts = await prisma.products.findMany({
 			where: {

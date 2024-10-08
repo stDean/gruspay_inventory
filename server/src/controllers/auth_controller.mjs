@@ -265,5 +265,5 @@ export const AuthController = {
 		res
 			.status(StatusCodes.OK)
 			.json({ message: "Password updated successfully", success: true });
-	}
+	},
 };
