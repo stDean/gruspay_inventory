@@ -32,23 +32,67 @@ enum SaleStatus {
   NOT_SOLD
 }
 
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BillType {
+  MONTHLY
+  YEARLY
+}
+
 model Company {
-  id            String       @id @default(uuid())
-  company_name  String       @unique
-  company_email String       @unique
-  password      String
-  country       String
-  payment_plan  Payment_Plan @default(FREE)
-  // TODO:Add a paid boolean so when the user has paid then turn true
-  Users         Users[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  verified      Boolean      @default(false)
-  Products      Products[]
-  suppliers     Supplier[]
-  customers     Buyer[]
-  swaps         Swaps[]
-  creditors     Creditor[]
+  id                String           @id @default(uuid())
+  company_name      String
+  company_email     String           @unique
+  password          String
+  country           String
+  Users             Users[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  verified          Boolean          @default(false)
+  paymentStatus     PlanStatus       @default(INACTIVE)
+  Products          Products[]
+  suppliers         Supplier[]
+  customers         Buyer[]
+  swaps             Swaps[]
+  creditors         Creditor[]
+  CompanyPayments   CompanyPayments? @relation(fields: [companyPaymentsId], references: [id])
+  companyPaymentsId String?          @unique
+  PayStackAuth      PayStackAuth[]
+}
+
+model CompanyPayments {
+  id            String         @id @default(uuid())
+  company       Company?
+  status        PlanStatus     @default(ACTIVE)
+  plan          Payment_Plan   @default(PERSONAL)
+  billType      BillType       @default(MONTHLY)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  authorization PayStackAuth[]
+}
+
+model PayStackAuth {
+  id                 String           @id @default(uuid())
+  authorization_code String           @unique
+  card_type          String
+  last4              String
+  exp_month          String
+  exp_year           String
+  bin                String
+  bank               String
+  channel            String
+  signature          String
+  reusable           Boolean
+  country_code       String
+  brand              String
+  account_name       String?
+  company            Company?         @relation(fields: [companyId], references: [id])
+  CompanyPayments    CompanyPayments? @relation(fields: [companyPaymentsId], references: [id])
+  companyPaymentsId  String?
+  companyId          String?
 }
 
 model Otp {

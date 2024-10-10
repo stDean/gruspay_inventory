@@ -1,5 +1,6 @@
 "use client";
 
+import { useReduxState } from "@/hook/useRedux";
 import { BillingPlanType, cn } from "@/lib/utils";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
 import { Check } from "lucide-react";
@@ -7,9 +8,17 @@ import { Check } from "lucide-react";
 interface PlanButtonsProps {
 	options: { billingPlan: (typeof BillingPlanType.options)[number] };
 	onChange: (value: (typeof BillingPlanType.options)[number]) => void;
+	type: string;
 }
 
-export const PlanButtons = ({ options, onChange }: PlanButtonsProps) => {
+export const PlanButtons = ({ options, onChange, type }: PlanButtonsProps) => {
+	const { companyDetails } = useReduxState();
+	const matcher: { [key: string]: string } = {
+		MONTHLY: "monthly",
+		YEARLY: "yearly",
+	};
+	const matchVal = companyDetails?.CompanyPayments!.billType!;
+
 	return (
 		<>
 			{[BillingPlanType].map(({ name, options: selectedOptions }) => (
@@ -23,7 +32,8 @@ export const PlanButtons = ({ options, onChange }: PlanButtonsProps) => {
 									cn(
 										"relative block cursor-pointer rounded-lg bg-white py-4 shadow-sm border-2 border-zinc-200 focus:outline-none ring-0 focus:ring-0 outline-none sm:flex sm:justify-between",
 										{
-											"border-[#F9AE19] bg-[#FEFDF0]": checked,
+											"border-[#F9AE19] bg-[#FEFDF0]":
+												checked && type === matcher[matchVal],
 										}
 									)
 								}
@@ -40,14 +50,16 @@ export const PlanButtons = ({ options, onChange }: PlanButtonsProps) => {
 													"border-2 rounded-full p-[2px] self-start flex items-center justify-center",
 													{
 														"border-[#F9AE19]":
-															options.billingPlan["title"] === option.title,
+															options.billingPlan["title"] === option.title &&
+															type === matcher[matchVal],
 													}
 												)}
 											>
 												<Check
 													className={cn("h-3 w-3 text-gray-400", {
 														"text-[#F9AE19]":
-															options.billingPlan["title"] === option.title,
+															options.billingPlan["title"] === option.title &&
+															type === matcher[matchVal],
 													})}
 													strokeWidth={3}
 												/>
@@ -58,9 +70,17 @@ export const PlanButtons = ({ options, onChange }: PlanButtonsProps) => {
 
 										<Description className="px-6 mb-1">
 											<span className="text-2xl lg:text-4xl font-semibold">
-												{option.amount}
+												{type === "monthly" ? option.amount : option.yrAmount}
 											</span>{" "}
 											per month
+										</Description>
+										<Description className="px-6 mb-1">
+											<span className="font-semibold text-base">
+												{type === "monthly"
+													? option.amountPY
+													: option.yrAmountPY}
+											</span>{" "}
+											per year
 										</Description>
 										<Description className="px-6">
 											{option.subTitle}

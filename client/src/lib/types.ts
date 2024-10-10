@@ -39,11 +39,11 @@ export interface ProductProps {
 		updateAt: string;
 		incomingProducts: Array<ProductProps>;
 	};
-  Creditor?: {
-    creditor_name: string;
+	Creditor?: {
+		creditor_name: string;
 		creditor_email?: string;
 		creditor_phone_no: string;
-  }
+	};
 }
 
 export interface ProductStockProps {
@@ -74,7 +74,10 @@ export interface UserProps {
 	password: string;
 	role: string;
 	updatedAt: string;
-	Company: { company_name: string, payment_plan: string };
+	Company: {
+		company_name: string;
+		CompanyPayments: { billType: string; plan: string };
+	};
 }
 
 export interface CustomerProps {
@@ -86,7 +89,7 @@ export interface CustomerProps {
 	createdAt: string;
 	id: string;
 	updatedAt: string;
-  creditor: boolean;
+	creditor: boolean;
 }
 
 export interface CreditorProps {
@@ -98,7 +101,7 @@ export interface CreditorProps {
 	createdAt: string;
 	id: string;
 	updatedAt: string;
-  creditor: boolean;
+	creditor: boolean;
 }
 
 export interface SupplierProps {

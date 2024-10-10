@@ -15,6 +15,7 @@ const Card = ({
 	customerText,
 	supplier,
 	supplierText,
+	yearFees,
 }: {
 	plan: string;
 	amount: string;
@@ -25,6 +26,7 @@ const Card = ({
 	customerText?: string;
 	supplier?: boolean;
 	supplierText?: string;
+	yearFees?: string;
 }) => {
 	const router = useRouter();
 	const handleGetPerAndPlan = () => {
@@ -46,10 +48,13 @@ const Card = ({
 					maiores in velit, quasi recusandae consequuntur sed excepturi
 				</p>
 
-				<p className="pt-3">
+				<div className="pt-3 space-y-2">
 					<span className="text-3xl lg:text-4xl font-semibold">{amount}</span> /
-					{per}
-				</p>
+					month
+					<p className="">
+						Billed yearly <span className="font-semibold">{yearFees}</span>
+					</p>
+				</div>
 			</div>
 
 			<div className="border-b py-6 space-y-4 font-semibold flex-1">
@@ -121,7 +126,8 @@ export const ChoosePlan = () => {
 			<div className="space-y-4 md:space-y-0 md:flex md:gap-6 w-full lg:px-10 px-6">
 				<Card
 					plan="Personal"
-					amount={type === "yearly" ? "₦14,400" : "₦18,500"}
+					amount={type === "yearly" ? "₦14,800" : "₦18,500"}
+					yearFees={type === "yearly" ? "₦177,600" : "₦222,000"}
 					per={type === "monthly" ? "month" : "year"}
 					val="70"
 					users="One User"
@@ -129,6 +135,7 @@ export const ChoosePlan = () => {
 				<Card
 					plan="Team"
 					amount={type === "yearly" ? "₦19,200" : "₦24,000"}
+					yearFees={type === "yearly" ? "₦230,400" : "₦288,000"}
 					per={type === "monthly" ? "month" : "year"}
 					val="150"
 					users="Up to 3 users"
@@ -138,6 +145,7 @@ export const ChoosePlan = () => {
 				<Card
 					plan="Enterprise"
 					amount={type === "yearly" ? "₦29,000" : "₦36,500"}
+					yearFees={type === "yearly" ? "₦348,000" : "₦438,000"}
 					per={type === "monthly" ? "month" : "year"}
 					val="250"
 					users="Up to 5 users"

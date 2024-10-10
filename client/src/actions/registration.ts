@@ -7,8 +7,10 @@ import { z } from "zod";
 
 export const SendOTP = async ({
 	values,
+	billingType,
 }: {
 	values: z.infer<typeof AuthSchema>;
+	billingType: string;
 }) => {
 	const validatedFields = AuthSchema.safeParse(values);
 	if (!validatedFields.success) {
@@ -18,9 +20,17 @@ export const SendOTP = async ({
 	try {
 		const { email, password, company_name, country, payment_plan } =
 			validatedFields.data;
+
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/sendOTP",
-			{ company_email: email, password, company_name, country, payment_plan }
+			"http://localhost:5001/api/auth/createCompany",
+			{
+				company_email: email,
+				password,
+				company_name,
+				country,
+				payment_plan,
+				billingType,
+			}
 		);
 		return { success: data };
 	} catch (e: any) {

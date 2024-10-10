@@ -67,7 +67,10 @@ export const AuthForm = () => {
 					return;
 				}
 
-				const { error, success } = await SendOTP({ values });
+				const { error, success } = await SendOTP({
+					values,
+					billingType: plan.per,
+				});
 
 				if (error) {
 					toast.error("Error", {
@@ -80,7 +83,8 @@ export const AuthForm = () => {
 					toast.success("Success", {
 						description: "OTP sent successfully",
 					});
-					router.push("/code");
+					router.push(success.transaction.authorization_url);
+
 					form.reset();
 				}
 				return;
@@ -103,6 +107,7 @@ export const AuthForm = () => {
 				});
 				router.push("/dashboard");
 
+				typeof localStorage !== "undefined" && localStorage.removeItem("plan");
 				form.reset();
 			}
 		});
@@ -240,7 +245,7 @@ export const AuthForm = () => {
 
 					<div className="text-end ml-auto">
 						<Button disabled={isPending}>
-							{pathname === "/" ? "Continue" : "Log In"}
+							{pathname === "/register" ? "Continue" : "Log In"}
 						</Button>
 					</div>
 				</div>

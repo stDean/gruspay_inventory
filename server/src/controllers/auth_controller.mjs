@@ -3,72 +3,182 @@ import { StatusCodes } from "http-status-codes";
 import { generateVerificationToken } from "../utils/token.mjs";
 import { hashPassword, comparePassword, createJWT } from "../utils/helper.mjs";
 import { sendMail } from "../utils/sendMail.mjs";
+import {
+	createSubscription,
+	initializeSubscription,
+	getCustomer,
+} from "./paystack.c.mjs";
+import { my_plans } from "../constants.mjs";
+
+const handleOtpForCompany = async email => {
+	const { token, expires } = await generateVerificationToken(email);
+	const existingOtp = await prisma.otp.findFirst({ where: { email } });
+
+	if (existingOtp) {
+		await prisma.otp.update({
+			where: { email },
+			data: { otp: token, expiresAt: expires },
+		});
+	} else {
+		await prisma.otp.create({
+			data: { email, otp: token, expiresAt: expires },
+		});
+	}
+
+	sendMail(email, token, "OTP Verification");
+};
 
 export const AuthController = {
-	sendOtp: async (req, res) => {
-		const { company_name, company_email, password, country } = req.body;
+	// create account
+	createCompany: async (req, res) => {
+		const {
+			company_name,
+			company_email,
+			password,
+			country,
+			billingType,
+			payment_plan,
+		} = req.body;
 
+		// Ensure all required fields are present
 		if (!company_email || !company_name || !password || !country) {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "All fields are required", success: false });
 		}
 
+		// Initialize the company as a customer
+		const { transaction, error } = await initializeSubscription({
+			email: company_email,
+			amount: "5000",
+		});
+
+		if (error) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: "Subscription initialization failed." });
+		}
+
+		// Prepare subscription details
+		const planName = `${payment_plan.toLowerCase()}_${billingType}`;
+		const startDate = new Date();
+		startDate.setDate(startDate.getDate() + 7); // 7-day trial period
+
+		const {
+			error: customerError,
+			theCustomer,
+			authorization,
+		} = await getCustomer({
+			email: company_email,
+		});
+
+		if (customerError) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
+		}
+
+		// TODO:Cancel any existing subscriptions before creating a new one
+    
+		// create company subscription plan
+		const { subscription, error: subscriptionError } = await createSubscription(
+			{
+				customer: theCustomer.id,
+				plan: my_plans[planName],
+				start_date: startDate,
+				authorization: authorization.authorization_code,
+			}
+		);
+
+		if (subscriptionError) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: "Subscription creation failed." });
+		}
+
+		// Check if the company already exists
 		const existingCompany = await prisma.company.findUnique({
 			where: { company_email },
 		});
 
-		if (existingCompany?.company_email) {
-			if (!existingCompany?.verified) {
-				const { token, expires } = await generateVerificationToken(
-					existingCompany.company_email
-				);
-				sendMail(existingCompany.company_email, token, "OTP Verification");
-				const existingOtp = await prisma.otp.findFirst({
-					where: { email: existingCompany.company_email },
+		if (existingCompany) {
+			if (existingCompany.paymentStatus === "INACTIVE") {
+				// Reactivate company and reconnect to the existing payment
+				const paymentPlan = await prisma.companyPayments.findFirst({
+					where: { company: { id: existingCompany.id } },
 				});
 
-				if (existingOtp) {
-					await prisma.otp.update({
-						where: { id: existingOtp.id, email: existingOtp.email },
-						data: { otp: token, expiresAt: expires },
-					});
-				}
+				await prisma.company.update({
+					where: { id: existingCompany.id },
+					data: {
+						paymentStatus: paymentPlan.status,
+						CompanyPayments: { connect: { id: paymentPlan.id } },
+					},
+				});
 
-				return res
-					.status(StatusCodes.OK)
-					.json({ message: "check your email for OTP", success: true });
+				await handleOtpForCompany(existingCompany.company_email);
+
+				return res.status(StatusCodes.OK).json({
+					message: "Check your email for OTP",
+					success: true,
+				});
+			}
+
+			if (
+				!existingCompany.verified &&
+				existingCompany.paymentStatus === "ACTIVE"
+			) {
+				await handleOtpForCompany(existingCompany.company_email);
+
+				return res.status(StatusCodes.OK).json({
+					message: "Check your email for OTP",
+					success: true,
+				});
 			}
 
 			return res
 				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "Company already exists", success: false });
+				.json({ msg: "Company already exists" });
 		}
 
-		const { token, expires } = await generateVerificationToken(company_email);
-		const existingOtp = await prisma.otp.findFirst({
-			where: { email: company_email },
-		});
-
-		if (existingOtp) {
-			await prisma.otp.delete({ where: { email: company_email } });
-		}
-		await prisma.otp.create({
-			data: { email: company_email, otp: token, expiresAt: expires },
-		});
-
-		sendMail(company_email, token, "OTP Verification");
-
-		// create company
+		// Create new company
 		const hashedPassword = await hashPassword(password);
 		const company = await prisma.company.create({
-			data: { ...req.body, password: hashedPassword },
+			data: {
+				company_email,
+				company_name,
+				country,
+				password: hashedPassword,
+				paymentStatus: "ACTIVE",
+			},
 		});
 
-		// Store email and hashed password temporarily
-		res
-			.status(StatusCodes.OK)
-			.json({ message: "OTP sent to your email", company, success: true });
+		await prisma.companyPayments.create({
+			data: {
+				company: { connect: { id: company.id } },
+				billType: billingType === "year" ? "YEARLY" : "MONTHLY",
+				plan: payment_plan.toUpperCase(),
+				status: "ACTIVE",
+				authorization: {
+					connectOrCreate: {
+						where: { authorization_code: authorization.authorization_code },
+						create: {
+							...authorization,
+							reusable: authorization.reusable === 1 ? true : false,
+							companyId: company.id,
+						},
+					},
+				},
+			},
+		});
+
+		// Send OTP for verification
+		await handleOtpForCompany(company.company_email);
+
+		return res.status(StatusCodes.OK).json({
+			message: "Company has been created.",
+			company,
+			transaction,
+			subscription,
+		});
 	},
 	verifyOtp: async (req, res) => {
 		const { otp, company_email } = req.body;

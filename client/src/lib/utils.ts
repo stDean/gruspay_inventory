@@ -49,20 +49,29 @@ export const BillingPlanType = {
 	name: "billingPlan",
 	options: [
 		{
-			title: "Personal Plan",
+			title: "Personal",
 			amount: formatCurrency(18500),
+			yrAmount: formatCurrency(14800),
+			amountPY: formatCurrency(222000),
+			yrAmountPY: formatCurrency(177600),
 			subTitle: "Includes access to 1 user, 70 inventory items.",
 		},
 
 		{
-			title: "Team Plan",
+			title: "Team",
 			amount: formatCurrency(24000),
+			yrAmount: formatCurrency(19200),
+			amountPY: formatCurrency(288000),
+			yrAmountPY: formatCurrency(230400),
 			subTitle:
 				"Includes access to 3 user, 150 inventory items and suppliers information.",
 		},
 		{
-			title: "Enterprise Plan",
+			title: "Enterprise",
 			amount: formatCurrency(36500),
+			yrAmount: formatCurrency(29000),
+			amountPY: formatCurrency(435000),
+			yrAmountPY: formatCurrency(348000),
 			subTitle:
 				"Includes access to 5 user, 250 inventory items, suppliers, customers and creditor information.",
 		},

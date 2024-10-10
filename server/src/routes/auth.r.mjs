@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth_controller.mjs";
+import { AuthMiddleware } from "../middlewares/auth.m.mjs";
 
 const router = Router();
 
-router.post("/sendOTP", AuthController.sendOtp);
+router.post("/createCompany", AuthController.createCompany);
 router.post("/verifyOTP", AuthController.verifyOtp);
 router.post("/resendOTP", AuthController.resendOtp);
 router.post("/login", AuthController.login);

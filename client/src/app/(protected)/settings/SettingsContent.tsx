@@ -13,9 +13,9 @@ import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 enum Plans {
-	"Personal Plan" = 0,
-	"Team Plan" = 1,
-	"Enterprise Plan" = 2,
+	"Personal" = 0,
+	"Team" = 1,
+	"Enterprise" = 2,
 }
 
 export const SettingsContent = () => {
@@ -26,12 +26,15 @@ export const SettingsContent = () => {
 		billing: boolean;
 		security: boolean;
 	}>({ billing: true, security: false });
+	const [billingType, setBillingType] = useState<"monthly" | "yearly">("monthly");
 
 	// Normalize the plan to lowercase and find the matching key from the enum
 	const planKey = Object.keys(Plans)
 		.filter(key => isNaN(Number(key))) // Filter out numeric values from enum
 		.find(key =>
-			key.toLowerCase().includes(companyDetails?.payment_plan!?.toLowerCase())
+			key
+				.toLowerCase()
+				.includes(companyDetails?.CompanyPayments?.plan!?.toLowerCase())
 		);
 
 	// Get the corresponding index (numeric value) of the plan from the enum
@@ -55,9 +58,9 @@ export const SettingsContent = () => {
 	}, [token, user]);
 
 	const matchers = {
-		"Personal Plan": "PERSONAL",
-		"Team Plan": "TEAM",
-		"Enterprise Plan": "ENTERPRISE",
+		Personal: "PERSONAL",
+		Team: "TEAM",
+		Enterprise: "ENTERPRISE",
 	};
 
 	const handleUpdate = () => {
@@ -95,36 +98,67 @@ export const SettingsContent = () => {
 						)}
 					</div>
 
-					<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
-						<Tab
-							first
-							title="Billing & Plan"
-							handleTab={() => {
-								setTab({
-									billing: true,
-									security: false,
-								});
-							}}
-							val={tab.billing}
-							styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r rounded-l-md"
-						/>
-						<Tab
-							title="Security"
-							handleTab={() => {
-								setTab({
-									billing: false,
-									security: true,
-								});
-							}}
-							val={tab.security}
-							styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] rounded-r-md"
-						/>
+					<div className="space-y-4">
+						<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
+							<Tab
+								first
+								title="Billing & Plan"
+								handleTab={() => {
+									setTab({
+										billing: true,
+										security: false,
+									});
+								}}
+								val={tab.billing}
+								styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r rounded-l-md"
+							/>
+							<Tab
+								title="Security"
+								handleTab={() => {
+									setTab({
+										billing: false,
+										security: true,
+									});
+								}}
+								val={tab.security}
+								styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] rounded-r-md"
+							/>
+						</div>
+
+						{tab.billing && (
+							<div className="max-w-[150px] bg-white border rounded-full flex p-1">
+								<p
+									className={`flex-1 text-center p-2 ${
+										billingType === "monthly" &&
+										"rounded-full text-white font-semibold bg-blue-500 transition ease-linear"
+									} cursor-pointer`}
+									onClick={() => {
+										setBillingType("monthly");
+									}}
+								>
+									Monthly
+								</p>
+								<p
+									className={`flex-1 text-center p-2 ${
+										billingType === "yearly" &&
+										"rounded-full text-white font-semibold bg-blue-500 transition ease-linear"
+									} cursor-pointer`}
+									onClick={() => {
+										setBillingType("yearly");
+									}}
+								>
+									Yearly
+								</p>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
 
 			{tab.security && <UserSettingsForm />}
-			{tab.billing && <Billing options={options} onChange={handleChange} />}
+			{tab.billing && (
+				<Billing options={options} onChange={handleChange} type={billingType} />
+			)}
 		</div>
 	);
 };
