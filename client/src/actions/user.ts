@@ -354,14 +354,16 @@ export const getCreditor = async ({
 export const updateCompanyPlan = async ({
 	token,
 	payment_plan,
+  billingType
 }: {
 	token: string;
 	payment_plan: string;
+  billingType: string
 }) => {
 	try {
 		const { data } = await axios.patch(
 			"http://localhost:5001/api/user/updateCompanyPlan",
-			{ payment_plan },
+			{ payment_plan, billingType },
 			{
 				headers: { Authorization: `Bearer ${token}` },
 			}

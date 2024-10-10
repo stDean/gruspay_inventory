@@ -17,8 +17,6 @@ export const CustomerInfo = ({
 	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	balance_owed?: boolean;
 }) => {
-	console.log({ customerInfo });
-
 	return (
 		<>
 			<p className="font-semibold text-base mt-3">Customers Information</p>

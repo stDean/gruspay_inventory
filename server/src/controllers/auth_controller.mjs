@@ -77,7 +77,7 @@ export const AuthController = {
 		}
 
 		// TODO:Cancel any existing subscriptions before creating a new one
-    
+
 		// create company subscription plan
 		const { subscription, error: subscriptionError } = await createSubscription(
 			{
@@ -376,4 +376,6 @@ export const AuthController = {
 			.status(StatusCodes.OK)
 			.json({ message: "Password updated successfully", success: true });
 	},
+	updateSubscription: async (req, res) => {},
+	cancelSubscription: async (req, res) => {},
 };

@@ -44,7 +44,7 @@ export const Creditor = ({ id }: { id: string }) => {
 	}, [completeModal.isOpen]);
 
 	// Early redirect if the company is on the PERSONAL plan
-	if (companyDetails?.payment_plan !== "ENTERPRISE") {
+	if (companyDetails?.CompanyPayments.plan !== "ENTERPRISE") {
 		router.push("/users");
 		return null; // Ensure nothing renders if the redirect happens
 	}

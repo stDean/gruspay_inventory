@@ -26,7 +26,9 @@ export const SettingsContent = () => {
 		billing: boolean;
 		security: boolean;
 	}>({ billing: true, security: false });
-	const [billingType, setBillingType] = useState<"monthly" | "yearly">("monthly");
+	const [billingType, setBillingType] = useState<"monthly" | "yearly">(
+		"monthly"
+	);
 
 	// Normalize the plan to lowercase and find the matching key from the enum
 	const planKey = Object.keys(Plans)
@@ -64,10 +66,17 @@ export const SettingsContent = () => {
 	};
 
 	const handleUpdate = () => {
+		console.log({
+			payment_plan: matchers[options.billingPlan.title].toUpperCase(),
+			billingType: billingType.toUpperCase(),
+		});
+		return;
+
 		startTransition(async () => {
 			const { data, error } = await updateCompanyPlan({
 				token,
-				payment_plan: matchers[options.billingPlan.title],
+				payment_plan: matchers[options.billingPlan.title].toUpperCase(),
+				billingType: billingType.toUpperCase(),
 			});
 
 			if (error) {
@@ -80,22 +89,14 @@ export const SettingsContent = () => {
 		});
 	};
 
+	console.log({ options, billingType });
+
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="flex justify-between items-center">
 				<div className="space-y-3 w-full">
 					<div className="flex justify-between items-center">
 						<h1 className="font-semibold text-xl md:text-2xl">Settings</h1>
-
-						{tab.billing && (
-							<Button
-								className="px-6 py-5 hover:opacity-90"
-								disabled={isPending}
-								onClick={handleUpdate}
-							>
-								Update Plan
-							</Button>
-						)}
 					</div>
 
 					<div className="space-y-4">
@@ -128,9 +129,9 @@ export const SettingsContent = () => {
 						{tab.billing && (
 							<div className="max-w-[150px] bg-white border rounded-full flex p-1">
 								<p
-									className={`flex-1 text-center p-2 ${
+									className={`flex-1 text-center p-[0.5px] ${
 										billingType === "monthly" &&
-										"rounded-full text-white font-semibold bg-blue-500 transition ease-linear"
+										"rounded-full text-white bg-blue-500 transition ease-linear"
 									} cursor-pointer`}
 									onClick={() => {
 										setBillingType("monthly");
@@ -139,9 +140,9 @@ export const SettingsContent = () => {
 									Monthly
 								</p>
 								<p
-									className={`flex-1 text-center p-2 ${
+									className={`flex-1 text-center p-[0.5px] ${
 										billingType === "yearly" &&
-										"rounded-full text-white font-semibold bg-blue-500 transition ease-linear"
+										"rounded-full text-white bg-blue-500 transition ease-linear"
 									} cursor-pointer`}
 									onClick={() => {
 										setBillingType("yearly");
@@ -157,7 +158,13 @@ export const SettingsContent = () => {
 
 			{tab.security && <UserSettingsForm />}
 			{tab.billing && (
-				<Billing options={options} onChange={handleChange} type={billingType} />
+				<Billing
+					options={options}
+					onChange={handleChange}
+					type={billingType}
+					plan={planKey}
+					handleClick={handleUpdate}
+				/>
 			)}
 		</div>
 	);

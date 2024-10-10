@@ -35,7 +35,7 @@ export const Supplier = ({ id }: { id: string }) => {
 	}, [id]);
 
 	// Early redirect if the company is on the PERSONAL plan
-	if (companyDetails?.payment_plan === "PERSONAL") {
+	if (companyDetails?.CompanyPayments.plan === "PERSONAL") {
 		router.push("/users");
 		return null; // Ensure nothing renders if the redirect happens
 	}

@@ -26,7 +26,7 @@ export const UserContent = () => {
 				<div className="space-y-3">
 					<h1 className="font-semibold text-xl md:text-2xl">Manage Users</h1>
 
-					{companyDetails?.payment_plan !== "PERSONAL" && (
+					{companyDetails?.CompanyPayments.plan !== "PERSONAL" && (
 						<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
 							<Tab
 								first
@@ -54,13 +54,13 @@ export const UserContent = () => {
 								}}
 								val={tab.suppliers}
 								styles={`bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] ${
-									companyDetails?.payment_plan === "ENTERPRISE"
+									companyDetails?.CompanyPayments.plan === "ENTERPRISE"
 										? "border-r"
 										: "rounded-r-md"
 								}`}
 							/>
 
-							{companyDetails?.payment_plan === "ENTERPRISE" && (
+							{companyDetails?.CompanyPayments.plan === "ENTERPRISE" && (
 								<>
 									<Tab
 										title="Customers"
@@ -94,7 +94,7 @@ export const UserContent = () => {
 					)}
 				</div>
 
-				{tab.employees && companyDetails?.payment_plan !== "PERSONAL" && (
+				{tab.employees && companyDetails?.CompanyPayments.plan !== "PERSONAL" && (
 					<>
 						<Button
 							className="px-6 py-5 hover:opacity-90"
