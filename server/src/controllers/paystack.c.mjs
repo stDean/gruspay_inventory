@@ -154,12 +154,15 @@ export const PayStackController = {
 	},
 	getCustomer: async (req, res) => {
 		const { email } = req.params;
-		const { error, theCustomer, authorization } = await getCustomer({ email });
+		const { error, theCustomer, authorization, subscriptions } =
+			await getCustomer({ email });
 		if (error) {
 			return res.status(StatusCodes.BAD_REQUEST).json({ msg: error });
 		}
 
-		return res.status(StatusCodes.OK).json({ theCustomer, authorization });
+		return res
+			.status(StatusCodes.OK)
+			.json({ theCustomer, authorization, sub: subscriptions[0] });
 	},
 	// When you select the type of billing, you go to register screen
 	// from there when you enter all details, you then call this route

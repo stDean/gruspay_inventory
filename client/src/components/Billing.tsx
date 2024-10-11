@@ -10,6 +10,7 @@ interface BillingProps {
 	plan?: string;
 	handleClick: () => void;
 	isPending?: boolean;
+  handleCancelPlan: () => void
 }
 
 export const Billing = ({
@@ -19,6 +20,7 @@ export const Billing = ({
 	plan,
 	handleClick,
 	isPending,
+  handleCancelPlan
 }: BillingProps) => {
 	return (
 		<div className="lg:w-[70vw]">
@@ -29,6 +31,7 @@ export const Billing = ({
 				plan={plan}
 				handleClick={handleClick}
 				isPending={isPending}
+        handleCancelPlan={handleCancelPlan}
 			/>
 		</div>
 	);

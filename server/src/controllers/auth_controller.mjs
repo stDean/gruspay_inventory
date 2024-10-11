@@ -34,9 +34,16 @@ const handleOtpForCompany = async email => {
 const updateBillingPlan = async (
 	companyPaymentsId,
 	billingType,
-	payment_plan
+	payment_plan,
+	company_id
 ) => {
 	try {
+		// enable the cancel button
+		await prisma.company.update({
+			where: { id: company_id },
+			data: { cancelable: true },
+		});
+
 		// Update the plan on the next billing date
 		await prisma.companyPayments.update({
 			where: { id: companyPaymentsId },
@@ -48,6 +55,75 @@ const updateBillingPlan = async (
 		console.log("Billing plan updated successfully");
 	} catch (error) {
 		console.error("Error updating billing plan:", error);
+	}
+};
+
+const deActivateAccount = async company_id => {
+	try {
+		const company = await prisma.company.findUnique({
+			where: { id: company_id },
+		});
+
+		if (!company) {
+			return { error: "Company not found" };
+		}
+
+		await prisma.company.update({
+			where: { id: company_id },
+			data: {
+				paymentStatus: "INACTIVE",
+				CompanyPayments: { disconnect: true },
+			},
+		});
+
+		await prisma.companyPayments.delete({
+			where: { id: company.companyPaymentsId },
+		});
+
+		console.log("Account deactivated successfully");
+	} catch (e) {
+		console.error("Error canceling billing plan:", error);
+	}
+};
+
+// Reusable function to get customer and active subscription
+const getCustomerAndSubscription = async email => {
+	try {
+		const {
+			error: customerError,
+			subscriptions,
+			theCustomer,
+			authorization,
+		} = await getCustomer({ email });
+
+		if (customerError || !subscriptions.length) {
+			return { error: customerError || "No active subscription found" };
+		}
+
+		const sub = subscriptions[0];
+		const nextBillingDate = new Date(sub.next_payment_date);
+		const cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
+			nextBillingDate.getMonth() + 1
+		} ${nextBillingDate.getDay()}`;
+
+		return { sub, nextBillingDate, cronTime, theCustomer, authorization };
+	} catch (error) {
+		console.error("Error retrieving customer and subscription:", error);
+		return { error: "Internal server error" };
+	}
+};
+
+// Reusable function to cancel an existing subscription
+const cancelCustomerSubscription = async sub => {
+	try {
+		const { error: cancelErr } = await cancelSubscription({
+			code: sub.subscription_code,
+			token: sub.email_token,
+		});
+		return cancelErr ? { error: cancelErr } : { success: true };
+	} catch (error) {
+		console.error("Error cancelling subscription:", error);
+		return { error: "Failed to cancel subscription" };
 	}
 };
 
@@ -398,39 +474,31 @@ export const AuthController = {
 			.json({ message: "Password updated successfully", success: true });
 	},
 	updateSubscription: async (req, res) => {
-		const { email, billingType, payment_plan } = req.body;
+		const { billingType, payment_plan } = req.body;
+		const { email, company_id } = req.user;
 
 		// get the current active subscriptions
 		const {
-			error: customerError,
+			sub,
+			nextBillingDate,
+			cronTime,
 			theCustomer,
 			authorization,
-			subscriptions,
-		} = await getCustomer({ email: req.user.email });
+			error,
+		} = await getCustomerAndSubscription(email);
 
-		if (customerError) {
-			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
+		if (error) {
+			return res
+				.StatusCodes(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: error });
 		}
-		// return res.status(StatusCodes.OK).json({ subscriptions });
 
-		// get the date it expires i.e the next billing date
-		const sub = subscriptions[0];
-		const nextBillingDate = new Date(sub.next_payment_date);
-		const cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
-			nextBillingDate.getMonth() + 1
-		} ${nextBillingDate.getDay()}`;
-
-		// cancel the previous subscription
-		const { error: cancelErr, success } = await cancelSubscription({
-			code: sub.subscription_code,
-			token: sub.email_token,
-		});
-
-		if (cancelErr) {
+		// Cancel the previous subscription
+		const { error: cancelError } = await cancelCustomerSubscription(sub);
+		if (cancelError)
 			return res
 				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: cancelErr });
-		}
+				.json({ msg: cancelError });
 
 		// create a new subscription with a start date the date the previous one ends
 		const planName = `${payment_plan.toLowerCase()}_${billingType}`;
@@ -451,13 +519,24 @@ export const AuthController = {
 
 		// update the company payment plan on the db and also update the authorization
 		const company = await prisma.company.findUnique({
-			where: { id: req.user.company_id },
+			where: { id: company_id },
+		});
+
+		// make the cancel subscription be disabled until the next billing date
+		await prisma.company.update({
+			where: { id: company_id },
+			data: { cancelable: false },
 		});
 
 		// update the plan on the next billing address
-		cron.schedule(cronTime, () => {
-			updateBillingPlan(company.companyPaymentsId, billingType, payment_plan);
-		});
+		cron.schedule(cronTime, () =>
+			updateBillingPlan(
+				company.companyPaymentsId,
+				billingType,
+				payment_plan,
+				company.id
+			)
+		);
 
 		// send a success message
 		return res.status(StatusCodes.OK).json({
@@ -470,7 +549,30 @@ export const AuthController = {
 		});
 	},
 	cancelSubscription: async (req, res) => {
+		const { email, company_id } = req.user;
+
 		// cancel the subscription
+		// get the current active subscriptions
+		const { sub, cronTime, error } = await getCustomerAndSubscription(email);
+
+		if (error) {
+			return res
+				.StatusCodes(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: error });
+		}
+
+		// cancel subscription
+		const { error: cancelError } = await cancelCustomerSubscription(sub);
+		if (cancelError)
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: cancelError });
+
 		// set set update the the pay status as to INACTIVE when the end date is
+		cron.schedule(cronTime, () => deActivateAccount(company_id));
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Subscription cancelled successfully" });
 	},
 };

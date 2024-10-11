@@ -61,6 +61,7 @@ model Company {
   CompanyPayments   CompanyPayments? @relation(fields: [companyPaymentsId], references: [id])
   companyPaymentsId String?          @unique
   PayStackAuth      PayStackAuth[]
+  cancelable        Boolean          @default(true)
 }
 
 model CompanyPayments {
@@ -72,6 +73,7 @@ model CompanyPayments {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   authorization PayStackAuth[]
+  expires       DateTime?
 }
 
 model PayStackAuth {

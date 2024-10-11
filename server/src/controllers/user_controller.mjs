@@ -11,7 +11,10 @@ export const UserCtrl = {
 				Company: {
 					select: {
 						company_name: true,
-						CompanyPayments: { select: { billType: true, plan: true } },
+						CompanyPayments: {
+							select: { billType: true, plan: true, expires: true },
+						},
+						cancelable: true,
 					},
 				},
 			},
@@ -70,6 +73,7 @@ export const UserCtrl = {
 				.json({ msg: "User with this email already exists." });
 		}
 
+		// TODO:Not more than 2 admin for enterprise, and 1 admin for team and just admin in personal
 		const hashPass = await hashPassword(req.body.password);
 		await prisma.users.create({
 			data: { ...req.body, password: hashPass, companyId: req.user.company_id },

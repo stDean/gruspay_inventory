@@ -354,11 +354,11 @@ export const getCreditor = async ({
 export const updateCompanyPlan = async ({
 	token,
 	payment_plan,
-  billingType
+	billingType,
 }: {
 	token: string;
 	payment_plan: string;
-  billingType: string
+	billingType: string;
 }) => {
 	try {
 		const { data } = await axios.post(
@@ -374,6 +374,31 @@ export const updateCompanyPlan = async ({
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
+export const cancelCompanyPlan = async ({ token }: { token: string }) => {
+	try {
+		const { data } = await axios.post(
+			"http://localhost:5001/api/auth/cancelSubscription",
+			{},
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 

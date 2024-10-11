@@ -12,7 +12,8 @@ interface PlanButtonsProps {
 	type: string;
 	plan?: string;
 	handleClick: () => void;
-  isPending?:boolean
+	isPending?: boolean;
+	handleCancelPlan: () => void;
 }
 
 export const PlanButtons = ({
@@ -21,7 +22,8 @@ export const PlanButtons = ({
 	type,
 	plan,
 	handleClick,
-  isPending
+	isPending,
+	handleCancelPlan,
 }: PlanButtonsProps) => {
 	const { companyDetails } = useReduxState();
 	const matcher: { [key: string]: string } = {
@@ -60,7 +62,7 @@ export const PlanButtons = ({
 													"border-2 rounded-full p-[2px] self-start flex items-center justify-center",
 													{
 														"border-[#F9AE19]":
-															options.billingPlan["title"] === option.title &&
+															options.billingPlan?.title === option.title &&
 															type === matcher[matchVal],
 													}
 												)}
@@ -68,7 +70,7 @@ export const PlanButtons = ({
 												<Check
 													className={cn("h-3 w-3 text-gray-400", {
 														"text-[#F9AE19]":
-															options.billingPlan["title"] === option.title &&
+															options.billingPlan?.title === option.title &&
 															type === matcher[matchVal],
 													})}
 													strokeWidth={3}
@@ -109,8 +111,17 @@ export const PlanButtons = ({
 															? "outline"
 															: "default"
 													}
-													onClick={handleClick}
-                          disabled={isPending}
+													onClick={
+														option.title === plan && type === matcher[matchVal]
+															? handleCancelPlan
+															: handleClick
+													}
+													disabled={
+														(option.title === plan &&
+															type === matcher[matchVal] &&
+															!companyDetails?.cancelable) ||
+														isPending
+													}
 												>
 													{option.title === plan && type === matcher[matchVal]
 														? "Cancel Subscription"

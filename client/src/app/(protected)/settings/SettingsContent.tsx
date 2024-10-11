@@ -1,6 +1,6 @@
 "use client";
 
-import { getUser, updateCompanyPlan } from "@/actions/user";
+import { cancelCompanyPlan, getUser, updateCompanyPlan } from "@/actions/user";
 import { useAppDispatch } from "@/app/redux";
 import { UserSettingsForm } from "@/components/auth/UserSettingsForm";
 import { Billing } from "@/components/Billing";
@@ -66,11 +66,6 @@ export const SettingsContent = () => {
 	};
 
 	const handleUpdate = () => {
-		console.log({
-			payment_plan: matchers[options.billingPlan.title].toUpperCase(),
-			billingType: billingType === "monthly" ? "month" : "year",
-		});
-
 		startTransition(async () => {
 			const { data, error } = await updateCompanyPlan({
 				token,
@@ -88,6 +83,20 @@ export const SettingsContent = () => {
 					"Subscription updated. Your plan will change when the current one expires.",
 			});
 			setUserState();
+		});
+	};
+
+	const handleCancelPlan = () => {
+		startTransition(async () => {
+			const { data, error } = await cancelCompanyPlan({ token });
+			if (error) {
+				toast.error("Error", { description: error });
+				return;
+			}
+
+			toast.success("Success", {
+				description: "Your subscription has been successfully canceled.",
+			});
 		});
 	};
 
@@ -165,6 +174,7 @@ export const SettingsContent = () => {
 					plan={planKey}
 					handleClick={handleUpdate}
 					isPending={isPending}
+					handleCancelPlan={handleCancelPlan}
 				/>
 			)}
 		</div>
