@@ -12,6 +12,7 @@ interface PlanButtonsProps {
 	type: string;
 	plan?: string;
 	handleClick: () => void;
+  isPending?:boolean
 }
 
 export const PlanButtons = ({
@@ -20,6 +21,7 @@ export const PlanButtons = ({
 	type,
 	plan,
 	handleClick,
+  isPending
 }: PlanButtonsProps) => {
 	const { companyDetails } = useReduxState();
 	const matcher: { [key: string]: string } = {
@@ -108,6 +110,7 @@ export const PlanButtons = ({
 															: "default"
 													}
 													onClick={handleClick}
+                          disabled={isPending}
 												>
 													{option.title === plan && type === matcher[matchVal]
 														? "Cancel Subscription"

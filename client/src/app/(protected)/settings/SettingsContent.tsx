@@ -68,15 +68,14 @@ export const SettingsContent = () => {
 	const handleUpdate = () => {
 		console.log({
 			payment_plan: matchers[options.billingPlan.title].toUpperCase(),
-			billingType: billingType.toUpperCase(),
+			billingType: billingType === "monthly" ? "month" : "year",
 		});
-		return;
 
 		startTransition(async () => {
 			const { data, error } = await updateCompanyPlan({
 				token,
 				payment_plan: matchers[options.billingPlan.title].toUpperCase(),
-				billingType: billingType.toUpperCase(),
+				billingType: billingType === "monthly" ? "month" : "year",
 			});
 
 			if (error) {
@@ -84,12 +83,13 @@ export const SettingsContent = () => {
 				return;
 			}
 
-			toast.success("Success", { description: data.msg });
+			toast.success("Success", {
+				description:
+					"Subscription updated. Your plan will change when the current one expires.",
+			});
 			setUserState();
 		});
 	};
-
-	console.log({ options, billingType });
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -164,6 +164,7 @@ export const SettingsContent = () => {
 					type={billingType}
 					plan={planKey}
 					handleClick={handleUpdate}
+					isPending={isPending}
 				/>
 			)}
 		</div>

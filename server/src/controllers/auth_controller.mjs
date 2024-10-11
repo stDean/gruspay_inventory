@@ -1,3 +1,4 @@
+import cron from "node-cron";
 import { prisma } from "../utils/db.mjs";
 import { StatusCodes } from "http-status-codes";
 import { generateVerificationToken } from "../utils/token.mjs";
@@ -7,6 +8,7 @@ import {
 	createSubscription,
 	initializeSubscription,
 	getCustomer,
+	cancelSubscription,
 } from "./paystack.c.mjs";
 import { my_plans } from "../constants.mjs";
 
@@ -26,6 +28,27 @@ const handleOtpForCompany = async email => {
 	}
 
 	sendMail(email, token, "OTP Verification");
+};
+
+// Function to update the billing plan
+const updateBillingPlan = async (
+	companyPaymentsId,
+	billingType,
+	payment_plan
+) => {
+	try {
+		// Update the plan on the next billing date
+		await prisma.companyPayments.update({
+			where: { id: companyPaymentsId },
+			data: {
+				billType: billingType === "year" ? "YEARLY" : "MONTHLY",
+				plan: payment_plan.toUpperCase(),
+			},
+		});
+		console.log("Billing plan updated successfully");
+	} catch (error) {
+		console.error("Error updating billing plan:", error);
+	}
 };
 
 export const AuthController = {
@@ -75,8 +98,6 @@ export const AuthController = {
 		if (customerError) {
 			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
 		}
-
-		// TODO:Cancel any existing subscriptions before creating a new one
 
 		// create company subscription plan
 		const { subscription, error: subscriptionError } = await createSubscription(
@@ -376,6 +397,80 @@ export const AuthController = {
 			.status(StatusCodes.OK)
 			.json({ message: "Password updated successfully", success: true });
 	},
-	updateSubscription: async (req, res) => {},
-	cancelSubscription: async (req, res) => {},
+	updateSubscription: async (req, res) => {
+		const { email, billingType, payment_plan } = req.body;
+
+		// get the current active subscriptions
+		const {
+			error: customerError,
+			theCustomer,
+			authorization,
+			subscriptions,
+		} = await getCustomer({ email: req.user.email });
+
+		if (customerError) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
+		}
+		// return res.status(StatusCodes.OK).json({ subscriptions });
+
+		// get the date it expires i.e the next billing date
+		const sub = subscriptions[0];
+		const nextBillingDate = new Date(sub.next_payment_date);
+		const cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
+			nextBillingDate.getMonth() + 1
+		} ${nextBillingDate.getDay()}`;
+
+		// cancel the previous subscription
+		const { error: cancelErr, success } = await cancelSubscription({
+			code: sub.subscription_code,
+			token: sub.email_token,
+		});
+
+		if (cancelErr) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: cancelErr });
+		}
+
+		// create a new subscription with a start date the date the previous one ends
+		const planName = `${payment_plan.toLowerCase()}_${billingType}`;
+		const { subscription, error: subscriptionError } = await createSubscription(
+			{
+				customer: theCustomer.id,
+				plan: my_plans[planName],
+				start_date: nextBillingDate,
+				authorization: authorization.authorization_code,
+			}
+		);
+
+		if (subscriptionError) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: "Subscription creation failed." });
+		}
+
+		// update the company payment plan on the db and also update the authorization
+		const company = await prisma.company.findUnique({
+			where: { id: req.user.company_id },
+		});
+
+		// update the plan on the next billing address
+		cron.schedule(cronTime, () => {
+			updateBillingPlan(company.companyPaymentsId, billingType, payment_plan);
+		});
+
+		// send a success message
+		return res.status(StatusCodes.OK).json({
+			msg: "Plan has been successfully changed.",
+			theCustomer,
+			authorization,
+			sub,
+			nextBillingDate,
+			subscription,
+		});
+	},
+	cancelSubscription: async (req, res) => {
+		// cancel the subscription
+		// set set update the the pay status as to INACTIVE when the end date is
+	},
 };

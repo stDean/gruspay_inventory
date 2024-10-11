@@ -94,10 +94,35 @@ export const getCustomer = async ({ email }) => {
 			my_plans_array.indexOf(subscription.plan.plan_code) !== -1
 	);
 
-	console.log({ subscriptions });
-
 	const authorization = subscriptionRes.data[0].authorization;
-	return { theCustomer, authorization };
+	return { theCustomer, authorization, subscriptions };
+};
+
+export const getCustomerSubscriptions = async customer_id => {
+	const customerSubscriptions = await paystack.subscription.list({
+		customer: customer_id,
+	});
+
+	if (customerSubscriptions.status === false) {
+		return { error: "Something went wrong" };
+	}
+
+	const my_plans_array = Array.from(Object.values(my_plans));
+
+	const subscriptions = customerSubscriptions.data.filter(
+		subscription =>
+			subscription.status === "active" ||
+			my_plans_array.indexOf(subscription.plan.plan_code) !== -1
+	);
+
+	// const subscriptions = customerSubscriptions.data.filter(
+	// 	subscription =>
+	// 		subscription.status === "active" ||
+	// 		(subscription.status === "non-renewing" &&
+	// 			my_plans_array.indexOf(subscription.plan.plan_code) !== -1)
+	// );
+
+	return { subscriptions };
 };
 
 export const PayStackController = {
@@ -114,34 +139,18 @@ export const PayStackController = {
 			nbHits: matchedPlans.length,
 		});
 	},
-	getCustomerSubscriptions: async (req, res) => {
+	getCustomerActiveSubscriptions: async (req, res) => {
 		const { customer_id } = req.params;
 
-		const customerSubscriptions = await paystack.subscription.list({
-			customer: customer_id,
-		});
-
-		if (customerSubscriptions.status === false) {
-			return res
-				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: "Something went wrong", success: false });
-		}
-
-		const my_plans_array = Array.from(Object.values(my_plans));
-
-		const subscriptions = customerSubscriptions.data.filter(
-			subscription =>
-				subscription.status === "active" ||
-				(subscription.status === "non-renewing" &&
-					my_plans_array.indexOf(subscription.plan.plan_code) !== -1)
+		const { error, subscriptions } = await getCustomerSubscriptions(
+			customer_id
 		);
 
-		return res.status(StatusCodes.OK).json({
-			msg: "Subscriptions fetched successfully",
-			success: true,
-			subscriptions,
-			nbHits: subscriptions.length,
-		});
+		if (error) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: error });
+		}
+
+		return res.status(StatusCodes.OK).json({ subscriptions });
 	},
 	getCustomer: async (req, res) => {
 		const { email } = req.params;

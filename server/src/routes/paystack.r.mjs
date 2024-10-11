@@ -7,7 +7,7 @@ router.get("/getPayPlans", PayStackController.getPlans);
 router.get("/getCustomer/:email", PayStackController.getCustomer);
 router.get(
 	"/getSubscriptions/:customer_id",
-	PayStackController.getCustomerSubscriptions
+	PayStackController.getCustomerActiveSubscriptions
 );
 router.post(
 	"/initializeSubscription",

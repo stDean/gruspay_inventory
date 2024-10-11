@@ -361,8 +361,8 @@ export const updateCompanyPlan = async ({
   billingType: string
 }) => {
 	try {
-		const { data } = await axios.patch(
-			"http://localhost:5001/api/user/updateCompanyPlan",
+		const { data } = await axios.post(
+			"http://localhost:5001/api/auth/updateSubscription",
 			{ payment_plan, billingType },
 			{
 				headers: { Authorization: `Bearer ${token}` },
