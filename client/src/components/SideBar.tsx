@@ -4,21 +4,21 @@ import { Logout } from "@/actions/logout";
 import { useAppDispatch } from "@/app/redux";
 import { useReduxState } from "@/hook/useRedux";
 import {
-  setEmail,
-  setIsSidebarCollapsed,
-  setLoggedInUser,
-  setToken,
-  setUser,
+	setEmail,
+	setIsSidebarCollapsed,
+	setLoggedInUser,
+	setToken,
+	setUser,
 } from "@/state";
 import {
-  Archive,
-  ClipboardCheck,
-  Layout,
-  LogOut,
-  LucideIcon,
-  Menu,
-  SlidersHorizontal,
-  Users
+	Archive,
+	ClipboardCheck,
+	Layout,
+	LogOut,
+	LucideIcon,
+	Menu,
+	SlidersHorizontal,
+	Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -89,7 +89,7 @@ export const SideBar = () => {
 		isSidebarCollapsed ? "w-0 md:w-20" : "w-72 md:w-64"
 	} bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
-  const year = new Date().getFullYear();  
+	const year = new Date().getFullYear();
 
 	return (
 		<div className={sidebarClassNames}>
@@ -116,36 +116,38 @@ export const SideBar = () => {
 
 			{/* LINKS */}
 			<div className="flex-grow mt-8">
-				<SidebarLink
-					href="/dashboard"
-					icon={Layout}
-					label="Dashboard"
-					isCollapsed={isSidebarCollapsed}
-				/>
+				{user?.role === "ADMIN" && (
+					<SidebarLink
+						href="/dashboard"
+						icon={Layout}
+						label="Dashboard"
+						isCollapsed={isSidebarCollapsed}
+					/>
+				)}
+
 				<SidebarLink
 					href="/inventory"
 					icon={Archive}
 					label="Inventory"
 					isCollapsed={isSidebarCollapsed}
 				/>
-				{/* <SidebarLink
-					href="/products"
-					icon={Clipboard}
-					label="Products"
-					isCollapsed={isSidebarCollapsed}
-				/> */}
-				<SidebarLink
-					href="/sold"
-					icon={ClipboardCheck}
-					label="Sales History"
-					isCollapsed={isSidebarCollapsed}
-				/>
+
+				{user?.role === "ADMIN" && (
+					<SidebarLink
+						href="/sold"
+						icon={ClipboardCheck}
+						label="Sales History"
+						isCollapsed={isSidebarCollapsed}
+					/>
+				)}
+
 				<SidebarLink
 					href="/users"
 					icon={Users}
 					label="Users"
 					isCollapsed={isSidebarCollapsed}
 				/>
+
 				<SidebarLink
 					href="/settings"
 					icon={SlidersHorizontal}

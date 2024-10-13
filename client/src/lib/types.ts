@@ -77,7 +77,8 @@ export interface UserProps {
 	Company: {
 		company_name: string;
 		CompanyPayments: { billType: string; plan: string; expires: string };
-    cancelable: boolean;
+		cancelable: boolean;
+		paymentStatus: string;
 	};
 }
 

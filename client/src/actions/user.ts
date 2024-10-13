@@ -18,6 +18,8 @@ export const getUser = async ({ token }: { token: string }) => {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -46,6 +48,8 @@ export const getUserById = async ({
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -107,6 +111,8 @@ export const updateUser = async ({
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -178,6 +184,8 @@ export const updateUserRole = async ({
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -377,6 +385,8 @@ export const updateCompanyPlan = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -399,6 +409,8 @@ export const cancelCompanyPlan = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 

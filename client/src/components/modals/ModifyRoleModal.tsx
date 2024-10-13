@@ -31,6 +31,7 @@ export const ModifyRoleModal = () => {
 
 		if (error) {
 			toast.error("Error", { description: error });
+      return
 		}
 
 		toast.success("Success", {

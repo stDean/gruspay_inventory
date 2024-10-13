@@ -2,15 +2,19 @@ import { Router } from "express";
 import { InventoryCtrl } from "../controllers/inventory.mjs";
 import { AuthMiddleware } from "../middlewares/auth.m.mjs";
 import { AdminMiddleware } from "../middlewares/admin.m.mjs";
+import { checkSubscriptionStatus } from "../middlewares/checkSubscriptionStatus.mjs";
 
 const router = Router();
 
 router
 	.route("/createProduct")
-	.post(AuthMiddleware, InventoryCtrl.createProduct);
+	.post([AuthMiddleware, checkSubscriptionStatus], InventoryCtrl.createProduct);
 router
 	.route("/createProducts")
-	.post(AuthMiddleware, InventoryCtrl.createProducts);
+	.post(
+		[AuthMiddleware, checkSubscriptionStatus],
+		InventoryCtrl.createProducts
+	);
 
 router
 	.route("/getProducts/:type/:brand/:product_name")
@@ -48,14 +52,22 @@ router
 
 router
 	.route("/updateProduct/:id")
-	.patch([AuthMiddleware, AdminMiddleware], InventoryCtrl.updateProduct);
+	.patch(
+		[AuthMiddleware, AdminMiddleware, checkSubscriptionStatus],
+		InventoryCtrl.updateProduct
+	);
 router
 	.route("/updateBalance/:id")
-	.patch(AuthMiddleware, InventoryCtrl.updateSoldProduct);
+	.patch(
+		[AuthMiddleware, checkSubscriptionStatus],
+		InventoryCtrl.updateSoldProduct
+	);
 router
 	.route("/sellProduct/:serialNo")
-	.patch(AuthMiddleware, InventoryCtrl.sellProduct);
+	.patch([AuthMiddleware, checkSubscriptionStatus], InventoryCtrl.sellProduct);
 
-router.route("/swapProducts").patch(AuthMiddleware, InventoryCtrl.swapProducts);
+router
+	.route("/swapProducts")
+	.patch([AuthMiddleware, checkSubscriptionStatus], InventoryCtrl.swapProducts);
 
 export default router;

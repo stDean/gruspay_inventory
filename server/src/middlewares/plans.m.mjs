@@ -4,7 +4,11 @@ import { prisma } from "../utils/db.mjs";
 async function checkCompany(company_id) {
 	const company = await prisma.company.findUnique({
 		where: { id: company_id },
-		include: { Users: true, Products: { where: { sales_status: "NOT_SOLD" } } },
+		include: {
+			Users: true,
+			Products: { where: { sales_status: "NOT_SOLD" } },
+			CompanyPayments: { select: { plan: true } },
+		},
 	});
 
 	if (!company) {
@@ -20,7 +24,7 @@ export const AddUserMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
-	switch (company.payment_plan) {
+	switch (company.CompanyPayments.plan) {
 		case "PERSONAL":
 			if (company.Users.length === 1) {
 				return res.status(StatusCodes.BAD_REQUEST).json({
@@ -54,11 +58,7 @@ export const SupplierMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
-	if (
-		company.payment_plan === "PERSONAL" ||
-		company.payment_plan ===
-			"FREE" /* remove this when you remove the free plan from the model */
-	) {
+	if (company.CompanyPayments.plan === "PERSONAL") {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			msg: "Cannot perform this action",
 		});
@@ -72,10 +72,8 @@ export const CustomerAndCreditorMiddleware = async (req, res, next) => {
 	const company = await checkCompany(company_id);
 
 	if (
-		company.payment_plan === "PERSONAL" ||
-		company.payment_plan === "TEAM" ||
-		company.payment_plan ===
-			"FREE" /* remove this when you remove the free plan from the model */
+		company.CompanyPayments.plan === "PERSONAL" ||
+		company.CompanyPayments.plan === "TEAM"
 	) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			msg: "Cannot perform this action",

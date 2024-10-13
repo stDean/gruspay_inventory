@@ -43,6 +43,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 		});
 		if (error) {
 			toast.error("Error", { description: error });
+      return
 		}
 
 		productDetails.onOpen(data);

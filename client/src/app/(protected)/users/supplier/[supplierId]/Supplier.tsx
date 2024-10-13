@@ -24,6 +24,7 @@ export const Supplier = ({ id }: { id: string }) => {
 			const { data, error } = await getSupplier({ token, id });
 			if (error) {
 				toast.error("Error", { description: error });
+        return
 			}
 
 			setSupplier(data.supplier);

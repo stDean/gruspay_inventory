@@ -110,32 +110,37 @@ export const SettingsContent = () => {
 
 					<div className="space-y-4">
 						<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
-							<Tab
-								first
-								title="Billing & Plan"
-								handleTab={() => {
-									setTab({
-										billing: true,
-										security: false,
-									});
-								}}
-								val={tab.billing}
-								styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r rounded-l-md"
-							/>
-							<Tab
-								title="Security"
-								handleTab={() => {
-									setTab({
-										billing: false,
-										security: true,
-									});
-								}}
-								val={tab.security}
-								styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] rounded-r-md"
-							/>
+							{user?.role === "ADMIN" && (
+								<>
+									<Tab
+										first
+										title="Billing & Plan"
+										handleTab={() => {
+											setTab({
+												billing: true,
+												security: false,
+											});
+										}}
+										val={tab.billing}
+										styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r rounded-l-md"
+									/>
+
+									<Tab
+										title="Security"
+										handleTab={() => {
+											setTab({
+												billing: false,
+												security: true,
+											});
+										}}
+										val={tab.security}
+										styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] rounded-r-md"
+									/>
+								</>
+							)}
 						</div>
 
-						{tab.billing && (
+						{tab.billing && user?.role === "ADMIN" && (
 							<div className="max-w-[150px] bg-white border rounded-full flex p-1">
 								<p
 									className={`flex-1 text-center p-[0.5px] ${
@@ -165,8 +170,8 @@ export const SettingsContent = () => {
 				</div>
 			</div>
 
-			{tab.security && <UserSettingsForm />}
-			{tab.billing && (
+			{tab.security || (user?.role !== "ADMIN" && <UserSettingsForm />)}
+			{tab.billing && user?.role === "ADMIN" && (
 				<Billing
 					options={options}
 					onChange={handleChange}

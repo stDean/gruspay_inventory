@@ -41,6 +41,7 @@ export const SwapProductTable = ({
 		const { data, error } = await getProduct({ serialNo, token });
 		if (error) {
 			toast.error("Error", { description: error });
+      return
 		}
 
 		swapProductDetails.onOpen(data);

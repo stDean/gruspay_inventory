@@ -51,6 +51,7 @@ export const EmployeeTable = () => {
 		const { data, error } = await getUserById({ token, id });
 		if (error) {
 			toast.error("Error", { description: error });
+      return
 		}
 
 		modifyModal.onOpen(data.user);

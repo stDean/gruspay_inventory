@@ -12,6 +12,8 @@ export const authRoutes = [
 	"/update-password",
 ];
 
+export const adminRoutes = ["/dashboard", "/sold"];
+
 /**
  * Route to redirect when a users successfully logs in
  * @type {string}

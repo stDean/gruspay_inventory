@@ -12,8 +12,6 @@ export const CreditorTable = ({
 	products: Array<ProductProps>;
 	page: number;
 }) => {
-	console.log({ products });
-
 	const completeModal = useCompletePayModal();
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
@@ -21,14 +19,14 @@ export const CreditorTable = ({
 
 	const indexOfLastTransaction = currentPage * rowsPerPage;
 	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
-  const [filter, setFilter] = useState<string>("");
+	const [filter, setFilter] = useState<string>("");
 
 	const productsByPage = products.slice(
 		indexOfFirstTransaction,
 		indexOfLastTransaction
 	);
 
-  const filterBySearch = productsByPage.filter(item => {
+	const filterBySearch = productsByPage.filter(item => {
 		return item.serial_no.toLowerCase().includes(filter.toLowerCase());
 	});
 
@@ -82,11 +80,11 @@ export const CreditorTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
-      search
+			search
 			placeHolder="Search serial no..."
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
-      handleClear={() => setFilter("")}
+			handleClear={() => setFilter("")}
 		/>
 	);
 };

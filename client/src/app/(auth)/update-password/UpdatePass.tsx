@@ -38,6 +38,7 @@ export const UpdatePass = () => {
 				toast.error("Error", {
 					description: error,
 				});
+        return
 			}
 		});
 	};

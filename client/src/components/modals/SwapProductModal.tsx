@@ -139,7 +139,6 @@ export const SwapProductModal = () => {
 			// Update products in the state first
 			setProducts(prevProducts => {
 				const updatedProducts = [...prevProducts, incoming];
-				console.log({ updatedProducts });
 				return updatedProducts;
 			});
 
@@ -154,6 +153,7 @@ export const SwapProductModal = () => {
 			const { data, error } = await swapProducts({ token, ...dataToDb });
 			if (error) {
 				toast.error("Error", { description: error });
+				return;
 			}
 
 			toast.success("Success", { description: data?.msg });

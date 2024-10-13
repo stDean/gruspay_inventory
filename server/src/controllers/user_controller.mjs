@@ -15,6 +15,7 @@ export const UserCtrl = {
 							select: { billType: true, plan: true, expires: true },
 						},
 						cancelable: true,
+						paymentStatus: true,
 					},
 				},
 			},

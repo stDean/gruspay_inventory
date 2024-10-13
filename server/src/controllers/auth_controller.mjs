@@ -403,7 +403,9 @@ export const AuthController = {
 			company_id: user.companyId,
 		});
 
-		res.status(StatusCodes.OK).json({ success: true, jwtToken });
+		res
+			.status(StatusCodes.OK)
+			.json({ success: true, jwtToken, role: user.role });
 	},
 	otp: async (req, res) => {
 		const { email, password } = req.body;

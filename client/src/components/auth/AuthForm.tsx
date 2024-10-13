@@ -95,6 +95,7 @@ export const AuthForm = () => {
 				toast.error("Error", {
 					description: error,
 				});
+        return
 			}
 
 			if (success) {

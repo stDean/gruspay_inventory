@@ -24,6 +24,7 @@ export const Customer = ({ id }: { id: string }) => {
 			const { data, error } = await getCustomer({ token, id });
 			if (error) {
 				toast.error("Error", { description: error });
+        return
 			}
 
 			setCustomer(data.customer);

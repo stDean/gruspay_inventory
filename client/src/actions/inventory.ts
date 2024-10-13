@@ -38,8 +38,6 @@ export const getProductsByName = async ({
 	type: string;
 	brand: string;
 }) => {
-	console.log({ name, type, brand });
-
 	const URI = `http://localhost:5001/api/inventory/getProducts/${type}/${brand}/${name}`;
 	try {
 		const { data } = await axios.get(URI, {

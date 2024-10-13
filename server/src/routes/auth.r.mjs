@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthController } from "../controllers/auth_controller.mjs";
 import { AuthMiddleware } from "../middlewares/auth.m.mjs";
 import { AdminMiddleware } from "../middlewares/admin.m.mjs";
+import { checkSubscriptionStatus } from "../middlewares/checkSubscriptionStatus.mjs";
 
 const router = Router();
 
@@ -14,12 +15,12 @@ router.post("/updatePassword", AuthController.verifyAndUpdatePassword);
 router.post("/updatePassword", AuthController.verifyAndUpdatePassword);
 router.post(
 	"/updateSubscription",
-	[AuthMiddleware, AdminMiddleware],
+	[AuthMiddleware, AdminMiddleware, checkSubscriptionStatus],
 	AuthController.updateSubscription
 );
 router.post(
 	"/cancelSubscription",
-	[AuthMiddleware, AdminMiddleware],
+	[AuthMiddleware, AdminMiddleware, checkSubscriptionStatus],
 	AuthController.cancelSubscription
 );
 

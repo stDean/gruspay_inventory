@@ -1,6 +1,8 @@
 "use client";
 
 import { getProductsByStock, getInventoryStats } from "@/actions/inventory";
+import { getUser } from "@/actions/user";
+import { useAppDispatch } from "@/app/redux";
 import { AddButton } from "@/components/AddButton";
 import { Spinner } from "@/components/Spinners";
 import { SummaryStats } from "@/components/SummaryStats";
@@ -11,19 +13,21 @@ import useAddProductModal from "@/hook/useAddProductModal";
 import useAddSingleProductModal from "@/hook/useAddSingleProductModal";
 import { useReduxState } from "@/hook/useRedux";
 import { ProductStockProps } from "@/lib/types";
+import { setUser } from "@/state";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const InventoryContent = () => {
 	const [products, setProducts] = useState<Array<ProductStockProps>>([]);
-	const { token } = useReduxState();
+	const { token, companyDetails, user } = useReduxState();
 	const searchParam = useSearchParams();
 	const [isPending, startTransition] = useTransition();
 	const page = Number(searchParam.get("page"));
 	const addProductsModal = useAddProductModal();
 	const addSingleProductModal = useAddSingleProductModal();
 	const addMultipleProductModal = useAddMultipleProductModal();
+	const dispatch = useAppDispatch();
 
 	const [stats, setStats] = useState<{
 		allCategory: number;
@@ -47,6 +51,11 @@ export const InventoryContent = () => {
 			setProducts(data);
 		});
 	}, [token, addSingleProductModal.isOpen, addMultipleProductModal.isOpen]);
+
+	const setUserState = useCallback(async () => {
+		const { data } = await getUser({ token });
+		dispatch(setUser(data.userInDb));
+	}, [token, user]);
 
 	const getInventoryStat = async () => {
 		const { data, error } = await getInventoryStats({ token });
@@ -73,6 +82,10 @@ export const InventoryContent = () => {
 		getInventoryStat();
 	}, [getProducts]);
 
+	useEffect(() => {
+		setUserState();
+	}, []);
+
 	return isPending ? (
 		<Spinner />
 	) : products.length === 0 ? (
@@ -85,7 +98,9 @@ export const InventoryContent = () => {
 		<>
 			<div className="flex justify-between items-center mb-3 -mt-4">
 				<h1 className="text-2xl font-semibold">Inventory</h1>
-				<Button onClick={addProductsModal.onOpen}>Add Product(s)</Button>
+				{companyDetails?.paymentStatus === "ACTIVE" && (
+					<Button onClick={addProductsModal.onOpen}>Add Product(s)</Button>
+				)}
 			</div>
 
 			<SummaryStats

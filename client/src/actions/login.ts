@@ -28,8 +28,14 @@ export const Login = async ({
 				httpOnly: true,
 				secure: true,
 			});
+
+			cookieStore.set("role", res.data.role, {
+				maxAge: 60 * 60 * 24 * 7,
+				httpOnly: true,
+				secure: true,
+			});
 		}
-    
+
 		return { success: res.data };
 	} catch (e: any) {
 		if (e.response?.status === 400) {

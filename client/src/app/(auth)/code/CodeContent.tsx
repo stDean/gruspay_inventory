@@ -30,12 +30,14 @@ export const CodeContent = () => {
 				toast.success("Success", {
 					description: "OTP verified successfully",
 				});
+        return
 			}
 
 			if (error) {
 				toast.error("Error", {
 					description: error,
 				});
+        return
 			}
 		});
 	};

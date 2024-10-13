@@ -16,7 +16,7 @@ import { months } from "@/lib/utils";
 
 export const DashboardContent = () => {
 	const dispatch = useAppDispatch();
-	const { token, user } = useReduxState();
+	const { token, user, companyDetails } = useReduxState();
 	const [isPending, startTransition] = useTransition();
 
 	const [dashboardStat, setDashboardStat] = useState<DashboardProps>();

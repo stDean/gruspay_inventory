@@ -1,15 +1,23 @@
 import { NextRequest } from "next/server";
-import { authRoutes, DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { adminRoutes, authRoutes, DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 export function middleware(request: NextRequest) {
 	const { nextUrl } = request;
 
 	const isLoggedIn = !!request.cookies.get("user")?.value;
+	const role = request.cookies.get("role")?.value;
 
 	const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+	const isAdminRoute = adminRoutes.includes(nextUrl.pathname);
 
-	if (isLoggedIn && isAuthRoute) {
-		return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+	if (isLoggedIn) {
+		if (isAuthRoute) {
+			return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+		}
+
+		if (isAdminRoute && role !== "ADMIN") {
+			return Response.redirect(new URL("/inventory", nextUrl));
+		}
 	}
 
 	if (!isLoggedIn && !isAuthRoute) {
