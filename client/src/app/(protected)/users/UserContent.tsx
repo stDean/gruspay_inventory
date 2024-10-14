@@ -18,7 +18,12 @@ export const UserContent = () => {
 		customers: boolean;
 		suppliers: boolean;
 		creditors: boolean;
-	}>({ employees: true, customers: false, suppliers: false, creditors: false });
+	}>({
+		employees: user?.role === "ADMIN",
+		customers: false,
+		suppliers: user?.role !== "ADMIN",
+		creditors: false,
+	});
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -101,7 +106,8 @@ export const UserContent = () => {
 
 				{tab.employees &&
 					companyDetails?.CompanyPayments.plan !== "PERSONAL" &&
-					companyDetails?.paymentStatus === "ACTIVE" && (
+					companyDetails?.paymentStatus === "ACTIVE" &&
+					user?.role === "ADMIN" && (
 						<>
 							<Button
 								className="px-6 py-5 hover:opacity-90"

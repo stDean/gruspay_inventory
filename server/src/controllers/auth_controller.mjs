@@ -35,21 +35,17 @@ const updateBillingPlan = async (
 	companyPaymentsId,
 	billingType,
 	payment_plan,
-	company_id
+	company_id,
+	expires
 ) => {
 	try {
-		// enable the cancel button
-		await prisma.company.update({
-			where: { id: company_id },
-			data: { cancelable: true },
-		});
-
 		// Update the plan on the next billing date
 		await prisma.companyPayments.update({
 			where: { id: companyPaymentsId },
 			data: {
 				billType: billingType === "year" ? "YEARLY" : "MONTHLY",
 				plan: payment_plan.toUpperCase(),
+				expires: new Date(expires),
 			},
 		});
 		console.log("Billing plan updated successfully");
@@ -264,6 +260,7 @@ export const AuthController = {
 						},
 					},
 				},
+				expires: new Date(subscription.next_payment_date),
 			},
 		});
 
@@ -479,28 +476,37 @@ export const AuthController = {
 		const { billingType, payment_plan } = req.body;
 		const { email, company_id } = req.user;
 
-		// get the current active subscriptions
 		const {
-			sub,
-			nextBillingDate,
-			cronTime,
+			error: customerError,
 			theCustomer,
 			authorization,
-			error,
-		} = await getCustomerAndSubscription(email);
+			subscriptions,
+		} = await getCustomer({
+			email,
+		});
 
-		if (error) {
-			return res
-				.StatusCodes(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: error });
+		if (customerError) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
 		}
 
-		// Cancel the previous subscription
-		const { error: cancelError } = await cancelCustomerSubscription(sub);
-		if (cancelError)
-			return res
-				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: cancelError });
+		let nextBillingDate = new Date();
+		let cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
+			nextBillingDate.getMonth() + 1
+		} ${nextBillingDate.getDay()}`;
+
+		if (subscriptions.length !== 0) {
+			const sub = subscriptions[0];
+			nextBillingDate = new Date(sub.next_payment_date);
+			cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
+				nextBillingDate.getMonth() + 1
+			} ${nextBillingDate.getDay()}`;
+			// Cancel the previous subscription
+			const { error: cancelError } = await cancelCustomerSubscription(sub);
+			if (cancelError)
+				return res
+					.status(StatusCodes.INTERNAL_SERVER_ERROR)
+					.json({ msg: cancelError });
+		}
 
 		// create a new subscription with a start date the date the previous one ends
 		const planName = `${payment_plan.toLowerCase()}_${billingType}`;
@@ -512,6 +518,11 @@ export const AuthController = {
 				authorization: authorization.authorization_code,
 			}
 		);
+
+		const nextCancel = new Date(subscription.next_payment_date);
+		const newCronTime = `${nextCancel.getMinutes()} ${nextCancel.getHours()} ${nextCancel.getDate()} ${
+			nextCancel.getMonth() + 1
+		} ${nextCancel.getDay()}`;
 
 		if (subscriptionError) {
 			return res
@@ -536,16 +547,23 @@ export const AuthController = {
 				company.companyPaymentsId,
 				billingType,
 				payment_plan,
-				company.id
+				company.id,
+				new Date(subscription.next_payment_date)
 			)
 		);
+
+		cron.schedule(newCronTime, async () => {
+			await prisma.company.update({
+				where: { id: company_id },
+				data: { cancelable: true },
+			});
+		});
 
 		// send a success message
 		return res.status(StatusCodes.OK).json({
 			msg: "Plan has been successfully changed.",
 			theCustomer,
 			authorization,
-			sub,
 			nextBillingDate,
 			subscription,
 		});
@@ -556,7 +574,6 @@ export const AuthController = {
 		// cancel the subscription
 		// get the current active subscriptions
 		const { sub, cronTime, error } = await getCustomerAndSubscription(email);
-
 		if (error) {
 			return res
 				.StatusCodes(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -572,6 +589,11 @@ export const AuthController = {
 
 		// set set update the the pay status as to INACTIVE when the end date is
 		cron.schedule(cronTime, () => deActivateAccount(company_id));
+
+		await prisma.company.update({
+			where: { id: company_id },
+			data: { cancelable: false },
+		});
 
 		return res
 			.status(StatusCodes.OK)

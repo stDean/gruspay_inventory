@@ -92,7 +92,7 @@ model PayStackAuth {
   brand              String
   account_name       String?
   company            Company?         @relation(fields: [companyId], references: [id])
-  CompanyPayments    CompanyPayments? @relation(fields: [companyPaymentsId], references: [id])
+  CompanyPayments    CompanyPayments? @relation(fields: [companyPaymentsId], references: [id], onDelete: Cascade)
   companyPaymentsId  String?
   companyId          String?
 }
