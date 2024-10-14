@@ -36,6 +36,8 @@ export const SendOTP = async ({
 	} catch (e: any) {
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong." };
@@ -60,6 +62,8 @@ export const ResendOTP = async ({
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
 		}
 
@@ -97,6 +101,8 @@ export const verifyOTPToken = async ({
 		return { success: res.data };
 	} catch (e: any) {
 		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
 		}
 

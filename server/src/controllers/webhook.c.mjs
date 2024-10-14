@@ -47,9 +47,14 @@ export const WebhookController = {
 				});
 				break;
 			case "invoice.update":
-				await prisma.company.update({
+				const company = await prisma.company.update({
 					where: { id: company.id },
-					data: { paymentStatus: "ACTIVE", expires: event.data.period_end },
+					data: { paymentStatus: "ACTIVE" },
+				});
+
+				await prisma.companyPayments.update({
+					where: { id: company.companyPaymentsId },
+					data: { status: "ACTIVE", expires: event.data.period_end },
 				});
 				break;
 			default:

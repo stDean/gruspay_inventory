@@ -387,6 +387,8 @@ export const updateCompanyPlan = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -411,6 +413,8 @@ export const cancelCompanyPlan = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
 		}
 

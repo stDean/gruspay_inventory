@@ -8,60 +8,110 @@ import {
 	SupplierMiddleware,
 } from "../middlewares/plans.m.mjs";
 import { checkSubscriptionStatus } from "../middlewares/checkSubscriptionStatus.mjs";
+import { customRateLimiter } from "../utils/customRateLimiter.mjs";
 
 const router = Router();
+
+const userRateLimiter = customRateLimiter(60 * 1000, 10); // 1 minute, max 10 requests
+const userChangeRateLimiter = customRateLimiter(5 * 60 * 1000, 5); // 5 minutes, max 5 requests
 
 router.route("/getUser").get(AuthMiddleware, UserCtrl.getUser);
 router
 	.route("/getUsers")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getUsers);
+	.get([AuthMiddleware, AdminMiddleware, userRateLimiter], UserCtrl.getUsers);
 router
 	.route("/getUser/:id")
-	.get([AuthMiddleware, AdminMiddleware], UserCtrl.getUserById);
+	.get(
+		[AuthMiddleware, AdminMiddleware, userRateLimiter],
+		UserCtrl.getUserById
+	);
 router
 	.route("/getSuppliers")
 	.get(
-		[AuthMiddleware, SupplierMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			SupplierMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
 		UserCtrl.getSuppliers
 	);
 router
 	.route("/getSupplier/:id")
 	.get(
-		[AuthMiddleware, SupplierMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			SupplierMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
 		UserCtrl.getSupplier
 	);
 router
 	.route("/getCustomers")
 	.get(
-		[AuthMiddleware, CustomerAndCreditorMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
 		UserCtrl.getCustomers
 	);
 router
 	.route("/getCustomer/:id")
 	.get(
-		[AuthMiddleware, CustomerAndCreditorMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
 		UserCtrl.getCustomer
 	);
 router
 	.route("/getCreditors")
 	.get(
-		[AuthMiddleware, CustomerAndCreditorMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
 		UserCtrl.getCreditors
 	);
 router
 	.route("/getCreditor/:id")
 	.get(
-		[AuthMiddleware, CustomerAndCreditorMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
 		UserCtrl.getCreditor
 	);
 
 router
 	.route("/updateUser")
-	.patch([AuthMiddleware, checkSubscriptionStatus], UserCtrl.updateUser);
+	.patch(
+		[
+			AuthMiddleware,
+			checkSubscriptionStatus,
+			userChangeRateLimiter,
+			userRateLimiter,
+		],
+		UserCtrl.updateUser
+	);
 router
 	.route("/updateUserRole/:id")
 	.patch(
-		[AuthMiddleware, AdminMiddleware, checkSubscriptionStatus],
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			checkSubscriptionStatus,
+			userChangeRateLimiter,
+		],
 		UserCtrl.updateUserRole
 	);
 
@@ -73,6 +123,7 @@ router
 			AdminMiddleware,
 			AddUserMiddleware,
 			checkSubscriptionStatus,
+			userChangeRateLimiter,
 		],
 		UserCtrl.createUser
 	);
