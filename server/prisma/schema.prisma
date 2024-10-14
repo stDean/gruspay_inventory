@@ -15,7 +15,6 @@ datasource db {
 }
 
 enum Payment_Plan {
-  FREE
   PERSONAL
   TEAM
   ENTERPRISE
@@ -43,58 +42,40 @@ enum BillType {
 }
 
 model Company {
-  id                String           @id @default(uuid())
-  company_name      String
-  company_email     String           @unique
-  password          String
-  country           String
-  Users             Users[]
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  verified          Boolean          @default(false)
-  paymentStatus     PlanStatus       @default(INACTIVE)
-  Products          Products[]
-  suppliers         Supplier[]
-  customers         Buyer[]
-  swaps             Swaps[]
-  creditors         Creditor[]
-  CompanyPayments   CompanyPayments? @relation(fields: [companyPaymentsId], references: [id])
-  companyPaymentsId String?          @unique
-  PayStackAuth      PayStackAuth[]
-  cancelable        Boolean          @default(true)
-}
-
-model CompanyPayments {
-  id            String         @id @default(uuid())
-  company       Company?
-  status        PlanStatus     @default(ACTIVE)
-  plan          Payment_Plan   @default(PERSONAL)
-  billType      BillType       @default(MONTHLY)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  authorization PayStackAuth[]
-  expires       DateTime?
+  id            String        @id @default(uuid())
+  company_name  String
+  company_email String        @unique
+  password      String
+  country       String
+  Users         Users[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  verified      Boolean       @default(false)
+  cancelable    Boolean       @default(true)
+  billingPlan   Payment_Plan  @default(PERSONAL)
+  billingType   BillType      @default(MONTHLY)
+  paymentStatus PlanStatus    @default(INACTIVE)
+  Products      Products[]
+  suppliers     Supplier[]
+  customers     Buyer[]
+  swaps         Swaps[]
+  creditors     Creditor[]
+  payStackAuth  PayStackAuth?
 }
 
 model PayStackAuth {
-  id                 String           @id @default(uuid())
-  authorization_code String           @unique
+  id                 String   @id @default(uuid())
+  authorization_code String   @unique
   card_type          String
   last4              String
-  exp_month          String
   exp_year           String
-  bin                String
   bank               String
-  channel            String
-  signature          String
+  customerCode       String
+  signature          String   @unique
   reusable           Boolean
-  country_code       String
-  brand              String
   account_name       String?
-  company            Company?         @relation(fields: [companyId], references: [id])
-  CompanyPayments    CompanyPayments? @relation(fields: [companyPaymentsId], references: [id], onDelete: Cascade)
-  companyPaymentsId  String?
-  companyId          String?
+  comany             Company? @relation(fields: [companyId], references: [id])
+  companyId          String   @unique
 }
 
 model Otp {

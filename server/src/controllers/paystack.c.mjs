@@ -80,19 +80,7 @@ export const getCustomer = async ({ email }) => {
 		customer => customer.email === email
 	);
 
-	const subscriptionRes = await paystack.subscription.list({
-		customer: theCustomer.id,
-	});
-
-	const my_plans_array = Array.from(Object.values(my_plans));
-	const subscriptions = subscriptionRes.data.filter(
-		subscription =>
-			subscription.status === "active" &&
-			my_plans_array.indexOf(subscription.plan.plan_code) !== -1
-	);
-
-	const authorization = subscriptionRes.data[0].authorization;
-	return { theCustomer, authorization, subscriptions };
+	return { theCustomer };
 };
 
 export const getCustomerSubscriptions = async customer_id => {

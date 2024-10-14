@@ -18,7 +18,7 @@ const handleOtpForCompany = async email => {
 
 	if (existingOtp) {
 		await prisma.otp.update({
-			where: { email },
+			where: { id: existingOtp.id },
 			data: { otp: token, expiresAt: expires },
 		});
 	} else {
@@ -36,15 +36,46 @@ const updateBillingPlan = async (
 	billingType,
 	payment_plan,
 	company_id,
-	expires
+	expires,
+	auth
 ) => {
 	try {
-		// Update the plan on the next billing date
-		await prisma.companyPayments.update({
-			where: { id: companyPaymentsId },
+		const company = await prisma.company.findUnique({
+			where: { id: company_id },
+		});
+
+		if (company?.companyPaymentsId) {
+			// Update the plan on the next billing date
+			await prisma.companyPayments.update({
+				where: { id: companyPaymentsId },
+				data: {
+					billType: billingType === "year" ? "YEARLY" : "MONTHLY",
+					plan: payment_plan.toUpperCase(),
+					expires: new Date(expires),
+				},
+			});
+		}
+
+		// create a new companyPayments record
+		await prisma.companyPayments.create({
 			data: {
+				company: { connect: { id: company.id } },
 				billType: billingType === "year" ? "YEARLY" : "MONTHLY",
 				plan: payment_plan.toUpperCase(),
+				status: "ACTIVE",
+				authorization: {
+					connectOrCreate: {
+						where: {
+							authorization_code: auth.authorization_code,
+							signature: auth.signature,
+						},
+						create: {
+							...auth,
+							reusable: auth.reusable === 1 ? true : false,
+							companyId: company.id,
+						},
+					},
+				},
 				expires: new Date(expires),
 			},
 		});
@@ -131,8 +162,8 @@ export const AuthController = {
 			company_email,
 			password,
 			country,
-			billingType,
 			payment_plan,
+			billingType,
 		} = req.body;
 
 		// Ensure all required fields are present
@@ -140,6 +171,27 @@ export const AuthController = {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "All fields are required", success: false });
+		}
+
+		const existingCompany = await prisma.company.findUnique({
+			where: { company_email },
+		});
+
+		// Check if the company already exists
+		if (existingCompany) {
+			if (
+				!existingCompany.verified &&
+				existingCompany.paymentStatus === "ACTIVE"
+			) {
+				await handleOtpForCompany(existingCompany.company_email);
+
+				return res.status(StatusCodes.OK).json({
+					message: "Check your email for OTP",
+					success: true,
+				});
+			}
+
+			await prisma.company.delete({ where: { id: existingCompany.id } });
 		}
 
 		// Initialize the company as a customer
@@ -154,16 +206,44 @@ export const AuthController = {
 				.json({ msg: "Subscription initialization failed." });
 		}
 
+		// Create new company
+		const hashedPassword = await hashPassword(password);
+		const company = await prisma.company.create({
+			data: {
+				company_email,
+				company_name,
+				country,
+				password: hashedPassword,
+				paymentStatus: "INACTIVE",
+				billingPlan: payment_plan.toUpperCase(),
+				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
+			},
+		});
+
+		// Send OTP for verification
+		await handleOtpForCompany(company.company_email);
+
+		return res.status(StatusCodes.OK).json({
+			message: "Company has been created.",
+			company,
+			transaction,
+		});
+	},
+	verifyOtp: async (req, res) => {
+		const { otp, company_email, payment_plan, billingType } = req.body;
+		if (!otp) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "OTP is required", success: false });
+		}
+
 		// Prepare subscription details
 		const planName = `${payment_plan.toLowerCase()}_${billingType}`;
 		const startDate = new Date();
 		startDate.setDate(startDate.getDate() + 7); // 7-day trial period
 
-		const {
-			error: customerError,
-			theCustomer,
-			authorization,
-		} = await getCustomer({
+		// get the customer data
+		const { error: customerError, theCustomer } = await getCustomer({
 			email: company_email,
 		});
 
@@ -176,8 +256,8 @@ export const AuthController = {
 			{
 				customer: theCustomer.id,
 				plan: my_plans[planName],
-				start_date: startDate,
-				authorization: authorization.authorization_code,
+				start_date: new Date(),
+				authorization: companyPayment.authorization.authorization_code,
 			}
 		);
 
@@ -187,100 +267,10 @@ export const AuthController = {
 				.json({ msg: "Subscription creation failed." });
 		}
 
-		// Check if the company already exists
-		const existingCompany = await prisma.company.findUnique({
-			where: { company_email },
+		await prisma.companyPayments.update({
+			where: { id: companyPayment.id },
+			data: { expires: new Date(subscription.next_payment_date) },
 		});
-
-		if (existingCompany) {
-			if (existingCompany.paymentStatus === "INACTIVE") {
-				// Reactivate company and reconnect to the existing payment
-				const paymentPlan = await prisma.companyPayments.findFirst({
-					where: { company: { id: existingCompany.id } },
-				});
-
-				await prisma.company.update({
-					where: { id: existingCompany.id },
-					data: {
-						paymentStatus: paymentPlan.status,
-						CompanyPayments: { connect: { id: paymentPlan.id } },
-					},
-				});
-
-				await handleOtpForCompany(existingCompany.company_email);
-
-				return res.status(StatusCodes.OK).json({
-					message: "Check your email for OTP",
-					success: true,
-				});
-			}
-
-			if (
-				!existingCompany.verified &&
-				existingCompany.paymentStatus === "ACTIVE"
-			) {
-				await handleOtpForCompany(existingCompany.company_email);
-
-				return res.status(StatusCodes.OK).json({
-					message: "Check your email for OTP",
-					success: true,
-				});
-			}
-
-			return res
-				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "Company already exists" });
-		}
-
-		// Create new company
-		const hashedPassword = await hashPassword(password);
-		const company = await prisma.company.create({
-			data: {
-				company_email,
-				company_name,
-				country,
-				password: hashedPassword,
-				paymentStatus: "ACTIVE",
-			},
-		});
-
-		await prisma.companyPayments.create({
-			data: {
-				company: { connect: { id: company.id } },
-				billType: billingType === "year" ? "YEARLY" : "MONTHLY",
-				plan: payment_plan.toUpperCase(),
-				status: "ACTIVE",
-				authorization: {
-					connectOrCreate: {
-						where: { authorization_code: authorization.authorization_code },
-						create: {
-							...authorization,
-							reusable: authorization.reusable === 1 ? true : false,
-							companyId: company.id,
-						},
-					},
-				},
-				expires: new Date(subscription.next_payment_date),
-			},
-		});
-
-		// Send OTP for verification
-		await handleOtpForCompany(company.company_email);
-
-		return res.status(StatusCodes.OK).json({
-			message: "Company has been created.",
-			company,
-			transaction,
-			subscription,
-		});
-	},
-	verifyOtp: async (req, res) => {
-		const { otp, company_email } = req.body;
-		if (!otp) {
-			return res
-				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "OTP is required", success: false });
-		}
 
 		const existingOtp = await prisma.otp.findFirst({
 			where: {
@@ -548,7 +538,8 @@ export const AuthController = {
 				billingType,
 				payment_plan,
 				company.id,
-				new Date(subscription.next_payment_date)
+				new Date(subscription.next_payment_date),
+				authorization
 			)
 		);
 

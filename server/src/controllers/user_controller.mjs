@@ -11,9 +11,9 @@ export const UserCtrl = {
 				Company: {
 					select: {
 						company_name: true,
-						CompanyPayments: {
-							select: { billType: true, plan: true, expires: true },
-						},
+						billingType: true,
+						billingPlan: true,
+						expires: true,
 						cancelable: true,
 						paymentStatus: true,
 					},

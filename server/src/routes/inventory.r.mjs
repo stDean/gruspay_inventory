@@ -24,7 +24,7 @@ router
 
 router
 	.route("/getProducts/:type/:brand/:product_name")
-	.get([AuthMiddleware], InventoryCtrl.getProducts);
+	.get([AuthMiddleware, inventoryRateLimiter], InventoryCtrl.getProducts);
 router
 	.route("/getAllProducts")
 	.get(
@@ -48,13 +48,13 @@ router
 	.get([AuthMiddleware], InventoryCtrl.getCountOfSoldProducts);
 router
 	.route("/getSoldProducts/:type/:brand/:product_name")
-	.get([AuthMiddleware], InventoryCtrl.getSoldProductsByName);
+	.get([AuthMiddleware, inventoryRateLimiter], InventoryCtrl.getSoldProductsByName);
 router
 	.route("/getSwapProductsByCount")
 	.get([AuthMiddleware], InventoryCtrl.getCountOfSwapProducts);
 router
 	.route("/getSwapProducts/:type/:brand/:product_name")
-	.get([AuthMiddleware], InventoryCtrl.getSwapProductsByName);
+	.get([AuthMiddleware, inventoryRateLimiter], InventoryCtrl.getSwapProductsByName);
 router
 	.route("/getBarChartData")
 	.get([AuthMiddleware], InventoryCtrl.getMonthlySalesAndPurchases);

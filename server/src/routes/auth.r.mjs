@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/auth_controller.mjs";
-import { AuthMiddleware } from "../middlewares/auth.m.mjs";
+import {
+  AuthController
+} from "../controllers/auth_controller.mjs";
 import { AdminMiddleware } from "../middlewares/admin.m.mjs";
+import { AuthMiddleware } from "../middlewares/auth.m.mjs";
 import { checkSubscriptionStatus } from "../middlewares/checkSubscriptionStatus.mjs";
 import { customRateLimiter } from "../utils/customRateLimiter.mjs";
 
@@ -50,5 +52,6 @@ router.post(
 	],
 	AuthController.cancelSubscription
 );
+
 
 export default router;
