@@ -24,20 +24,18 @@ export const CodeContent = () => {
 				dispatch(setLoggedInUser(true));
 				dispatch(setToken(success.jwtToken));
 
-				// TODO:get user by email and dispatch the user into the state
-
 				router.push("/dashboard");
 				toast.success("Success", {
 					description: "OTP verified successfully",
 				});
-        return
+				return;
 			}
 
 			if (error) {
 				toast.error("Error", {
 					description: error,
 				});
-        return
+				return;
 			}
 		});
 	};

@@ -16,6 +16,7 @@ export const UserCtrl = {
 						expires: true,
 						cancelable: true,
 						paymentStatus: true,
+						canUpdate: true,
 					},
 				},
 			},

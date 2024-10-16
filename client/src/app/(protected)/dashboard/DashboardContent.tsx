@@ -19,6 +19,7 @@ export const DashboardContent = () => {
 	const { token, user, companyDetails } = useReduxState();
 	const [isPending, startTransition] = useTransition();
 
+
 	const [dashboardStat, setDashboardStat] = useState<DashboardProps>();
 	const [data, setData] = useState<BarChartProps[]>();
 

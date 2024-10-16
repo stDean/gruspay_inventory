@@ -7,7 +7,6 @@ async function checkCompany(company_id) {
 		include: {
 			Users: true,
 			Products: { where: { sales_status: "NOT_SOLD" } },
-			CompanyPayments: { select: { plan: true } },
 		},
 	});
 
@@ -24,7 +23,7 @@ export const AddUserMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
-	switch (company.CompanyPayments.plan) {
+	switch (company.billingPlan) {
 		case "PERSONAL":
 			if (company.Users.length === 1) {
 				return res.status(StatusCodes.BAD_REQUEST).json({
@@ -58,7 +57,7 @@ export const SupplierMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
-	if (company.CompanyPayments.plan === "PERSONAL") {
+	if (company.billingPlan === "PERSONAL") {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			msg: "Cannot perform this action",
 		});
@@ -71,10 +70,7 @@ export const CustomerAndCreditorMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
-	if (
-		company.CompanyPayments.plan === "PERSONAL" ||
-		company.CompanyPayments.plan === "TEAM"
-	) {
+	if (company.billingPlan === "PERSONAL" || company.billingPlan === "TEAM") {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			msg: "Cannot perform this action",
 		});

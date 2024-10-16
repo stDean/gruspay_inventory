@@ -104,6 +104,7 @@ export const SideBar = () => {
 					alt="logo"
 					width={isSidebarCollapsed ? 250 : 150}
 					height={isSidebarCollapsed ? 250 : 150}
+          priority
 				/>
 
 				<button

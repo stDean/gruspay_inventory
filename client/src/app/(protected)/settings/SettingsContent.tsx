@@ -5,7 +5,6 @@ import { useAppDispatch } from "@/app/redux";
 import { UserSettingsForm } from "@/components/auth/UserSettingsForm";
 import { Billing } from "@/components/Billing";
 import { Tab } from "@/components/Tab";
-import { Button } from "@/components/ui/button";
 import { useReduxState } from "@/hook/useRedux";
 import { BillingPlanType } from "@/lib/utils";
 import { setUser } from "@/state";
@@ -25,7 +24,7 @@ export const SettingsContent = () => {
 	const [tab, setTab] = useState<{
 		billing: boolean;
 		security: boolean;
-	}>({ billing: true, security: false });
+	}>({ billing: user?.role === "ADMIN", security: user?.role !== "ADMIN" });
 	const [billingType, setBillingType] = useState<"monthly" | "yearly">(
 		"monthly"
 	);
@@ -34,9 +33,7 @@ export const SettingsContent = () => {
 	const planKey = Object.keys(Plans)
 		.filter(key => isNaN(Number(key))) // Filter out numeric values from enum
 		.find(key =>
-			key
-				.toLowerCase()
-				.includes(companyDetails?.CompanyPayments?.plan!?.toLowerCase())
+			key.toLowerCase().includes(companyDetails?.billingPlan!?.toLowerCase())
 		);
 
 	// Get the corresponding index (numeric value) of the plan from the enum
@@ -97,6 +94,7 @@ export const SettingsContent = () => {
 			toast.success("Success", {
 				description: "Your subscription has been successfully canceled.",
 			});
+			setUserState();
 		});
 	};
 
@@ -170,7 +168,7 @@ export const SettingsContent = () => {
 				</div>
 			</div>
 
-			{tab.security || (user?.role !== "ADMIN" && <UserSettingsForm />)}
+			{tab.security && <UserSettingsForm />}
 			{tab.billing && user?.role === "ADMIN" && (
 				<Billing
 					options={options}

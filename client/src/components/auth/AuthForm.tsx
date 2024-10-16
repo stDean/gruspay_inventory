@@ -55,8 +55,8 @@ export const AuthForm = () => {
 			if (pathname === "/register") {
 				const values = {
 					...data,
-					payment_plan: payment.toUpperCase(),
 					country: country?.label,
+					payment_plan: payment.toUpperCase(),
 				};
 
 				if (values.password !== values.confirmPassword) {
@@ -95,20 +95,17 @@ export const AuthForm = () => {
 				toast.error("Error", {
 					description: error,
 				});
-        return
+				return;
 			}
 
 			if (success) {
 				dispatch(setLoggedInUser(true));
 				dispatch(setToken(success.jwtToken));
 
-				// TODO:get user by email and dispatch the user into the state
 				toast.success("Success", {
 					description: "Login successfully",
 				});
 				router.push("/dashboard");
-
-				typeof localStorage !== "undefined" && localStorage.removeItem("plan");
 				form.reset();
 			}
 		});
@@ -164,6 +161,7 @@ export const AuthForm = () => {
 
 								<CustomSelect
 									label="Select Plan"
+									disabled
 									items={
 										<>
 											{PAYMENT_PLANS.map(type => (

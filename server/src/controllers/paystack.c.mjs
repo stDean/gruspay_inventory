@@ -40,9 +40,6 @@ export const createSubscription = async ({
 	return { subscription: createSubRes.data, error: null };
 };
 
-// handled by pay stack just show a link
-export const updateAccountInformation = () => {};
-
 export const cancelSubscription = async ({ code, token }) => {
 	// code === subscription code to cancel
 	// token === email_token gotten from pay stack
@@ -52,22 +49,6 @@ export const cancelSubscription = async ({ code, token }) => {
 	}
 
 	return { success: true };
-};
-
-export const getPlans = async () => {
-	const plans = await paystack.plan.list({});
-
-	if (plans.status === false) {
-		return { error: "Something went wrong" };
-	}
-
-	const my_plans_array = Array.from(Object.values(my_plans));
-
-	const matchedPlans = plans.data.filter(plan => {
-		return my_plans_array.indexOf(plan.plan_code) !== -1;
-	});
-
-	return { matchedPlans };
 };
 
 export const getCustomer = async ({ email }) => {
@@ -97,15 +78,9 @@ export const getCustomerSubscriptions = async customer_id => {
 	const subscriptions = customerSubscriptions.data.filter(
 		subscription =>
 			subscription.status === "active" ||
-			my_plans_array.indexOf(subscription.plan.plan_code) !== -1
+			(subscription.status === "non-renewing" &&
+				my_plans_array.indexOf(subscription.plan.plan_code) !== -1)
 	);
-
-	// const subscriptions = customerSubscriptions.data.filter(
-	// 	subscription =>
-	// 		subscription.status === "active" ||
-	// 		(subscription.status === "non-renewing" &&
-	// 			my_plans_array.indexOf(subscription.plan.plan_code) !== -1)
-	// );
 
 	return { subscriptions };
 };

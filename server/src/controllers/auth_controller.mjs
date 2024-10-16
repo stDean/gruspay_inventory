@@ -9,6 +9,7 @@ import {
 	initializeSubscription,
 	getCustomer,
 	cancelSubscription,
+	getCustomerSubscriptions,
 } from "./paystack.c.mjs";
 import { my_plans } from "../constants.mjs";
 
@@ -32,52 +33,52 @@ const handleOtpForCompany = async email => {
 
 // Function to update the billing plan
 const updateBillingPlan = async (
-	companyPaymentsId,
 	billingType,
 	payment_plan,
 	company_id,
-	expires,
+	subscription,
 	auth
 ) => {
 	try {
-		const company = await prisma.company.findUnique({
+		await prisma.company.update({
 			where: { id: company_id },
-		});
-
-		if (company?.companyPaymentsId) {
-			// Update the plan on the next billing date
-			await prisma.companyPayments.update({
-				where: { id: companyPaymentsId },
-				data: {
-					billType: billingType === "year" ? "YEARLY" : "MONTHLY",
-					plan: payment_plan.toUpperCase(),
-					expires: new Date(expires),
-				},
-			});
-		}
-
-		// create a new companyPayments record
-		await prisma.companyPayments.create({
 			data: {
-				company: { connect: { id: company.id } },
-				billType: billingType === "year" ? "YEARLY" : "MONTHLY",
-				plan: payment_plan.toUpperCase(),
-				status: "ACTIVE",
-				authorization: {
+				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
+				billingPlan: payment_plan.toUpperCase(),
+				paymentStatus: "ACTIVE",
+				expires: subscription.next_payment_date,
+				cancelable: true,
+				canUpdate: true,
+				payStackAuth: {
 					connectOrCreate: {
 						where: {
-							authorization_code: auth.authorization_code,
-							signature: auth.signature,
+							authorization_code_signature: {
+								authorization_code: auth.authorization_code,
+								signature: auth.signature,
+							},
+							companyId: company_id,
 						},
 						create: {
-							...auth,
-							reusable: auth.reusable === 1 ? true : false,
-							companyId: company.id,
+							authorization_code: auth.authorization_code,
+							reusable: auth.reusable,
+							bank: auth.bank,
+							card_type: auth.card_type,
+							exp_year: auth.exp_year,
+							last4: auth.last4,
+							status: auth.status,
+							signature: auth.signature,
+							account_name: auth.account_name,
+							customerCode,
 						},
 					},
 				},
-				expires: new Date(expires),
 			},
+		});
+
+		// make the cancel subscription enabled
+		await prisma.company.update({
+			where: { id: company_id },
+			data: { cancelable: true },
 		});
 		console.log("Billing plan updated successfully");
 	} catch (error) {
@@ -87,24 +88,9 @@ const updateBillingPlan = async (
 
 const deActivateAccount = async company_id => {
 	try {
-		const company = await prisma.company.findUnique({
-			where: { id: company_id },
-		});
-
-		if (!company) {
-			return { error: "Company not found" };
-		}
-
 		await prisma.company.update({
 			where: { id: company_id },
-			data: {
-				paymentStatus: "INACTIVE",
-				CompanyPayments: { disconnect: true },
-			},
-		});
-
-		await prisma.companyPayments.delete({
-			where: { id: company.companyPaymentsId },
+			data: { paymentStatus: "INACTIVE", canUpdate: true, cancelable: false },
 		});
 
 		console.log("Account deactivated successfully");
@@ -116,15 +102,18 @@ const deActivateAccount = async company_id => {
 // Reusable function to get customer and active subscription
 const getCustomerAndSubscription = async email => {
 	try {
-		const {
-			error: customerError,
-			subscriptions,
-			theCustomer,
-			authorization,
-		} = await getCustomer({ email });
+		const { error: customerError, theCustomer } = await getCustomer({ email });
 
-		if (customerError || !subscriptions.length) {
-			return { error: customerError || "No active subscription found" };
+		if (customerError) {
+			return { error: customerError };
+		}
+
+		const { error, subscriptions } = await getCustomerSubscriptions(
+			theCustomer.id
+		);
+
+		if (error || !subscriptions.length) {
+			return { error: error || "No active subscription found" };
 		}
 
 		const sub = subscriptions[0];
@@ -133,7 +122,7 @@ const getCustomerAndSubscription = async email => {
 			nextBillingDate.getMonth() + 1
 		} ${nextBillingDate.getDay()}`;
 
-		return { sub, nextBillingDate, cronTime, theCustomer, authorization };
+		return { sub, nextBillingDate, cronTime, theCustomer };
 	} catch (error) {
 		console.error("Error retrieving customer and subscription:", error);
 		return { error: "Internal server error" };
@@ -162,7 +151,7 @@ export const AuthController = {
 			company_email,
 			password,
 			country,
-			payment_plan,
+			billingPlan,
 			billingType,
 		} = req.body;
 
@@ -191,6 +180,15 @@ export const AuthController = {
 				});
 			}
 
+			if (
+				existingCompany.verified &&
+				existingCompany.paymentStatus === "INACTIVE"
+			) {
+				return res
+					.status(StatusCodes.BAD_REQUEST)
+					.json({ msg: "Company already exists." });
+			}
+
 			await prisma.company.delete({ where: { id: existingCompany.id } });
 		}
 
@@ -215,7 +213,7 @@ export const AuthController = {
 				country,
 				password: hashedPassword,
 				paymentStatus: "INACTIVE",
-				billingPlan: payment_plan.toUpperCase(),
+				billingPlan: billingPlan.toUpperCase(),
 				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
 			},
 		});
@@ -225,52 +223,16 @@ export const AuthController = {
 
 		return res.status(StatusCodes.OK).json({
 			message: "Company has been created.",
-			company,
 			transaction,
 		});
 	},
 	verifyOtp: async (req, res) => {
-		const { otp, company_email, payment_plan, billingType } = req.body;
+		const { otp, company_email } = req.body;
 		if (!otp) {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "OTP is required", success: false });
 		}
-
-		// Prepare subscription details
-		const planName = `${payment_plan.toLowerCase()}_${billingType}`;
-		const startDate = new Date();
-		startDate.setDate(startDate.getDate() + 7); // 7-day trial period
-
-		// get the customer data
-		const { error: customerError, theCustomer } = await getCustomer({
-			email: company_email,
-		});
-
-		if (customerError) {
-			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
-		}
-
-		// create company subscription plan
-		const { subscription, error: subscriptionError } = await createSubscription(
-			{
-				customer: theCustomer.id,
-				plan: my_plans[planName],
-				start_date: new Date(),
-				authorization: companyPayment.authorization.authorization_code,
-			}
-		);
-
-		if (subscriptionError) {
-			return res
-				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: "Subscription creation failed." });
-		}
-
-		await prisma.companyPayments.update({
-			where: { id: companyPayment.id },
-			data: { expires: new Date(subscription.next_payment_date) },
-		});
 
 		const existingOtp = await prisma.otp.findFirst({
 			where: {
@@ -288,6 +250,37 @@ export const AuthController = {
 				.json({ msg: "Invalid OTP", success: false });
 		}
 
+		const company = await prisma.company.findUnique({
+			where: { company_email },
+			include: { payStackAuth: true },
+		});
+
+		const planName = `${company.billingPlan.toLowerCase()}_${company.billingType
+			.replace("LY", "")
+			.toLowerCase()}`;
+		const startDate = new Date();
+		startDate.setDate(startDate.getDate() + 7); // 7-day trial period
+
+		const auth = await prisma.payStackAuth.findUnique({
+			where: { id: company.payStackAuth.id },
+		});
+
+		// create company subscription plan
+		const { subscription, error: subscriptionError } = await createSubscription(
+			{
+				customer: auth.customerCode,
+				plan: my_plans[planName],
+				start_date: startDate,
+				authorization: auth.authorization_code,
+			}
+		);
+
+		if (subscriptionError) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: "Subscription creation failed." });
+		}
+
 		// Mark OTP as verified
 		await prisma.otp.update({
 			where: { id: existingOtp.id },
@@ -295,9 +288,9 @@ export const AuthController = {
 		});
 
 		// update company verified field
-		const company = await prisma.company.update({
+		await prisma.company.update({
 			where: { company_email: existingOtp.email },
-			data: { verified: true },
+			data: { verified: true, expires: subscription.next_payment_date },
 		});
 
 		// delete the otp
@@ -466,12 +459,14 @@ export const AuthController = {
 		const { billingType, payment_plan } = req.body;
 		const { email, company_id } = req.user;
 
-		const {
-			error: customerError,
-			theCustomer,
-			authorization,
-			subscriptions,
-		} = await getCustomer({
+		if (!billingType || !payment_plan) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				msg: "Billing type and payment plan are required",
+				success: false,
+			});
+		}
+
+		const { error: customerError, theCustomer } = await getCustomer({
 			email,
 		});
 
@@ -479,17 +474,25 @@ export const AuthController = {
 			return res.status(StatusCodes.BAD_REQUEST).json({ msg: customerError });
 		}
 
-		let nextBillingDate = new Date();
+		const { error, subscriptions } = await getCustomerSubscriptions(
+			theCustomer.id
+		);
+		if (error) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: error });
+		}
+
+		const company = await prisma.company.findUnique({
+			where: { id: company_id },
+		});
+
+		let nextBillingDate =
+			company.expires < new Date() ? new Date() : new Date(company.expires);
 		let cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
 			nextBillingDate.getMonth() + 1
 		} ${nextBillingDate.getDay()}`;
+		const sub = subscriptions[0];
 
-		if (subscriptions.length !== 0) {
-			const sub = subscriptions[0];
-			nextBillingDate = new Date(sub.next_payment_date);
-			cronTime = `${nextBillingDate.getMinutes()} ${nextBillingDate.getHours()} ${nextBillingDate.getDate()} ${
-				nextBillingDate.getMonth() + 1
-			} ${nextBillingDate.getDay()}`;
+		if (sub.status === "active") {
 			// Cancel the previous subscription
 			const { error: cancelError } = await cancelCustomerSubscription(sub);
 			if (cancelError)
@@ -505,14 +508,9 @@ export const AuthController = {
 				customer: theCustomer.id,
 				plan: my_plans[planName],
 				start_date: nextBillingDate,
-				authorization: authorization.authorization_code,
+				authorization: sub.authorization.authorization_code,
 			}
 		);
-
-		const nextCancel = new Date(subscription.next_payment_date);
-		const newCronTime = `${nextCancel.getMinutes()} ${nextCancel.getHours()} ${nextCancel.getDate()} ${
-			nextCancel.getMonth() + 1
-		} ${nextCancel.getDay()}`;
 
 		if (subscriptionError) {
 			return res
@@ -520,43 +518,27 @@ export const AuthController = {
 				.json({ msg: "Subscription creation failed." });
 		}
 
-		// update the company payment plan on the db and also update the authorization
-		const company = await prisma.company.findUnique({
-			where: { id: company_id },
-		});
-
 		// make the cancel subscription be disabled until the next billing date
 		await prisma.company.update({
 			where: { id: company_id },
-			data: { cancelable: false },
+			data: { cancelable: false, canUpdate: false },
 		});
 
 		// update the plan on the next billing address
-		cron.schedule(cronTime, () =>
+		cron.schedule(cronTime, async () => {
+			// update the plan
 			updateBillingPlan(
-				company.companyPaymentsId,
 				billingType,
 				payment_plan,
 				company.id,
-				new Date(subscription.next_payment_date),
-				authorization
-			)
-		);
-
-		cron.schedule(newCronTime, async () => {
-			await prisma.company.update({
-				where: { id: company_id },
-				data: { cancelable: true },
-			});
+				subscription,
+				sub.authorization
+			);
 		});
 
 		// send a success message
 		return res.status(StatusCodes.OK).json({
 			msg: "Plan has been successfully changed.",
-			theCustomer,
-			authorization,
-			nextBillingDate,
-			subscription,
 		});
 	},
 	cancelSubscription: async (req, res) => {
@@ -566,9 +548,7 @@ export const AuthController = {
 		// get the current active subscriptions
 		const { sub, cronTime, error } = await getCustomerAndSubscription(email);
 		if (error) {
-			return res
-				.StatusCodes(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: error });
+			return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
 		}
 
 		// cancel subscription
@@ -581,9 +561,10 @@ export const AuthController = {
 		// set set update the the pay status as to INACTIVE when the end date is
 		cron.schedule(cronTime, () => deActivateAccount(company_id));
 
+		// make the cancel subscription be disabled
 		await prisma.company.update({
 			where: { id: company_id },
-			data: { cancelable: false },
+			data: { cancelable: false, canUpdate: false },
 		});
 
 		return res

@@ -189,8 +189,6 @@ export const InventoryCtrl = {
 					},
 				});
 
-				console.log({ result });
-
 				results.push(result); // Collect the successful result
 			} catch (error) {
 				console.log({ error });

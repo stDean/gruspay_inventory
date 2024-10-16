@@ -30,7 +30,7 @@ export const PlanButtons = ({
 		MONTHLY: "monthly",
 		YEARLY: "yearly",
 	};
-	const matchVal = companyDetails?.CompanyPayments!.billType!;
+	const matchVal = companyDetails?.billingType!;
 
 	return (
 		<>
@@ -120,7 +120,8 @@ export const PlanButtons = ({
 														(option.title === plan &&
 															type === matcher[matchVal] &&
 															!companyDetails?.cancelable) ||
-														isPending
+														isPending ||
+														!companyDetails?.canUpdate
 													}
 												>
 													{option.title === plan && type === matcher[matchVal]

@@ -20,7 +20,7 @@ app.use(cors());
 app.use("/api", Routes);
 
 // PayStack Webhook
-app.post("/", async (req, res) => {
+app.post("/webhook", async (req, res) => {
 	//validate event
 	const hash = crypto
 		.createHmac("sha512", process.env.PAYSTACKSECRETKEY)
@@ -34,21 +34,34 @@ app.post("/", async (req, res) => {
 	// Extract data from the webhook payload
 	const payload = req.body;
 
+	console.log({ payload });
+
 	switch (payload.event) {
 		case "subscription.create":
 			res.status(200).json({ msg: "Subscription created" });
 			break;
 		case "charge.success":
-			await prisma.company.update({
+			const getCompany = await prisma.company.findUnique({
 				where: { company_email: payload.data.customer.email },
+			});
+
+			if (!getCompany) {
+				return res.status(400).json({ msg: "Company not found" });
+			}
+
+			await prisma.company.update({
+				where: { id: getCompany.id },
 				data: {
 					paymentStatus: "ACTIVE",
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
-								authorization_code:
-									payload.data.authorization.authorization_code,
-								signature: payload.data.authorization.signature,
+								authorization_code_signature: {
+									authorization_code:
+										payload.data.authorization.authorization_code,
+									signature: payload.data.authorization.signature,
+								},
+								companyId: getCompany.id,
 							},
 							create: {
 								authorization_code:
@@ -74,7 +87,7 @@ app.post("/", async (req, res) => {
 			console.log("Payment failed");
 			break;
 		default:
-			console.log("Unhandled event type: ", event.type);
+			console.log("Unhandled event type: ", payload.type);
 			break;
 	}
 });

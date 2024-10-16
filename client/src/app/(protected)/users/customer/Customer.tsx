@@ -36,7 +36,7 @@ export const Customer = ({ id }: { id: string }) => {
 	}, [id]);
 
 	// Early redirect if the company is on the PERSONAL plan
-	if (companyDetails?.CompanyPayments.plan !== "ENTERPRISE") {
+	if (companyDetails?.billingPlan !== "ENTERPRISE") {
 		router.push("/users");
 		return null; // Ensure nothing renders if the redirect happens
 	}

@@ -1,10 +1,10 @@
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
@@ -16,6 +16,7 @@ export const CustomSelect = ({
 	handleChange,
 	width,
 	width2,
+	disabled,
 }: {
 	items: ReactNode;
 	value: string;
@@ -23,11 +24,13 @@ export const CustomSelect = ({
 	width?: boolean;
 	width2?: boolean;
 	handleChange: (value: string, id?: number) => void;
+	disabled?: boolean;
 }) => {
 	return (
 		<Select
 			value={value}
 			onValueChange={(value: string, id?: number) => handleChange(value, id!)}
+			disabled={disabled}
 		>
 			<SelectTrigger
 				className={cn("h-10", {

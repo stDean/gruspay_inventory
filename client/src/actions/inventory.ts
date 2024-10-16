@@ -21,6 +21,10 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 	} catch (e: any) {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again" };
@@ -51,6 +55,10 @@ export const getProductsByName = async ({
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -108,6 +116,8 @@ export const addSingleProduct = async ({
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again" };
@@ -138,6 +148,8 @@ export const addMultipleProduct = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong." };
@@ -166,6 +178,10 @@ export const getProduct = async ({
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -204,7 +220,10 @@ export const sellProduct = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong, try again" };
 	}
 };
@@ -223,6 +242,10 @@ export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -279,6 +302,8 @@ export const swapProducts = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "something went wrong, try again" };
@@ -299,6 +324,10 @@ export const getInventoryStats = async ({ token }: { token: string }) => {
 		return { data };
 	} catch (e: any) {
 		if (e?.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -335,6 +364,10 @@ export const getDashboardStats = async ({
 	} catch (e: any) {
 		if (e.response?.status === 401) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong..." };
@@ -359,6 +392,10 @@ export const getBarChartData = async ({
 		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 
@@ -394,7 +431,10 @@ export const updateSoldProduct = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong, try again" };
 	}
 };

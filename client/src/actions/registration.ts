@@ -28,8 +28,8 @@ export const SendOTP = async ({
 				password,
 				company_name,
 				country,
-				payment_plan,
 				billingType,
+				billingPlan: payment_plan,
 			}
 		);
 		return { success: data };

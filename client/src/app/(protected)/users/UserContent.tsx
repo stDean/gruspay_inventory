@@ -31,7 +31,7 @@ export const UserContent = () => {
 				<div className="space-y-3">
 					<h1 className="font-semibold text-xl md:text-2xl">Manage Users</h1>
 
-					{companyDetails?.CompanyPayments.plan !== "PERSONAL" &&
+					{companyDetails?.billingPlan !== "PERSONAL" &&
 						companyDetails?.paymentStatus === "ACTIVE" && (
 							<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">
 								{user?.role === "ADMIN" && (
@@ -63,13 +63,13 @@ export const UserContent = () => {
 									}}
 									val={tab.suppliers}
 									styles={`bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] ${
-										companyDetails?.CompanyPayments.plan === "ENTERPRISE"
+										companyDetails?.billingPlan === "ENTERPRISE"
 											? "border-r"
 											: "rounded-r-md"
 									}`}
 								/>
 
-								{companyDetails?.CompanyPayments.plan === "ENTERPRISE" &&
+								{companyDetails?.billingPlan === "ENTERPRISE" &&
 									companyDetails?.paymentStatus === "ACTIVE" && (
 										<>
 											<Tab
@@ -105,7 +105,7 @@ export const UserContent = () => {
 				</div>
 
 				{tab.employees &&
-					companyDetails?.CompanyPayments.plan !== "PERSONAL" &&
+					companyDetails?.billingPlan !== "PERSONAL" &&
 					companyDetails?.paymentStatus === "ACTIVE" &&
 					user?.role === "ADMIN" && (
 						<>

@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { getUser, updateUser } from "@/actions/user";
+import { useAppDispatch } from "@/app/redux";
+import { CustomInput } from "@/components/auth/CustomInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { UpdateUserSchema } from "@/schema";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CustomInput } from "@/components/auth/CustomInput";
 import { useReduxState } from "@/hook/useRedux";
-import { updateUser } from "@/actions/user";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { UpdateUserSchema } from "@/schema";
 import { setUser } from "@/state";
-import { useAppDispatch } from "@/app/redux";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 export const UserSettingsForm = () => {
 	const dispatch = useAppDispatch();
@@ -84,8 +84,9 @@ export const UserSettingsForm = () => {
 				description: "Profile has been updated successfully",
 			});
 
-      setDisabled(true);
-			dispatch(setUser(data.updatedUser));
+			setDisabled(true);
+			const { data: userDate } = await getUser({ token });
+			dispatch(setUser(userDate.userInDb));
 			router.refresh();
 		});
 	};
@@ -102,7 +103,10 @@ export const UserSettingsForm = () => {
 							Update Profile
 						</h1>
 
-						<Pencil className="cursor-pointer h-5 w-5" onClick={() => setDisabled(false)} />
+						<Pencil
+							className="cursor-pointer h-5 w-5"
+							onClick={() => setDisabled(false)}
+						/>
 					</div>
 					<div className="flex gap-4 items-center">
 						<CustomInput
@@ -156,7 +160,10 @@ export const UserSettingsForm = () => {
 				</div>
 
 				<div className="border-t p-6 flex">
-					<Button disabled={isPending || disabled} className={`px-6 py-5 ml-auto`}>
+					<Button
+						disabled={isPending || disabled}
+						className={`px-6 py-5 ml-auto`}
+					>
 						Update
 					</Button>
 				</div>
