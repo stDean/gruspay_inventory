@@ -201,15 +201,15 @@ export const DashboardContent = () => {
 						</div>
 						{dashboardStat?.topSellingWithDetails.map(product => (
 							<div
-								key={product.product_name}
+								key={product.product_name || ""}
 								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
-								<p className="flex-1">{product.product_name}</p>
+								<p className="flex-1">{product.product_name || ""}</p>
 								<p className="flex-1 flex justify-center">
-									{product.total_sold}
+									{product.total_sold || ""}
 								</p>
 								<p className="flex-1 flex justify-center">
-									{product.remaining_quantity}
+									{product.remaining_quantity || ""}
 								</p>
 								<p className="flex-1 flex justify-end">
 									{formatCurrency(Number(product.total_sold_price) || 0)}
@@ -226,8 +226,8 @@ export const DashboardContent = () => {
 					<div className="space-y-3">
 						<p className="font-semibold text-lg">Top Seller</p>
 						<p className="font-semibold text-3xl">
-							{dashboardStat?.topSellerDetail.first_name}{" "}
-							{dashboardStat?.topSellerDetail.last_name}
+							{dashboardStat?.topSellerDetail.first_name || ""}{" "}
+							{dashboardStat?.topSellerDetail.last_name || ""}
 						</p>
 						<p className="space-x-10 font-semibold text-lg">
 							<span>
@@ -235,7 +235,7 @@ export const DashboardContent = () => {
 									Number(dashboardStat?.topSellerDetail.totalPrice) || 0
 								)}
 							</span>
-							<span>{dashboardStat?.topSellerDetail.count} item(s)</span>
+							<span>{dashboardStat?.topSellerDetail.count || 0} item(s)</span>
 						</p>
 					</div>
 
@@ -266,7 +266,7 @@ export const DashboardContent = () => {
 					<div className="space-y-2">
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.stockCount}
+								{dashboardStat?.businessSummary.stockCount || 0}
 							</span>
 							<span className="font-semibold">Stock Count</span>
 						</p>
@@ -282,14 +282,14 @@ export const DashboardContent = () => {
 
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.suppliers}
+								{dashboardStat?.businessSummary.suppliers || 0}
 							</span>
 							<span className="font-semibold">Number of Suppliers</span>
 						</p>
 
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.customers}
+								{dashboardStat?.businessSummary.customers || 0}
 							</span>
 							<span className="font-semibold">Number of Customers</span>
 						</p>
@@ -311,7 +311,7 @@ export const DashboardContent = () => {
 								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
 								<p>{product.product_name}</p>
-								<p className="mr-36">{product.count}</p>
+								<p className="mr-36">{product.count || 0}</p>
 							</div>
 						))}
 					</div>

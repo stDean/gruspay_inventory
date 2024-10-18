@@ -80,7 +80,7 @@ export const verifyOTPToken = async ({
 
 	try {
 		const res = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/verifyOTP`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/verifyOTP`,
 			{
 				company_email: email,
 				otp,
@@ -89,6 +89,12 @@ export const verifyOTPToken = async ({
 		if (res.status === 200) {
 			const cookieStore = cookies();
 			cookieStore.set("user", JSON.stringify(res.data.jwtToken), {
+				maxAge: 60 * 60 * 24 * 7,
+				httpOnly: true,
+				secure: true,
+			});
+
+			cookieStore.set("role", res.data.role, {
 				maxAge: 60 * 60 * 24 * 7,
 				httpOnly: true,
 				secure: true,
