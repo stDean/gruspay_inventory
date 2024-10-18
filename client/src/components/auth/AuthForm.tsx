@@ -119,7 +119,7 @@ export const AuthForm = () => {
 						src="/logo.png"
 						alt="logo"
 						className="w-44 md:w-52 lg:w-56 cursor-pointer mx-auto"
-						// onClick={() => router.push("/dashboard")}
+						onClick={() => router.push("/")}
 					/>
 
 					<p className="text-xl md:text-2xl mt-1 font-semibold">

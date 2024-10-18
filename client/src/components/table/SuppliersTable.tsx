@@ -6,7 +6,7 @@ import { useReduxState } from "@/hook/useRedux";
 import { SupplierProps } from "@/lib/types";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../Spinners";
 import { TableContainer } from "./Table";
@@ -34,20 +34,20 @@ export const SuppliersTable = () => {
 		return item.supplier_name.toLowerCase().includes(filter.toLowerCase());
 	});
 
-	const getAllSuppliers = () => {
+	const getAllSuppliers = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getSuppliers({ token });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await getSuppliers({ token });
+			if ("error" in res) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
-			setSuppliers(data.suppliers);
+			setSuppliers(res?.data.suppliers);
 		});
-	};
+	}, [token]);
 
 	useEffect(() => {
 		getAllSuppliers();
-	}, []);
+	}, [getAllSuppliers]);
 
 	const tableHeaders = (
 		<>
@@ -95,7 +95,7 @@ export const SuppliersTable = () => {
 			placeHolder="Search name..."
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
-      handleClear={() => setFilter("")}
+			handleClear={() => setFilter("")}
 		/>
 	) : (
 		<p>No Suppliers yet</p>

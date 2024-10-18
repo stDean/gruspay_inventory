@@ -8,7 +8,7 @@ import useModifyRoleModal from "@/hook/useUpdateRoleModal";
 import { UserProps } from "@/lib/types";
 import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../Spinners";
 import { TableContainer } from "./Table";
@@ -34,7 +34,7 @@ export const EmployeeTable = () => {
 		indexOfLastTransaction
 	);
 
-	const getAllUsers = () => {
+	const getAllUsers = useCallback(() => {
 		startTransition(async () => {
 			const { error, data } = await getUsers({ token });
 
@@ -45,13 +45,13 @@ export const EmployeeTable = () => {
 
 			setUsers(data.users);
 		});
-	};
+	}, [token]);
 
 	const handleClick = async (id: string) => {
 		const { data, error } = await getUserById({ token, id });
 		if (error) {
 			toast.error("Error", { description: error });
-      return
+			return;
 		}
 
 		modifyModal.onOpen(data.user);
@@ -59,7 +59,7 @@ export const EmployeeTable = () => {
 
 	useEffect(() => {
 		getAllUsers();
-	}, [userModal.isOpen, modifyModal.isOpen]);
+	}, [userModal.isOpen, modifyModal.isOpen, getAllUsers]);
 
 	const tableHeaders = (
 		<>

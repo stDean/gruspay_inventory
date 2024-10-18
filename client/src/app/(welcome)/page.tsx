@@ -15,7 +15,7 @@ export default function page() {
 					className="bg-blue-500 hover:bg-blue-400 md:py-6 md:px-10 md:text-lg"
 					asChild
 				>
-					<Link href="/login">Login</Link>
+					<Link href="#plan">Get Started</Link>
 				</Button>
 			</div>
 

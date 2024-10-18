@@ -4,7 +4,7 @@ import { getCustomer } from "@/actions/user";
 import { Spinner } from "@/components/Spinners";
 import { useReduxState } from "@/hook/useRedux";
 import { CustomerProps } from "@/lib/types";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useCallback } from "react";
 import { toast } from "sonner";
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { CustomerTable } from "@/components/table/CustomerTable";
@@ -19,7 +19,7 @@ export const Customer = ({ id }: { id: string }) => {
 	const [isPending, startTransition] = useTransition();
 	const [customer, setCustomer] = useState<CustomerProps | null>(null);
 
-	const getCustomerData = () => {
+	const getCustomerData = useCallback(() => {
 		startTransition(async () => {
 			const { data, error } = await getCustomer({ token, id });
 			if (error) {
@@ -29,11 +29,11 @@ export const Customer = ({ id }: { id: string }) => {
 
 			setCustomer(data.customer);
 		});
-	};
+	}, [token, id]);
 
 	useEffect(() => {
 		getCustomerData();
-	}, [id]);
+	}, [getCustomerData]);
 
 	// Early redirect if the company is on the PERSONAL plan
 	if (companyDetails?.billingPlan !== "ENTERPRISE") {

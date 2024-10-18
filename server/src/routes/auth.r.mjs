@@ -9,11 +9,6 @@ const router = Router();
 const authRateLimiter = customRateLimiter(15 * 60 * 1000, 5); // 15 minutes, max 5 requests
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
-// const updateOrCancelRateLimiter = customRateLimiter(
-// 	THIRTY_DAYS_IN_MS,
-// 	1,
-// 	"This action is limited to once every 30 days. Try again later."
-// );
 
 router.post("/createCompany", authRateLimiter, AuthController.createCompany);
 router.post("/verifyOTP", authRateLimiter, AuthController.verifyOtp);

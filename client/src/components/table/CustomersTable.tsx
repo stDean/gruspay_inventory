@@ -6,7 +6,7 @@ import { useReduxState } from "@/hook/useRedux";
 import { CustomerProps } from "@/lib/types";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useCallback } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../Spinners";
 import { TableContainer } from "./Table";
@@ -34,7 +34,7 @@ export const CustomersTable = () => {
 		return item.buyer_name.toLowerCase().includes(filter.toLowerCase());
 	});
 
-	const getAllCustomers = () => {
+	const getAllCustomers = useCallback(() => {
 		startTransition(async () => {
 			const { error, data } = await getCustomers({ token });
 			if (error) {
@@ -43,11 +43,11 @@ export const CustomersTable = () => {
 			}
 			setCustomers(data.customers);
 		});
-	};
+	}, [token]);
 
 	useEffect(() => {
 		getAllCustomers();
-	}, []);
+	}, [getAllCustomers]);
 
 	const tableHeaders = (
 		<>

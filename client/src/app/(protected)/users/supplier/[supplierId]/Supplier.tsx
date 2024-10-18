@@ -7,7 +7,7 @@ import { SupplierTable } from "@/components/table/SupplierTable";
 import { useReduxState } from "@/hook/useRedux";
 import { SupplierProps } from "@/lib/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useCallback } from "react";
 import { toast } from "sonner";
 
 export const Supplier = ({ id }: { id: string }) => {
@@ -19,21 +19,21 @@ export const Supplier = ({ id }: { id: string }) => {
 	const [isPending, startTransition] = useTransition();
 	const [supplier, setSupplier] = useState<SupplierProps | null>(null);
 
-	const getSupplierData = () => {
+	const getSupplierData = useCallback(() => {
 		startTransition(async () => {
 			const { data, error } = await getSupplier({ token, id });
 			if (error) {
 				toast.error("Error", { description: error });
-        return
+				return;
 			}
 
 			setSupplier(data.supplier);
 		});
-	};
+	}, [token, id]);
 
 	useEffect(() => {
 		getSupplierData();
-	}, [id]);
+	}, [getSupplierData]);
 
 	// Early redirect if the company is on the PERSONAL plan
 	if (companyDetails?.billingPlan === "PERSONAL") {
