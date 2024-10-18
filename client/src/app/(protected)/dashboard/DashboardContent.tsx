@@ -305,12 +305,12 @@ export const DashboardContent = () => {
 							<p className="font-semibold">Product Name</p>
 							<p className="font-semibold mr-7">Remaining Quantity</p>
 						</div>
-						{dashboardStat?.lowQuantityProducts.map(product => (
+						{dashboardStat?.lowQuantityProducts.map((product, idx) => (
 							<div
-								key={product.product_name}
+								key={product.product_name || idx}
 								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
-								<p>{product.product_name}</p>
+								<p>{product.product_name || ""}</p>
 								<p className="mr-36">{product.count || 0}</p>
 							</div>
 						))}
