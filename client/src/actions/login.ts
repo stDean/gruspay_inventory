@@ -37,14 +37,13 @@ export const Login = async ({
 		}
 
 		return { success: res.data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong." };
 	}
 };
@@ -66,14 +65,13 @@ export const ResetOTP = async ({
 			{ email, password }
 		);
 		return data;
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong." };
 	}
 };
@@ -93,13 +91,11 @@ export const VerifyOTPAndUpdatePass = async ({
 			{ email, password, otp }
 		);
 		return { success: true, data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong." };

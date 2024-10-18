@@ -18,18 +18,16 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 		});
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
-		} else {
-			return { error: "Something went wrong, try again" };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
+
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -53,20 +51,18 @@ export const getProductsByName = async ({
 		});
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 404) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
-		} else {
-			return { error: "Something went wrong, try again" };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
+
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -115,18 +111,16 @@ export const addSingleProduct = async ({
 		);
 
 		return data;
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg, status: 400 };
-			} else if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
-		} else {
-			return { error: "Something went wrong, try again" };
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg, status: 400 };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
+		return { error: "Something went wrong, try again" };
 	}
 };
 
@@ -149,17 +143,15 @@ export const addMultipleProduct = async ({
 		);
 
 		return data;
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
-		return { error: "Something went wrong." };
+    return { error: "Something went wrong." };
 	}
 };
 
@@ -181,18 +173,17 @@ export const getProduct = async ({
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 404) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong, try again" };
 	}
 };
@@ -223,16 +214,15 @@ export const sellProduct = async ({
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong, try again" };
 	}
 };
@@ -249,17 +239,15 @@ export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
-		return { error: "Something went wrong..." };
+    return { error: "Something went wrong..." };
 	}
 };
 
@@ -307,16 +295,15 @@ export const swapProducts = async ({
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "something went wrong, try again" };
 	}
 };
@@ -333,16 +320,15 @@ export const getInventoryStats = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e?.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e?.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went Wrong..." };
 	}
 };
@@ -373,15 +359,13 @@ export const getDashboardStats = async ({
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
 		return { error: "Something went wrong..." };
 	}
@@ -403,16 +387,15 @@ export const getBarChartData = async ({
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong..." };
 	}
 };
@@ -438,18 +421,17 @@ export const updateSoldProduct = async ({
 		);
 
 		return { data };
-	} catch (e) {
-		if (axios.isAxiosError(e)) {
-			if (e.response?.status === 400) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 401) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 404) {
-				return { error: e.response.data.msg };
-			} else if (e.response?.status === 429) {
-				return { error: e.response.data.msg };
-			}
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
 		}
+
 		return { error: "Something went wrong, try again" };
 	}
 };
