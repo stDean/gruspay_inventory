@@ -19,6 +19,10 @@ app.use(cors());
 // Route
 app.use("/api", Routes);
 
+app.get("/test", (req, res) => {
+	return res.status(200).json({ msg: "API WORKING!!" });
+});
+
 // PayStack Webhook
 app.post("/webhook", async (req, res) => {
 	//validate event
