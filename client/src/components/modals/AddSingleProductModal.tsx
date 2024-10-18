@@ -19,6 +19,7 @@ export const AddSingleProductModal = () => {
 			onClose={addSingleProduct.onClose}
 			headerContent={headerContent}
 			body={<AddProductForm />}
+      onSubmit={() => {}}
 		/>
 	);
 };

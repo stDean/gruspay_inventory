@@ -30,7 +30,7 @@ export const PlanButtons = ({
 		MONTHLY: "monthly",
 		YEARLY: "yearly",
 	};
-	const matchVal = companyDetails!.billingType!;
+	const matchVal = companyDetails?.billingType;
 
 	return (
 		<>
@@ -63,7 +63,7 @@ export const PlanButtons = ({
 													{
 														"border-[#F9AE19]":
 															options.billingPlan?.title === option.title &&
-															type === matcher[matchVal],
+															type === matcher[matchVal as string],
 													}
 												)}
 											>
@@ -71,7 +71,7 @@ export const PlanButtons = ({
 													className={cn("h-3 w-3 text-gray-400", {
 														"text-[#F9AE19]":
 															options.billingPlan?.title === option.title &&
-															type === matcher[matchVal],
+															type === matcher[matchVal as string],
 													})}
 													strokeWidth={3}
 												/>
@@ -107,24 +107,27 @@ export const PlanButtons = ({
 												<Button
 													className=""
 													variant={
-														option.title === plan && type === matcher[matchVal]
+														option.title === plan &&
+														type === matcher[matchVal as string]
 															? "outline"
 															: "default"
 													}
 													onClick={
-														option.title === plan && type === matcher[matchVal]
+														option.title === plan &&
+														type === matcher[matchVal as string]
 															? handleCancelPlan
 															: handleClick
 													}
 													disabled={
 														(option.title === plan &&
-															type === matcher[matchVal] &&
+															type === matcher[matchVal as string] &&
 															!companyDetails?.cancelable) ||
 														isPending ||
 														!companyDetails?.canUpdate
 													}
 												>
-													{option.title === plan && type === matcher[matchVal]
+													{option.title === plan &&
+													type === matcher[matchVal as string]
 														? "Cancel Subscription"
 														: "Upgrade Plan"}
 												</Button>

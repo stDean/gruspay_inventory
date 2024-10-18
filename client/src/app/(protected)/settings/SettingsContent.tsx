@@ -33,7 +33,7 @@ export const SettingsContent = () => {
 	const planKey = Object.keys(Plans)
 		.filter(key => isNaN(Number(key))) // Filter out numeric values from enum
 		.find(key =>
-			key.toLowerCase().includes(companyDetails!.billingPlan!.toLowerCase())
+			key.toLowerCase().includes(companyDetails?.billingPlan?.toLowerCase() as string)
 		);
 
 	// Get the corresponding index (numeric value) of the plan from the enum
@@ -41,7 +41,7 @@ export const SettingsContent = () => {
 
 	const [options, setOptions] = useState<{
 		billingPlan: (typeof BillingPlanType.options)[number];
-	}>({ billingPlan: BillingPlanType.options[planIndex!] });
+	}>({ billingPlan: BillingPlanType.options[planIndex as number] });
 
 	const handleChange = (val: (typeof BillingPlanType.options)[number]) => {
 		setOptions(prev => ({

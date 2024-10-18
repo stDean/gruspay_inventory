@@ -102,7 +102,7 @@ export const AddMultipleProductsModal = () => {
 		setProgress({ percentage: 0, show: true });
 		const products = data.filter(product => product?.product_name !== "");
 		dispatch(setPreviewProducts(products));
-    setProgress({ percentage: 100, show: true });
+		setProgress({ percentage: 100, show: true });
 		setTimeout(() => {
 			router.push("/inventory/preview");
 			addMultipleProductModal.onClose();
@@ -188,9 +188,7 @@ export const AddMultipleProductsModal = () => {
 				</div>
 
 				<div className="px-4 pb-4 flex justify-end">
-					<Button onClick={handleUpload}>
-						Add Products
-					</Button>
+					<Button onClick={handleUpload}>Add Products</Button>
 				</div>
 			</>
 		);
@@ -202,6 +200,7 @@ export const AddMultipleProductsModal = () => {
 			onClose={addMultipleProductModal.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
+			onSubmit={() => {}}
 		/>
 	);
 };

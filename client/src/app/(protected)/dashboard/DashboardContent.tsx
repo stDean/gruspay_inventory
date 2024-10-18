@@ -62,17 +62,17 @@ export const DashboardContent = () => {
 		startTransition(async () => {
 			const { data } = await getDashboardStats({
 				token,
-				soldYear: selectedYears!["dashYear"],
+				soldYear: selectedYears["dashYear"],
 				soldMonth:
 					selectedMonths["dashMonth"] !== ""
 						? String(months.indexOf(selectedMonths["dashMonth"]) + 1)
 						: "",
-				sellerYear: selectedYears!["topSellerYear"],
+				sellerYear: selectedYears["topSellerYear"],
 				sellerMonth:
 					selectedMonths["topSellerMonth"] !== ""
 						? String(months.indexOf(selectedMonths["topSellerMonth"]) + 1)
 						: "",
-				tssYear: selectedYears!["stockYear"],
+				tssYear: selectedYears["stockYear"],
 				tssMonth:
 					selectedMonths["stockMonth"] !== ""
 						? String(months.indexOf(selectedMonths["stockMonth"]) + 1)
@@ -124,7 +124,7 @@ export const DashboardContent = () => {
 							{formatCurrency(Number(dashboardStat?.totalSoldPrice || 0))}
 						</h1>
 						<p className="font-semibold md:text-lg">
-							{dashboardStat?.totalSalesCount || 0} item(s)
+							{dashboardStat?.totalSalesCount} item(s)
 						</p>
 					</div>
 
@@ -133,10 +133,10 @@ export const DashboardContent = () => {
 							Total Purchases
 						</p>
 						<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
-							{formatCurrency(Number(dashboardStat?.totalPurchasePrice || 0))}
+							{formatCurrency(Number(dashboardStat?.totalPurchasePrice))}
 						</h1>
 						<p className="font-semibold md:text-lg">
-							{dashboardStat?.totalPurchasesCount || 0} item(s)
+							{dashboardStat?.totalPurchasesCount} item(s)
 						</p>
 					</div>
 
@@ -169,7 +169,7 @@ export const DashboardContent = () => {
 						/>
 					</div>
 
-					<BarChartContent data={data!} />
+					<BarChartContent data={data || []} />
 				</div>
 
 				<div className="border rounded-lg shadow-md p-6 bg-white/70 space-y-4">
@@ -201,15 +201,15 @@ export const DashboardContent = () => {
 						</div>
 						{dashboardStat?.topSellingWithDetails.map(product => (
 							<div
-								key={product.product_name || ""}
+								key={product.product_name}
 								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
-								<p className="flex-1">{product.product_name || ""}</p>
+								<p className="flex-1">{product.product_name}</p>
 								<p className="flex-1 flex justify-center">
-									{product.total_sold || ""}
+									{product.total_sold}
 								</p>
 								<p className="flex-1 flex justify-center">
-									{product.remaining_quantity || ""}
+									{product.remaining_quantity}
 								</p>
 								<p className="flex-1 flex justify-end">
 									{formatCurrency(Number(product.total_sold_price) || 0)}
@@ -227,7 +227,7 @@ export const DashboardContent = () => {
 						<p className="font-semibold text-lg">Top Seller</p>
 						<p className="font-semibold text-3xl">
 							{dashboardStat?.topSellerDetail.first_name || ""}{" "}
-							{dashboardStat?.topSellerDetail.last_name || ""}
+							{dashboardStat?.topSellerDetail.last_name}
 						</p>
 						<p className="space-x-10 font-semibold text-lg">
 							<span>
@@ -235,7 +235,7 @@ export const DashboardContent = () => {
 									Number(dashboardStat?.topSellerDetail.totalPrice) || 0
 								)}
 							</span>
-							<span>{dashboardStat?.topSellerDetail.count || 0} item(s)</span>
+							<span>{dashboardStat?.topSellerDetail.count} item(s)</span>
 						</p>
 					</div>
 
@@ -266,7 +266,7 @@ export const DashboardContent = () => {
 					<div className="space-y-2">
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.stockCount || 0}
+								{dashboardStat?.businessSummary.stockCount}
 							</span>
 							<span className="font-semibold">Stock Count</span>
 						</p>
@@ -282,14 +282,14 @@ export const DashboardContent = () => {
 
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.suppliers || 0}
+								{dashboardStat?.businessSummary.suppliers}
 							</span>
 							<span className="font-semibold">Number of Suppliers</span>
 						</p>
 
 						<p className="flex flex-col">
 							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.customers || 0}
+								{dashboardStat?.businessSummary.customers}
 							</span>
 							<span className="font-semibold">Number of Customers</span>
 						</p>
@@ -310,8 +310,8 @@ export const DashboardContent = () => {
 								key={product.product_name || idx}
 								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
 							>
-								<p>{product.product_name || ""}</p>
-								<p className="mr-36">{product.count || 0}</p>
+								<p>{product.product_name}</p>
+								<p className="mr-36">{product.count}</p>
 							</div>
 						))}
 					</div>

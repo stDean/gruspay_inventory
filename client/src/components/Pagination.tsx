@@ -8,7 +8,7 @@ import { PaginationProps } from "@/lib/types";
 
 export const Pagination = ({ totalPages, page }: PaginationProps) => {
   const router = useRouter();
-  const searchParams = useSearchParams()!;
+  const searchParams = useSearchParams();
 
   const handleNavigation = (type: "prev" | "next") => {
     const pageNumber = type === "prev" ? page - 1 : page + 1;

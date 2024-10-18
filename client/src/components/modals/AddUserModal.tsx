@@ -19,6 +19,7 @@ export const AddUserModal = () => {
 			onClose={userModal.onClose}
 			headerContent={headerContent}
 			body={<AddUser />}
+      onSubmit={() => {}}
 		/>
 	);
 };

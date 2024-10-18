@@ -61,25 +61,25 @@ export const CompletePayModal = () => {
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Name"
-						value={completeModal.product!?.product_name!}
+						value={completeModal.product?.product_name as string}
 					/>
 					<MyInput
 						label="Serial Number"
-						value={completeModal.product!?.serial_no!}
+						value={completeModal.product?.serial_no as string}
 					/>
 				</div>
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Price"
-						value={completeModal.product!?.price!}
+						value={completeModal.product?.price as string}
 					/>
 					<MyInput
 						label="Amount Paid"
-						value={completeModal.product!?.bought_for!}
+						value={completeModal.product?.bought_for as string}
 					/>
 					<MyInput
 						label="Balance Owed"
-						value={completeModal.product!?.balance_owed!}
+						value={completeModal.product?.balance_owed as string}
 					/>
 				</div>
 			</div>
@@ -92,11 +92,11 @@ export const CompletePayModal = () => {
 				<div className="flex items-center gap-4 ">
 					<MyInput
 						label="Customer Name"
-						value={completeModal.product!?.Creditor!.creditor_name!}
+						value={completeModal.product?.Creditor?.creditor_name as string}
 					/>
 					<MyInput
 						label="Customer Number"
-						value={completeModal.product!?.Creditor!.creditor_phone_no!}
+						value={completeModal.product?.Creditor?.creditor_phone_no as string}
 					/>
 				</div>
 			</div>
@@ -123,7 +123,7 @@ export const CompletePayModal = () => {
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					disabled={isPending}
-					onClick={() => handlePay(completeModal.product!?.id!, amount)}
+					onClick={() => handlePay(completeModal.product?.id as string, amount)}
 				>
 					Complete Pay
 				</Button>
@@ -137,6 +137,7 @@ export const CompletePayModal = () => {
 			onClose={completeModal.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
+      onSubmit={() => {}}
 		/>
 	);
 };

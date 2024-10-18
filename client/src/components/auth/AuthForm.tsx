@@ -37,7 +37,7 @@ export const AuthForm = () => {
 
 	const plan =
 		typeof localStorage !== "undefined" &&
-		JSON.parse(localStorage.getItem("plan")!);
+		JSON.parse(localStorage.getItem("plan") as string);
 
 	const selectedPlan = plan ? plan.plan : "Personal";
 	const [payment, setPayment] = useState<string>(selectedPlan);

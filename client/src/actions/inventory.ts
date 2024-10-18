@@ -10,7 +10,7 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 	}
 
 	const URI =
-		`${process.env.NEXT_PUBLIC_API_BASE_URL!}/api/inventory/getProductsByStock`;
+		`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProductsByStock`;
 	try {
 		const { data } = await axios.get(URI, {
 			headers: {

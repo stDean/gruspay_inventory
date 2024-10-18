@@ -99,14 +99,14 @@ export const TableContainer = ({
 							<FilterSelect
 								label="Filter Type"
 								selectPlaceHolder="Type"
-								items={itemsType!}
-								onChange={handleTypeChange!}
+								items={itemsType}
+								onChange={handleTypeChange as any}
 							/>
 							<FilterSelect
 								label="Filter Brand"
 								selectPlaceHolder="Brand"
-								items={itemsBrand!}
-								onChange={handleBrandChange!}
+								items={itemsBrand}
+								onChange={handleBrandChange as any}
 							/>
 						</div>
 					)}
@@ -121,9 +121,12 @@ export const TableContainer = ({
 				<TableBody>{tableBody}</TableBody>
 			</Table>
 
-			{totalPages! > 1 && (
+			{totalPages && totalPages > 1 && (
 				<div className=" w-full border-t">
-					<Pagination totalPages={totalPages!} page={currentPage!} />
+					<Pagination
+						totalPages={totalPages as number}
+						page={currentPage as number}
+					/>
 				</div>
 			)}
 		</div>

@@ -29,7 +29,7 @@ export const CustomSelect = ({
 	return (
 		<Select
 			value={value}
-			onValueChange={(value: string, id?: number) => handleChange(value, id!)}
+			onValueChange={(value: string, id?: number) => handleChange(value, id)}
 			disabled={disabled}
 		>
 			<SelectTrigger

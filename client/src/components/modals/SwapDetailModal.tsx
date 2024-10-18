@@ -30,21 +30,21 @@ export const SwapDetailModal = () => {
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Name"
-						value={swapProductDetails.product!?.product_name!}
+						value={swapProductDetails.product?.product_name as string}
 					/>
 					<MyInput
 						label="Serial Number"
-						value={swapProductDetails.product!?.serial_no!}
+						value={swapProductDetails.product?.serial_no as string}
 					/>
 				</div>
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Price"
-						value={swapProductDetails.product!?.price!}
+						value={swapProductDetails.product?.price as string}
 					/>
 					<MyInput
 						label="Amount Included"
-						value={swapProductDetails.product!?.bought_for!}
+						value={swapProductDetails.product?.bought_for as string}
 					/>
 				</div>
 			</div>
@@ -57,11 +57,13 @@ export const SwapDetailModal = () => {
 				<div className="flex items-center gap-4 ">
 					<MyInput
 						label="Supplier Name"
-						value={swapProductDetails.product!?.Supplier.supplier_name!}
+						value={swapProductDetails.product?.Supplier.supplier_name as string}
 					/>
 					<MyInput
 						label="Supplier Phone Number"
-						value={swapProductDetails.product!?.Supplier.supplier_phone_no!}
+						value={
+							swapProductDetails.product?.Supplier.supplier_phone_no as string
+						}
 					/>
 				</div>
 			</div>
@@ -70,7 +72,7 @@ export const SwapDetailModal = () => {
 
 			<div className="p-2 px-6 space-y-2">
 				<h1 className="text-sm font-semibold">Incoming Product(s)</h1>
-				{swapProductDetails.product!?.OutgoingProduct!.incomingProducts.map(
+				{swapProductDetails.product?.OutgoingProduct?.incomingProducts.map(
 					(product, idx) => (
 						<div key={product.id} className="w-full space-y-2">
 							<div className="flex items-center gap-4">
@@ -97,11 +99,13 @@ export const SwapDetailModal = () => {
 				<div className="flex items-center gap-4 ">
 					<MyInput
 						label="Customer Name"
-						value={swapProductDetails.product!?.Customer!.buyer_name!}
+						value={swapProductDetails.product?.Customer?.buyer_name as string}
 					/>
 					<MyInput
 						label="Customer Number"
-						value={swapProductDetails.product!?.Customer!.buyer_phone_no!}
+						value={
+							swapProductDetails.product?.Customer?.buyer_phone_no as string
+						}
 					/>
 				</div>
 			</div>
@@ -115,7 +119,8 @@ export const SwapDetailModal = () => {
 			headerContent={headerContent}
 			body={bodyContent}
 			addStyle="mt-10"
-      lessPadd="!p-4"
+			lessPadd="!p-4"
+      onSubmit={() => {}}
 		/>
 	);
 };

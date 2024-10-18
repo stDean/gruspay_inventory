@@ -230,7 +230,7 @@ export const SwapProductModal = () => {
 								<div
 									className="h-full bg-gray-100 border-l border-gray-400 rounded-tr-lg rounded-br-lg absolute right-0 w-11 flex items-center justify-center top-0 cursor-pointer"
 									onClick={() => {
-										handleAddAnotherItem(search.value!);
+										handleAddAnotherItem(search.value);
 										setSearch({ show: false, value: "" });
 									}}
 								>
@@ -378,6 +378,7 @@ export const SwapProductModal = () => {
 			onClose={swapProductModal.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
+      onSubmit={() => {}}
 		/>
 	);
 };

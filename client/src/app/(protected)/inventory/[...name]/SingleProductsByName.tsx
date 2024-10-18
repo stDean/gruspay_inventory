@@ -35,11 +35,11 @@ export const SingleProductsByName = ({
 				type,
 				brand,
 			});
-			if ('error' in res!) {
+			if ('error' in res) {
 				toast.error("Error", { description: res.error });
 				return;
 			}
-			setProducts(res!.data);
+			setProducts(res?.data);
 		});
 	}, [token, name, showProductModal.isOpen]);
 

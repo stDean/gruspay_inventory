@@ -61,7 +61,7 @@ export const CustomerTable = ({
 						{product?.balance_owed}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{format(product.date_sold!, "PPP")}
+						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>
 			))}

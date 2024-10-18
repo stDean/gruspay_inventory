@@ -49,11 +49,11 @@ export const Customer = ({ id }: { id: string }) => {
 		<div className="-mt-4">
 			<ItemsHeader
 				routeTo="/users"
-				types={customer!.buyer_name}
+				types={customer?.buyer_name}
 				productName="All Products Purchased"
 			/>
 
-			<CustomerTable products={customer!.Products} page={page} />
+			<CustomerTable products={customer?.Products} page={page} />
 		</div>
 	) : (
 		<div>No customer data available.</div> // Handle case where customer is null

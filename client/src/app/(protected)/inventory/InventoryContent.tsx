@@ -44,11 +44,11 @@ export const InventoryContent = () => {
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
 			const res = await getProductsByStock({ token });
-			if ('error' in res!) {
+			if ('error' in res) {
 				toast.error("Error", { description: res.error });
 				return;
 			}
-			setProducts(res!.data);
+			setProducts(res?.data);
 		});
 	}, [token, addSingleProductModal.isOpen, addMultipleProductModal.isOpen]);
 

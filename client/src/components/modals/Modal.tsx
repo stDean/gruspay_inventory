@@ -6,18 +6,18 @@ import { ReactElement, useCallback, useEffect, useState } from "react";
 
 interface ModalProps {
 	isOpen: boolean;
-	onClose?: () => void;
+	onClose: () => void;
 	headerContent?: ReactElement;
 	body?: ReactElement;
 	secondaryAction?: () => void;
 	secondaryActionLabel?: string;
 	disabled?: boolean;
 	actionLabel?: string;
-	onSubmit?: () => void;
+	onSubmit: () => void;
 	addedStyle?: string;
 	footer?: boolean;
-  addStyle?: string;
-  lessPadd?: string;
+	addStyle?: string;
+	lessPadd?: string;
 }
 
 export const Modal = ({
@@ -32,8 +32,8 @@ export const Modal = ({
 	onSubmit,
 	addedStyle,
 	footer,
-  addStyle,
-  lessPadd
+	addStyle,
+	lessPadd,
 }: ModalProps) => {
 	const [showModal, setShowModal] = useState<boolean>(isOpen);
 
@@ -44,7 +44,7 @@ export const Modal = ({
 	const handleClose = useCallback(() => {
 		setShowModal(false);
 		setTimeout(() => {
-			onClose!();
+			onClose();
 		}, 300);
 	}, [onClose]);
 
@@ -53,7 +53,7 @@ export const Modal = ({
 			return;
 		}
 
-		onSubmit!();
+		onSubmit();
 	}, [onSubmit, disabled]);
 
 	const handleSecondaryAction = useCallback(() => {
@@ -78,9 +78,13 @@ export const Modal = ({
 						} ${showModal ? "opacity-100" : "opacity-0"}
           `}
 					>
-						<div className={`translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none ${addStyle}`}>
+						<div
+							className={`translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none ${addStyle}`}
+						>
 							{/* Header */}
-							<div className={`flex items-center p-6 rounded-t relative border-b-[1px] ${lessPadd}`}>
+							<div
+								className={`flex items-center p-6 rounded-t relative border-b-[1px] ${lessPadd}`}
+							>
 								{headerContent}
 								<button
 									className="p-1 border-0 hover:opacity-70 transition absolute right-4"
@@ -106,7 +110,7 @@ export const Modal = ({
 											</Button>
 										)}
 
-										{onSubmit && actionLabel && (
+										{actionLabel && (
 											<Button
 												disabled={disabled}
 												onClick={handleSubmit}

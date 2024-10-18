@@ -74,22 +74,21 @@ export const SwapProductTable = ({
 						{product.serial_no}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{format(product.date_sold!, "PPP")}
+						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.price}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product.SoldByUser!.first_name
-							? `${product.SoldByUser!.first_name!} ${product.SoldByUser!
-									.last_name!}`
-							: `${product.SoldByUser!.email!}`}
+						{product.SoldByUser?.first_name
+							? `${product.SoldByUser?.first_name} ${product.SoldByUser?.last_name}`
+							: `${product.SoldByUser?.email}`}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.Customer?.buyer_name}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product.OutgoingProduct!.incomingProducts.length}
+						{product.OutgoingProduct?.incomingProducts.length}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}

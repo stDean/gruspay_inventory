@@ -11,7 +11,7 @@ export const UpdatePass = () => {
 	const router = useRouter();
 	const { email, password } =
 		typeof localStorage !== "undefined"
-			? JSON.parse(localStorage.getItem("user")!)
+			? JSON.parse(localStorage.getItem("user") as string)
 			: null;
 
 	const [isPending, startTransition] = useTransition();
