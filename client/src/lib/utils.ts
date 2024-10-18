@@ -2,9 +2,27 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 import { UrlQueryParams } from "./types";
+import { Metadata } from "next";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
+}
+
+export function constructMetadata({
+	title = "Gruspay - Inventory",
+	description = "A seamless inventory management system",
+	icons = "/favicon.ico",
+}: {
+	title?: string;
+	description?: string;
+	icons?: string;
+} = {}): Metadata {
+	return {
+		title,
+		description,
+		icons,
+		metadataBase: new URL("https://google.com"),
+	};
 }
 
 export function formUrlQuery({ params, key, value }: UrlQueryParams) {
@@ -21,7 +39,7 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 	);
 }
 
-export const formatCurrency = (val: number, symbol: string = "₦") => {
+export const formatCurrency = (val: number) => {
 	const formattedNumber = new Intl.NumberFormat("en-NG", {
 		style: "currency",
 		currency: "NGN",

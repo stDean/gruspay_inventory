@@ -11,7 +11,6 @@ interface SelectContainerProps {
 	value: string;
 	handleChange: (val: string) => void;
 	style?: string;
-	addCaret?: boolean;
 	placeholder?: string;
 	children: ReactNode;
 }
@@ -20,7 +19,6 @@ export const SelectContainer = ({
 	value,
 	handleChange,
 	style,
-	addCaret,
 	placeholder,
 	children,
 }: SelectContainerProps) => {

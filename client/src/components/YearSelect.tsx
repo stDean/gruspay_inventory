@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SelectContainer } from "./SelectContainer";
 import { SelectItem } from "./ui/select";
 
@@ -8,7 +8,6 @@ export const YearSelect = ({
 	startYear,
 	endYear,
 	style,
-	addCaret,
 	style2,
 	componentKey,
 	onYearChange,
@@ -17,7 +16,6 @@ export const YearSelect = ({
 	startYear: number;
 	endYear: number;
 	style?: string;
-	addCaret?: boolean;
 	style2?: string;
 	componentKey: string;
 	initialYear: string;
@@ -40,7 +38,6 @@ export const YearSelect = ({
 		<SelectContainer
 			value={selectedYear.toString()}
 			handleChange={handleYearChange}
-			addCaret={addCaret}
 			style={style}
 			placeholder="year"
 		>

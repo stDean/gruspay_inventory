@@ -177,7 +177,7 @@ export const SwapProductModal = () => {
 			swapProductModal.onClose();
 			router.push("/inventory");
 		});
-	}, [products, incoming, token, customerInfo, swapProductModal.items]);
+	}, [products, incoming, token, customerInfo, swapProductModal, router]);
 
 	const handleAddAnotherItem = async (serial_no: string) => {
 		if (!serial_no) return;

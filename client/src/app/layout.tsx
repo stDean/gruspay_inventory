@@ -3,23 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import StoreProvider from "./redux";
-
-export function constructMetadata({
-	title = "Gruspay - Inventory",
-	description = "A seamless inventory management system",
-	icons = "/favicon.ico",
-}: {
-	title?: string;
-	description?: string;
-	icons?: string;
-} = {}): Metadata {
-	return {
-		title,
-		description,
-		icons,
-		metadataBase: new URL("https://google.com"),
-	};
-}
+import { constructMetadata } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = constructMetadata();

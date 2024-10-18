@@ -30,7 +30,7 @@ export const PlanButtons = ({
 		MONTHLY: "monthly",
 		YEARLY: "yearly",
 	};
-	const matchVal = companyDetails?.billingType!;
+	const matchVal = companyDetails!.billingType!;
 
 	return (
 		<>

@@ -33,7 +33,7 @@ export const SettingsContent = () => {
 	const planKey = Object.keys(Plans)
 		.filter(key => isNaN(Number(key))) // Filter out numeric values from enum
 		.find(key =>
-			key.toLowerCase().includes(companyDetails?.billingPlan!?.toLowerCase())
+			key.toLowerCase().includes(companyDetails!.billingPlan!.toLowerCase())
 		);
 
 	// Get the corresponding index (numeric value) of the plan from the enum
@@ -64,7 +64,7 @@ export const SettingsContent = () => {
 
 	const handleUpdate = () => {
 		startTransition(async () => {
-			const { data, error } = await updateCompanyPlan({
+			const { error } = await updateCompanyPlan({
 				token,
 				payment_plan: matchers[options.billingPlan.title].toUpperCase(),
 				billingType: billingType === "monthly" ? "month" : "year",
@@ -85,7 +85,7 @@ export const SettingsContent = () => {
 
 	const handleCancelPlan = () => {
 		startTransition(async () => {
-			const { data, error } = await cancelCompanyPlan({ token });
+			const { error } = await cancelCompanyPlan({ token });
 			if (error) {
 				toast.error("Error", { description: error });
 				return;

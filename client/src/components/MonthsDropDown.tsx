@@ -22,7 +22,7 @@ export const MonthsDropDown = ({
 		if (initialMonth !== selectedMonth) {
 			setSelectedMonth(initialMonth);
 		}
-	}, [initialMonth]);
+	}, [initialMonth, selectedMonth]);
 
 	const handleMonthChange = (val: string) => {
 		setSelectedMonth(val);

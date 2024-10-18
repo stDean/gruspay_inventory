@@ -14,13 +14,14 @@ export const getSoldProductsByCount = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (error: any) {
-		if (error.response?.status === 401) {
-			return { error: error.response.data.msg };
-		} else if (error.response?.status === 400) {
-			return { error: error.response.data.msg };
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response?.status === 401) {
+				return { error: error.response.data.msg };
+			} else if (error.response?.status === 400) {
+				return { error: error.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong." };
 	}
 };
@@ -47,15 +48,16 @@ export const getSoldProductsByName = async ({
 		);
 
 		return { data };
-	} catch (error: any) {
-		if (error.response?.status === 401) {
-			return { error: error.response.data.msg };
-		} else if (error.response?.status === 429) {
-			return { error: error.response.data.msg };
-		} else if (error.response?.status === 400) {
-			return { error: error.response.data.msg };
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response?.status === 401) {
+				return { error: error.response.data.msg };
+			} else if (error.response?.status === 429) {
+				return { error: error.response.data.msg };
+			} else if (error.response?.status === 400) {
+				return { error: error.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong." };
 	}
 };
@@ -72,13 +74,14 @@ export const getSwapProductsByCount = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (error: any) {
-		if (error.response?.status === 401) {
-			return { error: error.response.data.msg };
-		} else if (error.response?.status === 400) {
-			return { error: error.response.data.msg };
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response?.status === 401) {
+				return { error: error.response.data.msg };
+			} else if (error.response?.status === 400) {
+				return { error: error.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong." };
 	}
 };
@@ -105,15 +108,16 @@ export const getSwapProductsByName = async ({
 		);
 
 		return { data };
-	} catch (error: any) {
-		if (error.response?.status === 401) {
-			return { error: error.response.data.msg };
-		} else if (error.response?.status === 429) {
-			return { error: error.response.data.msg };
-		} else if (error.response?.status === 400) {
-			return { error: error.response.data.msg };
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			if (error.response?.status === 401) {
+				return { error: error.response.data.msg };
+			} else if (error.response?.status === 429) {
+				return { error: error.response.data.msg };
+			} else if (error.response?.status === 400) {
+				return { error: error.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong." };
 	}
 };

@@ -100,7 +100,7 @@ export const PreviewTable = () => {
 
 	const handleAddProducts = () => {
 		startTransition(async () => {
-			const { data, error } = await addMultipleProduct({
+			const { error } = await addMultipleProduct({
 				token,
 				products: previewProducts,
 			});

@@ -9,10 +9,10 @@ import useAddMultipleProductModal from "@/hook/useAddMultipleProductsModal";
 import { setPreviewProducts } from "@/state";
 import { Download, File, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { parse } from "papaparse";
+import { useCallback, useEffect, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { toast } from "sonner";
-import { parse } from "papaparse";
 
 enum STEPS {
 	UPLOAD = 0,
@@ -107,7 +107,7 @@ export const AddMultipleProductsModal = () => {
 			router.push("/inventory/preview");
 			addMultipleProductModal.onClose();
 		}, 500);
-	}, [setProgress, data]);
+	}, [setProgress, data, dispatch, router, addMultipleProductModal]);
 
 	const headerContent = (
 		<div className="flex flex-col gap-1">

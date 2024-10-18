@@ -71,7 +71,7 @@ export const UserSettingsForm = () => {
 			}
 
 			// Proceed with updating the user even if the password is not provided
-			const { error, data } = await updateUser({ token, userData });
+			const { error } = await updateUser({ token, userData });
 
 			if (error) {
 				toast.error("Error", {

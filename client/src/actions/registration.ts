@@ -33,24 +33,19 @@ export const SendOTP = async ({
 			}
 		);
 		return { success: data };
-	} catch (e: any) {
-		if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong." };
 	}
 };
 
-export const ResendOTP = async ({
-	email,
-	password,
-}: {
-	email: string;
-	password?: string;
-}) => {
+export const ResendOTP = async ({ email }: { email: string }) => {
 	try {
 		const { data } = await axios.post(
 			"http://localhost:5001/api/auth/resendOTP",
@@ -58,15 +53,16 @@ export const ResendOTP = async ({
 		);
 
 		return data;
-	} catch (e: any) {
-		if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong." };
 	}
 };
@@ -99,13 +95,14 @@ export const verifyOTPToken = async ({
 			});
 		}
 		return { success: res.data };
-	} catch (e: any) {
-		if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Invalid OTP!" };
 	}
 };

@@ -76,19 +76,19 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 						{item.serial_no}
 					</TableCell>
 					<TableCell className="border-r capitalize">
-						{format(item?.date_sold!, "PPP")}
+						{format(item.date_sold!, "PPP")}
 					</TableCell>
 					<TableCell className="border-r capitalize">{item.price}</TableCell>
 					<TableCell className="border-r">
-						{item.SoldByUser?.first_name
-							? `${item.SoldByUser?.first_name!} ${item.SoldByUser?.last_name!}`
-							: `${item.SoldByUser?.email!}`}
+						{item.SoldByUser!.first_name
+							? `${item.SoldByUser!.first_name!} ${item.SoldByUser!.last_name!}`
+							: `${item.SoldByUser!.email!}`}
 					</TableCell>
 					<TableCell className="border-r">
-						{item.Customer?.buyer_name!}
+						{item.Customer!.buyer_name!}
 					</TableCell>
-					<TableCell className="border-r">{item?.bought_for!}</TableCell>
-					<TableCell className="border-r">{item?.balance_owed!}</TableCell>
+					<TableCell className="border-r">{item.bought_for!}</TableCell>
+					<TableCell className="border-r">{item.balance_owed!}</TableCell>
 				</TableRow>
 			))}
 		</>

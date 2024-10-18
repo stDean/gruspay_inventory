@@ -55,7 +55,7 @@ export const CodeContent = () => {
 				// onClick={() => router.push("/dashboard")}
 			/>
 			<p className="text-sm md:text-base">
-				Enter the OTP sent to <span className="font-semibold">{email}</span>{" "}
+				Enter the OTP sent to <span className="font-semibold">{email}</span>
 			</p>
 
 			<OtpInput value={value} handleChange={value => setValue(value)} />

@@ -33,7 +33,7 @@ export const SwapProductTable = ({
 		indexOfLastTransaction
 	);
 
-  const filterBySearch = productsByPage.filter(item => {
+	const filterBySearch = productsByPage.filter(item => {
 		return item.serial_no.toLowerCase().includes(filter.toLowerCase());
 	});
 
@@ -41,7 +41,7 @@ export const SwapProductTable = ({
 		const { data, error } = await getProduct({ serialNo, token });
 		if (error) {
 			toast.error("Error", { description: error });
-      return
+			return;
 		}
 
 		swapProductDetails.onOpen(data);
@@ -80,19 +80,19 @@ export const SwapProductTable = ({
 						{product.price}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product.SoldByUser?.first_name
-							? `${product.SoldByUser?.first_name!} ${product.SoldByUser
-									?.last_name!}`
-							: `${product.SoldByUser?.email!}`}
+						{product.SoldByUser!.first_name
+							? `${product.SoldByUser!.first_name!} ${product.SoldByUser!
+									.last_name!}`
+							: `${product.SoldByUser!.email!}`}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.Customer?.buyer_name}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product.OutgoingProduct?.incomingProducts.length}
+						{product.OutgoingProduct!.incomingProducts.length}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product?.bought_for}
+						{product.bought_for}
 					</TableCell>
 				</TableRow>
 			))}
@@ -104,11 +104,11 @@ export const SwapProductTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
-      search
+			search
 			placeHolder="Search serial no..."
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
-      handleClear={() => setFilter("")}
+			handleClear={() => setFilter("")}
 		/>
 	);
 };

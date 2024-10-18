@@ -30,7 +30,7 @@ export const CompletePayModal = () => {
 
 	const handlePay = useCallback((id: string, amount: string) => {
 		startTransition(async () => {
-			const { error, data } = await updateSoldProduct({
+			const { error } = await updateSoldProduct({
 				token,
 				amount,
 				id,
@@ -45,7 +45,7 @@ export const CompletePayModal = () => {
 			setAmount("");
 			completeModal.onClose();
 		});
-	}, []);
+	}, [token, completeModal]);
 
 	const headerContent = (
 		<>
@@ -61,25 +61,25 @@ export const CompletePayModal = () => {
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Name"
-						value={completeModal.product?.product_name!}
+						value={completeModal.product!.product_name!}
 					/>
 					<MyInput
 						label="Serial Number"
-						value={completeModal.product?.serial_no!}
+						value={completeModal.product!.serial_no!}
 					/>
 				</div>
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Price"
-						value={completeModal.product?.price!}
+						value={completeModal.product!.price!}
 					/>
 					<MyInput
 						label="Amount Paid"
-						value={completeModal.product?.bought_for!}
+						value={completeModal.product!.bought_for!}
 					/>
 					<MyInput
 						label="Balance Owed"
-						value={completeModal.product?.balance_owed!}
+						value={completeModal.product!.balance_owed!}
 					/>
 				</div>
 			</div>
@@ -92,11 +92,11 @@ export const CompletePayModal = () => {
 				<div className="flex items-center gap-4 ">
 					<MyInput
 						label="Customer Name"
-						value={completeModal.product?.Creditor!.creditor_name!}
+						value={completeModal.product!.Creditor!.creditor_name!}
 					/>
 					<MyInput
 						label="Customer Number"
-						value={completeModal.product?.Creditor!.creditor_phone_no!}
+						value={completeModal.product!.Creditor!.creditor_phone_no!}
 					/>
 				</div>
 			</div>
@@ -123,7 +123,7 @@ export const CompletePayModal = () => {
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					disabled={isPending}
-					onClick={() => handlePay(completeModal.product?.id!, amount)}
+					onClick={() => handlePay(completeModal.product!.id!, amount)}
 				>
 					Complete Pay
 				</Button>

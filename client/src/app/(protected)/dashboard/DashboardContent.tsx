@@ -9,16 +9,14 @@ import { Spinner } from "@/components/Spinners";
 import { YearSelect } from "@/components/YearSelect";
 import { useReduxState } from "@/hook/useRedux";
 import { BarChartProps, DashboardProps } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, months } from "@/lib/utils";
 import { setUser } from "@/state";
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { months } from "@/lib/utils";
 
 export const DashboardContent = () => {
 	const dispatch = useAppDispatch();
-	const { token, user, companyDetails } = useReduxState();
+	const { token, user } = useReduxState();
 	const [isPending, startTransition] = useTransition();
-
 
 	const [dashboardStat, setDashboardStat] = useState<DashboardProps>();
 	const [data, setData] = useState<BarChartProps[]>();

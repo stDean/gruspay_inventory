@@ -35,7 +35,7 @@ export const AddUser = () => {
 
 	const handleAddUser = (data: z.infer<typeof AddUserSchema>) => {
 		startTransition(async () => {
-			const { error, data: success } = await createUser({
+			const { error } = await createUser({
 				token,
 				role,
 				userData: data,

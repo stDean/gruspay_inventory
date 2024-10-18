@@ -1,8 +1,6 @@
 "use client";
 
 import { ResetOTP } from "@/actions/login";
-import { ResendOTP } from "@/actions/registration";
-import { useAppDispatch } from "@/app/redux";
 import { CustomInput } from "@/components/auth/CustomInput";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -14,10 +12,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const PAYMENT_PLANS = ["Free", "Basic", "Standard", "Premium"];
 
 export const ResetForm = () => {
-	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 	const [show, setShow] = useState<{ password: boolean; cfPassword: boolean }>({

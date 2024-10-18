@@ -1,18 +1,18 @@
 "use client";
 
-import { AddProductSchema } from "@/schema";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Form } from "@/components/ui/form";
-import { useTransition } from "react";
-import { CustomInput } from "@/components/auth/CustomInput";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CustomTextArea } from "@/components/auth/CustomTextArea";
-import { Button } from "../ui/button";
 import { addSingleProduct } from "@/actions/inventory";
-import { toast } from "sonner";
+import { CustomInput } from "@/components/auth/CustomInput";
+import { CustomTextArea } from "@/components/auth/CustomTextArea";
+import { Form } from "@/components/ui/form";
 import useAddSingleProductModal from "@/hook/useAddSingleProductModal";
 import { useReduxState } from "@/hook/useRedux";
+import { AddProductSchema } from "@/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "../ui/button";
 
 export const AddProductForm = () => {
 	const [isPending, startTransition] = useTransition();
@@ -35,25 +35,20 @@ export const AddProductForm = () => {
 	});
 	const handleAddProduct = (data: z.infer<typeof AddProductSchema>) => {
 		startTransition(async () => {
-			const {
-				data: success,
-				error,
-				status,
-			} = await addSingleProduct({ val: data, token });
-      if (status === 400 && error) {
-        toast.error("Error", { description: error });
-        setTimeout(() => {
-          addSingleProductModal.onClose();
-          form.reset();
-        }, 300);
-        return;
-      }
+			const { error, status } = await addSingleProduct({ val: data, token });
+			if (status === 400 && error) {
+				toast.error("Error", { description: error });
+				setTimeout(() => {
+					addSingleProductModal.onClose();
+					form.reset();
+				}, 300);
+				return;
+			}
 
 			if (error) {
 				toast.error("Error", { description: error });
 				return;
 			}
-
 
 			toast.success("Success", {
 				description: "Product added successfully",

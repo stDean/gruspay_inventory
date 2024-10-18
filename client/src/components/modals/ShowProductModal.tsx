@@ -67,9 +67,9 @@ export const ShowProductModal = () => {
 					return;
 				}
 
-				const { data, error } = await sellProduct({
+				const { error } = await sellProduct({
 					token,
-					serialNo: singleData?.serial_no!,
+					serialNo: singleData!.serial_no!,
 					customerInfo,
 				});
 
@@ -201,9 +201,9 @@ export const ShowProductModal = () => {
 						className="w-full py-5"
 						onClick={() =>
 							handleSwap({
-								product_name: singleData?.product_name!,
-								serial_no: singleData?.serial_no!,
-								price: singleData?.price!,
+								product_name: singleData!.product_name!,
+								serial_no: singleData!.serial_no!,
+								price: singleData!.price!,
 							})
 						}
 					>

@@ -47,7 +47,7 @@ export const CreditorsTable = () => {
 
 	useEffect(() => {
 		getAllCreditors();
-	}, []);
+	}, [getAllCreditors]);
 
 	const tableHeaders = (
 		<>

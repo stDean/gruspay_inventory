@@ -18,8 +18,6 @@ interface CustomInputProps {
 	placeholder: string;
 	show?: boolean;
 	handleShow?: () => void;
-	c?: boolean;
-	small?: boolean;
 	disabled?: boolean;
 	withSpan?: boolean;
 	add?: boolean;
@@ -33,8 +31,6 @@ export const CustomInput = ({
 	placeholder,
 	show,
 	handleShow,
-	c,
-	small,
 	disabled,
 	withSpan,
 	add,
@@ -78,7 +74,7 @@ export const CustomInput = ({
 										)}
 										type={show ? "text" : "password"}
 										{...field}
-                    disabled={disabled}
+										disabled={disabled}
 									/>
 
 									<div
@@ -86,13 +82,23 @@ export const CustomInput = ({
 										onClick={handleShow}
 									>
 										{show ? (
-											<Eye className={cn("w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer", {
-                        "opacity-50 cursor-not-allowed": disabled
-                      })} />
+											<Eye
+												className={cn(
+													"w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer",
+													{
+														"opacity-50 cursor-not-allowed": disabled,
+													}
+												)}
+											/>
 										) : (
-											<EyeOff className={cn("w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer", {
-                        "opacity-50 cursor-not-allowed": disabled
-                      })} />
+											<EyeOff
+												className={cn(
+													"w-[14px] h-[14px] md:w-[18px] md:h-[18px] cursor-pointer",
+													{
+														"opacity-50 cursor-not-allowed": disabled,
+													}
+												)}
+											/>
 										)}
 									</div>
 								</div>

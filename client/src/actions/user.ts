@@ -13,15 +13,16 @@ export const getUser = async ({ token }: { token: string }) => {
 		});
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -44,17 +45,18 @@ export const getUserById = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -71,17 +73,18 @@ export const getUsers = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -111,17 +114,18 @@ export const updateUser = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -152,17 +156,18 @@ export const createUser = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -188,17 +193,18 @@ export const updateUserRole = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -216,15 +222,16 @@ export const getSuppliers = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg, status: 400 };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg, status: 400 };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -247,17 +254,18 @@ export const getSupplier = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg, status: 400 };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg, status: 400 };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -275,15 +283,16 @@ export const getCustomers = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg, status: 400 };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg, status: 400 };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -306,17 +315,18 @@ export const getCustomer = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg, status: 400 };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg, status: 400 };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -334,15 +344,16 @@ export const getCreditors = async ({ token }: { token: string }) => {
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg, status: 400 };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg, status: 400 };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -365,17 +376,18 @@ export const getCreditor = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: "the redirect" };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg, status: 400 };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: "the redirect" };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg, status: 400 };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -400,19 +412,20 @@ export const updateCompanyPlan = async ({
 		);
 
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 500) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 500) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };
@@ -427,19 +440,20 @@ export const cancelCompanyPlan = async ({ token }: { token: string }) => {
 			}
 		);
 		return { data };
-	} catch (e: any) {
-		if (e.response?.status === 401) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 404) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 500) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 400) {
-			return { error: e.response.data.msg };
-		} else if (e.response?.status === 429) {
-			return { error: e.response.data.msg };
+	} catch (e) {
+		if (axios.isAxiosError(e)) {
+			if (e.response?.status === 401) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 404) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 500) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 400) {
+				return { error: e.response.data.msg };
+			} else if (e.response?.status === 429) {
+				return { error: e.response.data.msg };
+			}
 		}
-
 		return { error: "Something went wrong, try again." };
 	}
 };

@@ -29,7 +29,7 @@ const useSwapProductModal = create<swapProductModalStore>((set, get) => ({
 			isOpen: true,
 		}),
 	addItem: (item: ItemProps) =>
-		set(state => ({
+		set(() => ({
 			isOpen: true,
 			items: [item],
 		})),
