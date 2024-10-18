@@ -318,7 +318,12 @@ export const AuthController = {
 
 		res
 			.status(StatusCodes.OK)
-			.json({ message: "OTP verified", success: true, jwtToken });
+			.json({
+				message: "OTP verified",
+				success: true,
+				jwtToken,
+				role: user.role,
+			});
 	},
 	resendOtp: async (req, res) => {
 		if (!req.body.email) {
