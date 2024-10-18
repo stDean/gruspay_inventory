@@ -76,13 +76,13 @@ export const SideBar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
 	};
 
-	const handleLogout = async () => {
+	const handleLogout = () => {
+		router.push("/welcome");
+		Logout();
 		dispatch(setLoggedInUser(false));
 		dispatch(setToken(""));
 		dispatch(setEmail(""));
 		dispatch(setUser({}));
-		await Logout();
-		router.push("/welcome");
 	};
 
 	const sidebarClassNames = `fixed flex flex-col ${
@@ -104,7 +104,7 @@ export const SideBar = () => {
 					alt="logo"
 					width={isSidebarCollapsed ? 250 : 150}
 					height={isSidebarCollapsed ? 250 : 150}
-          priority
+					priority
 				/>
 
 				<button
