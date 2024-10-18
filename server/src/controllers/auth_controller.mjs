@@ -11,7 +11,7 @@ import {
 	cancelSubscription,
 	getCustomerSubscriptions,
 } from "./paystack.c.mjs";
-import { my_plans } from "../constants.mjs";
+import { my_plans } from "../utils/constants.mjs";
 
 const handleOtpForCompany = async email => {
 	const { token, expires } = await generateVerificationToken(email);

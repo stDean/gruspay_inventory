@@ -1,5 +1,5 @@
 import Paystack from "@paystack/paystack-sdk";
-import { my_plans } from "../constants.mjs";
+import { my_plans } from "../utils/constants.mjs";
 const paystack = new Paystack(process.env.PAYSTACKSECRETKEY);
 
 // this makes you get the customer and authorization keys from pay-stack
