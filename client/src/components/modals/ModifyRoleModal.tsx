@@ -14,10 +14,10 @@ import { Modal } from "./Modal";
 export const ModifyRoleModal = () => {
 	const modifyModal = useModifyRoleModal();
 	const { token } = useReduxState();
-	const [role, setRole] = useState(modifyModal!.user!.role!);
+	const [role, setRole] = useState(modifyModal!.user!?.role!);
 
 	useEffect(() => {
-		setRole(modifyModal!.user!.role!);
+		setRole(modifyModal!.user!?.role!);
 	}, [modifyModal.isOpen]);
 
 	const headerContent = (
@@ -46,19 +46,19 @@ export const ModifyRoleModal = () => {
 			<div className="flex items-center p-6 w-full gap-4">
 				<div className="flex-1">
 					<p className="text-sm font-semibold">First Name</p>
-					<Input disabled value={modifyModal!.user!.first_name} />
+					<Input disabled value={modifyModal!.user!?.first_name} />
 				</div>
 
 				<div className="flex-1">
 					<p className="text-sm font-semibold">First Name</p>
-					<Input disabled value={modifyModal!.user!.last_name} />
+					<Input disabled value={modifyModal!.user!?.last_name} />
 				</div>
 			</div>
 
 			<div className="flex items-center p-6 pt-2 w-full  gap-4">
 				<div className="flex-1">
 					<p className="text-sm font-semibold">Email</p>
-					<Input disabled value={modifyModal!.user!.email} />
+					<Input disabled value={modifyModal!.user!?.email} />
 				</div>
 
 				<div className="flex-1">
@@ -83,7 +83,7 @@ export const ModifyRoleModal = () => {
 			<hr />
 
 			<div className="px-6 py-4 flex justify-end">
-				<Button onClick={() => handleUpdate(modifyModal!.user!.id!)}>
+				<Button onClick={() => handleUpdate(modifyModal!.user!?.id!)}>
 					Update Role
 				</Button>
 			</div>

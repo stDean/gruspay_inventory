@@ -30,21 +30,21 @@ export const SoldDetailModal = () => {
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Name"
-						value={productDetails.product!.product_name!}
+						value={productDetails.product!?.product_name!}
 					/>
 					<MyInput
 						label="Serial Number"
-						value={productDetails.product!.serial_no!}
+						value={productDetails.product!?.serial_no!}
 					/>
 				</div>
 				<div className="flex items-center gap-4">
 					<MyInput
 						label="Product Price"
-						value={productDetails.product!.price!}
+						value={productDetails.product!?.price!}
 					/>
 					<MyInput
 						label="Bought For"
-						value={productDetails.product!.bought_for!}
+						value={productDetails.product!?.bought_for!}
 					/>
 				</div>
 			</div>
@@ -57,11 +57,11 @@ export const SoldDetailModal = () => {
 				<div className="flex items-center gap-4 ">
 					<MyInput
 						label="Supplier Name"
-						value={productDetails.product!.Supplier.supplier_name!}
+						value={productDetails.product!?.Supplier.supplier_name!}
 					/>
 					<MyInput
 						label="Supplier Phone Number"
-						value={productDetails.product!.Supplier.supplier_phone_no!}
+						value={productDetails.product!?.Supplier.supplier_phone_no!}
 					/>
 				</div>
 			</div>
@@ -74,11 +74,11 @@ export const SoldDetailModal = () => {
 				<div className="flex items-center gap-4 ">
 					<MyInput
 						label="Customer Name"
-						value={productDetails.product!.Customer!.buyer_name!}
+						value={productDetails.product!?.Customer!.buyer_name!}
 					/>
 					<MyInput
 						label="Customer Number"
-						value={productDetails.product!.Customer!.buyer_phone_no!}
+						value={productDetails.product!?.Customer!.buyer_phone_no!}
 					/>
 				</div>
 			</div>
