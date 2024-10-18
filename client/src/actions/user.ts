@@ -6,11 +6,14 @@ import { z } from "zod";
 
 export const getUser = async ({ token }: { token: string }) => {
 	try {
-		const { data } = await axios.get("http://localhost:5001/api/user/getUser", {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		});
+		const { data } = await axios.get(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getUser`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
 
 		return { data };
 	} catch (e: any) {
@@ -35,7 +38,7 @@ export const getUserById = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/user/getUser/${id}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getUser/${id}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -62,7 +65,7 @@ export const getUserById = async ({
 export const getUsers = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/user/getUsers",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getUsers`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -101,7 +104,7 @@ export const updateUser = async ({
 	try {
 		const { email, password, first_name, last_name } = validateFields.data;
 		const { data } = await axios.patch(
-			"http://localhost:5001/api/user/updateUser",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/updateUser`,
 			{ email, password, first_name, last_name },
 			{
 				headers: {
@@ -142,7 +145,7 @@ export const createUser = async ({
 
 	try {
 		const { data } = await axios.post(
-			"http://localhost:5001/api/user/createUser",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/createUser`,
 			{ ...validateFields.data, role },
 			{
 				headers: {
@@ -178,7 +181,7 @@ export const updateUserRole = async ({
 }) => {
 	try {
 		const { data } = await axios.patch(
-			`http://localhost:5001/api/user/updateUserRole/${id}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/updateUserRole/${id}`,
 			{ role },
 			{
 				headers: {
@@ -207,7 +210,7 @@ export const updateUserRole = async ({
 export const getSuppliers = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/user/getSuppliers",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getSuppliers`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -238,7 +241,7 @@ export const getSupplier = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/user/getSupplier/${id}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getSupplier/${id}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -266,7 +269,7 @@ export const getSupplier = async ({
 export const getCustomers = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/user/getCustomers",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getCustomers`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -297,7 +300,7 @@ export const getCustomer = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/user/getCustomer/${id}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getCustomer/${id}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -325,7 +328,7 @@ export const getCustomer = async ({
 export const getCreditors = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/user/getCreditors",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getCreditors`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -356,7 +359,7 @@ export const getCreditor = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/user/getCreditor/${id}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/getCreditor/${id}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -392,7 +395,7 @@ export const updateCompanyPlan = async ({
 }) => {
 	try {
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/updateSubscription",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/updateSubscription`,
 			{ payment_plan, billingType },
 			{
 				headers: { Authorization: `Bearer ${token}` },
@@ -420,7 +423,7 @@ export const updateCompanyPlan = async ({
 export const cancelCompanyPlan = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/cancelSubscription",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/cancelSubscription`,
 			{},
 			{
 				headers: { Authorization: `Bearer ${token}` },

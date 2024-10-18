@@ -17,10 +17,13 @@ export const Login = async ({
 
 	try {
 		const { email, password } = validatedFields.data;
-		const res = await axios.post("http://localhost:5001/api/auth/login", {
-			email,
-			password,
-		});
+		const res = await axios.post(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`,
+			{
+				email,
+				password,
+			}
+		);
 		if (res.status === 200) {
 			const cookieStore = cookies();
 			cookieStore.set("user", JSON.stringify(res.data.jwtToken), {
@@ -61,7 +64,7 @@ export const ResetOTP = async ({
 	try {
 		const { email, password } = validatedFields.data;
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/resetOtp",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/resetOtp`,
 			{ email, password }
 		);
 		return data;
@@ -87,7 +90,7 @@ export const VerifyOTPAndUpdatePass = async ({
 }) => {
 	try {
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/updatePassword",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/updatePassword`,
 			{ email, password, otp }
 		);
 		return { success: true, data };

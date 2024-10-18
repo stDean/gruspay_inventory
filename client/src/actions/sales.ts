@@ -5,7 +5,7 @@ import axios from "axios";
 export const getSoldProductsByCount = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/inventory/getSoldProductsByCount",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSoldProductsByCount`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ export const getSoldProductsByName = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/inventory/getSoldProducts/${type}/${brand}/${name}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSoldProducts/${type}/${brand}/${name}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -61,7 +61,7 @@ export const getSoldProductsByName = async ({
 export const getSwapProductsByCount = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/inventory/getSwapProductsByCount",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSwapProductsByCount`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ export const getSwapProductsByName = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/inventory/getSwapProducts/${type}/${brand}/${name}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSwapProducts/${type}/${brand}/${name}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

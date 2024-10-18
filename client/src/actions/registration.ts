@@ -22,7 +22,7 @@ export const SendOTP = async ({
 			validatedFields.data;
 
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/createCompany",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/createCompany`,
 			{
 				company_email: email,
 				password,
@@ -46,7 +46,7 @@ export const SendOTP = async ({
 export const ResendOTP = async ({ email }: { email: string }) => {
 	try {
 		const { data } = await axios.post(
-			"http://localhost:5001/api/auth/resendOTP",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/resendOTP`,
 			{ email }
 		);
 
@@ -79,10 +79,13 @@ export const verifyOTPToken = async ({
 	}
 
 	try {
-		const res = await axios.post("http://localhost:5001/api/auth/verifyOTP", {
-			company_email: email,
-			otp,
-		});
+		const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/verifyOTP`,
+			{
+				company_email: email,
+				otp,
+			}
+		);
 		if (res.status === 200) {
 			const cookieStore = cookies();
 			cookieStore.set("user", JSON.stringify(res.data.jwtToken), {

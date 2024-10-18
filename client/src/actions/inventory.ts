@@ -9,7 +9,8 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 		return { error: "No token provided" };
 	}
 
-	const URI = "http://localhost:5001/api/inventory/getProductsByStock";
+	const URI =
+		`${process.env.NEXT_PUBLIC_API_BASE_URL!}/api/inventory/getProductsByStock`;
 	try {
 		const { data } = await axios.get(URI, {
 			headers: {
@@ -42,7 +43,7 @@ export const getProductsByName = async ({
 	type: string;
 	brand: string;
 }) => {
-	const URI = `http://localhost:5001/api/inventory/getProducts/${type}/${brand}/${name}`;
+	const URI = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProducts/${type}/${brand}/${name}`;
 	try {
 		const { data } = await axios.get(URI, {
 			headers: {
@@ -91,7 +92,7 @@ export const addSingleProduct = async ({
 			supplier_email,
 		} = validatedFields.data;
 		const { data } = await axios.post(
-			"http://localhost:5001/api/inventory/createProduct",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/createProduct`,
 			{
 				product_name,
 				brand,
@@ -133,7 +134,7 @@ export const addMultipleProduct = async ({
 }) => {
 	try {
 		const { data } = await axios.post(
-			"http://localhost:5001/api/inventory/createProducts",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/createProducts`,
 			products,
 			{
 				headers: {
@@ -151,7 +152,7 @@ export const addMultipleProduct = async ({
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
 		}
-    return { error: "Something went wrong." };
+		return { error: "Something went wrong." };
 	}
 };
 
@@ -164,7 +165,7 @@ export const getProduct = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/inventory/getProduct/${serialNo}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProduct/${serialNo}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -204,7 +205,7 @@ export const sellProduct = async ({
 }) => {
 	try {
 		const { data } = await axios.patch(
-			`http://localhost:5001/api/inventory/sellProduct/${serialNo}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/sellProduct/${serialNo}`,
 			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no },
 			{
 				headers: {
@@ -230,7 +231,7 @@ export const sellProduct = async ({
 export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/inventory/getAllProducts",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getAllProducts`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -247,7 +248,7 @@ export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
-    return { error: "Something went wrong..." };
+		return { error: "Something went wrong..." };
 	}
 };
 
@@ -278,7 +279,7 @@ export const swapProducts = async ({
 }: SwapProductsProps) => {
 	try {
 		const { data } = await axios.patch(
-			"http://localhost:5001/api/inventory/swapProducts",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/swapProducts`,
 			{
 				incoming,
 				outgoing,
@@ -311,7 +312,7 @@ export const swapProducts = async ({
 export const getInventoryStats = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(
-			"http://localhost:5001/api/inventory/getInventoryStats",
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getInventoryStats`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -352,7 +353,7 @@ export const getDashboardStats = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/inventory/getDashboardStats?soldYear=${soldYear}&soldMonth=${soldMonth}&sellerMonth=${sellerMonth}&sellerYear=${sellerYear}&tssYear=${tssYear}&tssMonth=${tssMonth}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getDashboardStats?soldYear=${soldYear}&soldMonth=${soldMonth}&sellerMonth=${sellerMonth}&sellerYear=${sellerYear}&tssYear=${tssYear}&tssMonth=${tssMonth}`,
 			{
 				headers: { Authorization: `Bearer ${token}` },
 			}
@@ -380,7 +381,7 @@ export const getBarChartData = async ({
 }) => {
 	try {
 		const { data } = await axios.get(
-			`http://localhost:5001/api/inventory/getBarChartData?barYear=${barYear}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getBarChartData?barYear=${barYear}`,
 			{
 				headers: { Authorization: `Bearer ${token}` },
 			}
@@ -411,7 +412,7 @@ export const updateSoldProduct = async ({
 }) => {
 	try {
 		const { data } = await axios.patch(
-			`http://localhost:5001/api/inventory/updateBalance/${id}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/updateBalance/${id}`,
 			{ amount },
 			{
 				headers: {
