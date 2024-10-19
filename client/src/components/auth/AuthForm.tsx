@@ -96,7 +96,9 @@ export const AuthForm = () => {
 				return;
 			}
 
-			const { error, success } = await Login({ values: data });
+			const { error, success } = await Login({
+				values: { email: data.email, password: data.password },
+			});
 			if (error) {
 				toast.error("Error", {
 					description: error,
