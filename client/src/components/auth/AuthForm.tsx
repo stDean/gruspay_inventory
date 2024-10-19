@@ -63,9 +63,6 @@ export const AuthForm = () => {
 					payment_plan: payment.plan.toUpperCase(),
 				};
 
-				console.log({ ...values, a: payment.type });
-				return;
-
 				if (values.password !== values.confirmPassword) {
 					toast.error("Error", {
 						description: "Passwords do not match",
