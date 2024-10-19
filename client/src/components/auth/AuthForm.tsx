@@ -47,10 +47,8 @@ export const AuthForm = () => {
 	const form = useForm<z.infer<typeof AuthSchema>>({
 		resolver: zodResolver(AuthSchema),
 		defaultValues: {
-			company_name: "",
 			email: "",
 			password: "",
-			confirmPassword: "",
 		},
 	});
 
@@ -96,9 +94,7 @@ export const AuthForm = () => {
 				return;
 			}
 
-			const { error, success } = await Login({
-				values: { email: data.email, password: data.password },
-			});
+			const { error, success } = await Login({ values: data });
 			if (error) {
 				toast.error("Error", {
 					description: error,
