@@ -39,14 +39,18 @@ export const AuthForm = () => {
 		typeof localStorage !== "undefined" &&
 		JSON.parse(localStorage.getItem("plan") as string);
 
-	const selectedPlan = plan ? plan.plan : "Personal";
-	const [payment, setPayment] = useState<string>(selectedPlan);
+	const [payment, setPayment] = useState<{ plan: string; type: string }>({
+		plan: plan ? plan.plan : "Personal",
+		type: plan ? plan.per : "Month",
+	});
 
 	const form = useForm<z.infer<typeof AuthSchema>>({
 		resolver: zodResolver(AuthSchema),
 		defaultValues: {
+			company_name: "",
 			email: "",
 			password: "",
+			confirmPassword: "",
 		},
 	});
 
@@ -56,8 +60,11 @@ export const AuthForm = () => {
 				const values = {
 					...data,
 					country: country?.label,
-					payment_plan: payment.toUpperCase(),
+					payment_plan: payment.plan.toUpperCase(),
 				};
+
+				console.log({ ...values, a: payment.type });
+				return;
 
 				if (values.password !== values.confirmPassword) {
 					toast.error("Error", {
@@ -69,7 +76,7 @@ export const AuthForm = () => {
 
 				const { error, success } = await SendOTP({
 					values,
-					billingType: plan.per,
+					billingType: payment.type,
 				});
 
 				if (error) {
@@ -86,6 +93,8 @@ export const AuthForm = () => {
 					router.push(success.transaction.authorization_url);
 
 					form.reset();
+					typeof localStorage !== "undefined" &&
+						localStorage.removeItem("plan");
 				}
 				return;
 			}
@@ -105,6 +114,7 @@ export const AuthForm = () => {
 				toast.success("Success", {
 					description: "Login successfully",
 				});
+
 				router.push("/dashboard");
 				form.reset();
 			}
@@ -158,26 +168,49 @@ export const AuthForm = () => {
 								<p className="text-sm text-gray-700 font-medium mb-1">
 									Select Plan
 								</p>
+								<div className="space-y-4 md:space-y-0 md:flex md:gap-4">
+									<CustomSelect
+										label="Select Plan"
+										items={
+											<>
+												{PAYMENT_PLANS.map(type => (
+													<SelectItem
+														value={type}
+														key={type}
+														className="capitalize"
+													>
+														{type}
+													</SelectItem>
+												))}
+											</>
+										}
+										handleChange={(value: string) =>
+											setPayment({ ...payment, plan: value })
+										}
+										value={payment.plan}
+									/>
 
-								<CustomSelect
-									label="Select Plan"
-									disabled
-									items={
-										<>
-											{PAYMENT_PLANS.map(type => (
-												<SelectItem
-													value={type}
-													key={type}
-													className="capitalize"
-												>
-													{type}
-												</SelectItem>
-											))}
-										</>
-									}
-									handleChange={(value: string) => setPayment(value)}
-									value={payment}
-								/>
+									<CustomSelect
+										label="Select Type"
+										items={
+											<>
+												{["Month", "Year"].map(type => (
+													<SelectItem
+														value={type}
+														key={type}
+														className="capitalize"
+													>
+														{type}
+													</SelectItem>
+												))}
+											</>
+										}
+										handleChange={(value: string) =>
+											setPayment({ ...payment, type: value })
+										}
+										value={payment.type}
+									/>
+								</div>
 							</div>
 						</>
 					)}

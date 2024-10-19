@@ -15,7 +15,7 @@ export default function page() {
 					className="bg-blue-500 hover:bg-blue-400 md:py-6 md:px-10 md:text-lg"
 					asChild
 				>
-					<Link href="#plan">Get Started</Link>
+					<Link href="/login">Login</Link>
 				</Button>
 			</div>
 
@@ -47,6 +47,10 @@ export default function page() {
 							</h1>
 							<p className="text-sm md:text-lg">
 								Select the plan that best suits your business.
+							</p>
+
+							<p className="text-sm md:text-lg font-semibold mt-2">
+								Start your 7-day free trial today!
 							</p>
 						</div>
 

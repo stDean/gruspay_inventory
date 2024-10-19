@@ -214,7 +214,7 @@ export const AuthController = {
 				password: hashedPassword,
 				paymentStatus: "INACTIVE",
 				billingPlan: billingPlan.toUpperCase(),
-				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
+				billingType: billingType.toLowerCase() === "year" ? "YEARLY" : "MONTHLY",
 			},
 		});
 

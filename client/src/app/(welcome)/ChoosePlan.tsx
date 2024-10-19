@@ -128,7 +128,7 @@ export const ChoosePlan = () => {
 					plan="Personal"
 					amount={type === "yearly" ? "₦14,800" : "₦18,500"}
 					yearFees={type === "yearly" ? "₦177,600" : "₦222,000"}
-					per={type === "monthly" ? "month" : "year"}
+					per={type === "monthly" ? "Month" : "Year"}
 					val="70"
 					users="One User"
 				/>
@@ -136,23 +136,23 @@ export const ChoosePlan = () => {
 					plan="Team"
 					amount={type === "yearly" ? "₦19,200" : "₦24,000"}
 					yearFees={type === "yearly" ? "₦230,400" : "₦288,000"}
-					per={type === "monthly" ? "month" : "year"}
+					per={type === "monthly" ? "Month" : "Year"}
 					val="150"
 					users="Up to 3 users"
 					supplier
-					supplierText="Supplier information"
+					supplierText="Supplier's information"
 				/>
 				<Card
 					plan="Enterprise"
 					amount={type === "yearly" ? "₦29,000" : "₦36,500"}
 					yearFees={type === "yearly" ? "₦348,000" : "₦438,000"}
-					per={type === "monthly" ? "month" : "year"}
+					per={type === "monthly" ? "Month" : "Year"}
 					val="250"
 					users="Up to 5 users"
 					supplier
-					supplierText="Supplier information"
+					supplierText="Supplier's information"
 					customer
-					customerText="Customers and Creditors information"
+					customerText="Customer's and Creditor's information"
 				/>
 			</div>
 		</div>

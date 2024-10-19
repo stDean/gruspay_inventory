@@ -81,7 +81,7 @@ export interface UserProps {
 		expires: string;
 		cancelable: boolean;
 		paymentStatus: string;
-    canUpdate: boolean
+		canUpdate: boolean;
 	};
 }
 
