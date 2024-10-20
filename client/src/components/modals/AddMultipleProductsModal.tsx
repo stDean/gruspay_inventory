@@ -100,7 +100,7 @@ export const AddMultipleProductsModal = () => {
 
 	const handleUpload = useCallback(() => {
 		setProgress({ percentage: 0, show: true });
-		const products = data.filter(product => product?.product_name !== "");
+		const products = data.filter(product => product["Product Name"] !== "");
 		dispatch(setPreviewProducts(products));
 		setProgress({ percentage: 100, show: true });
 		setTimeout(() => {
@@ -108,6 +108,15 @@ export const AddMultipleProductsModal = () => {
 			addMultipleProductModal.onClose();
 		}, 500);
 	}, [setProgress, data, dispatch, router, addMultipleProductModal]);
+
+	const downloadTemplate = () => {
+		const aTag = document.createElement("a");
+		aTag.href = `${process.env.NEXT_PUBLIC_API_BASE_URL2}/temp.xlsx`;
+		aTag.setAttribute("download", "temp.xlsx");
+		document.body.appendChild(aTag);
+		aTag.click();
+		aTag.remove();
+	};
 
 	const headerContent = (
 		<div className="flex flex-col gap-1">
@@ -127,20 +136,17 @@ export const AddMultipleProductsModal = () => {
 					<li>You can import a maximum of 100 items </li>
 				</ul>
 
-				<p className="text-[#FF4405] text-lg font-semibold mt-4 flex gap-2 items-center cursor-pointer">
+				<p
+					className="text-[#FF4405] text-lg font-semibold mt-4 flex gap-2 items-center cursor-pointer"
+					onClick={downloadTemplate}
+				>
 					Download template <Download className="h-5 w-5" />
 				</p>
 			</div>
 
 			<div className="border-2 border-[#EAECF0] rounded-md py-5">
 				<DropzoneContainer
-					acceptedType={{
-						"text/plain": [],
-						"text/csv": [],
-						"application/vnd.ms-excel": [],
-						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-							[],
-					}}
+					acceptedType={{ "text/csv": [] }}
 					handleDropAccepted={handleDropAccepted}
 					handleDropRejected={handleDropRejected}
 					notPend="CSV (max 5mb)"

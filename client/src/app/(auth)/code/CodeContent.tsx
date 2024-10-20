@@ -32,17 +32,21 @@ export const CodeContent = () => {
 			}
 
 			if (error) {
-				toast.error("Error", {
-					description: error,
-				});
+				toast.error("Error", { description: error });
 				return;
 			}
 		});
 	};
 
-	const resendOTP = () => {
+	const resendOTP = (email: string) => {
 		startTransition(async () => {
-			await ResendOTP({ email });
+			const { error, data } = await ResendOTP({ email });
+			if (error) {
+				toast.error("Error", { description: error });
+				return;
+			}
+
+			toast.success("Success", { description: data.message });
 		});
 	};
 
@@ -64,7 +68,9 @@ export const CodeContent = () => {
 				Didn't get OTP?{" "}
 				<span
 					className="font-semibold text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
-					onClick={resendOTP}
+					onClick={() => {
+						resendOTP(email);
+					}}
 				>
 					Resend Code
 				</span>

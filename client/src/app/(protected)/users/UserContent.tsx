@@ -110,7 +110,7 @@ export const UserContent = () => {
 					user?.role === "ADMIN" && (
 						<>
 							<Button
-								className="px-6 py-5 hover:opacity-90"
+								className="text-sm md:text-base md:px-6 md:py-5 hover:opacity-90"
 								onClick={userModal.onOpen}
 							>
 								Add User

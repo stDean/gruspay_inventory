@@ -9,7 +9,7 @@ export const initializeSubscription = async ({ email, amount }) => {
 		email,
 		amount,
 		channels: ["card"],
-		callback_url: process.env.REDIRECT_URL,
+		callback_url: "http://localhost:3000/code",
 	});
 
 	if (initializeTransactionRes.status === false) {

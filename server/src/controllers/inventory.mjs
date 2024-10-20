@@ -162,21 +162,21 @@ export const InventoryCtrl = {
 		for (const product of req.body) {
 			try {
 				const supplier = await getOrCreateSupplier({
-					supplier_email: product.supplier_email,
-					supplier_name: product.supplier_name,
-					supplier_phone_no: product.supplier_phone_no,
+					supplier_email: product["Supplier Email"],
+					supplier_name: product["Supplier Name"],
+					supplier_phone_no: product["Supplier Phone Number"],
 					companyId: company.id,
 				});
 
 				// Now create the product with the connected supplier
 				const result = await prisma.products.create({
 					data: {
-						product_name: product.product_name,
-						brand: product.brand,
-						description: product.description,
-						type: product.type,
-						price: product.price,
-						serial_no: product.serial_no,
+						product_name: product["Product Name"],
+						brand: product.Brand,
+						description: product.Description,
+						type: product["Item Type"],
+						price: product.Price,
+						serial_no: product["Serial Number"],
 						Company: {
 							connect: { id: company.id },
 						},

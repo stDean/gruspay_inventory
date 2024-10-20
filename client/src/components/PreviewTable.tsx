@@ -59,22 +59,22 @@ const PreviewTableData = ({
 				<TableBody>
 					{productsByPage.map((item, idx) => (
 						<TableRow
-							key={`${item.product_name} ${idx}`}
+							key={`${item["Product Name"]} ${idx}`}
 							className="hover:!bg-none"
 						>
 							<TableCell className="border-r">{idx + 1}</TableCell>
 							<TableCell className="border-r capitalize">
-								{item.serial_no}
+								{item["Serial Number"]}
 							</TableCell>
 							<TableCell className="border-r capitalize">
-								{item.product_name}
+								{item["Product Name"]}
 							</TableCell>
 							<TableCell className="border-r capitalize">
-								{item.brand}
+								{item.Brand}
 							</TableCell>
-							<TableCell className="border-r capitalize">{item.type}</TableCell>
-							<TableCell className="border-r">{item.price}</TableCell>
-							<TableCell className="border-r">{item.supplier_name}</TableCell>
+							<TableCell className="border-r capitalize">{item["Item Type"]}</TableCell>
+							<TableCell className="border-r">{item.Price}</TableCell>
+							<TableCell className="border-r">{item["Supplier Name"]}</TableCell>
 						</TableRow>
 					))}
 				</TableBody>

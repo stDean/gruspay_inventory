@@ -214,7 +214,8 @@ export const AuthController = {
 				password: hashedPassword,
 				paymentStatus: "INACTIVE",
 				billingPlan: billingPlan.toUpperCase(),
-				billingType: billingType.toLowerCase() === "year" ? "YEARLY" : "MONTHLY",
+				billingType:
+					billingType.toLowerCase() === "year" ? "YEARLY" : "MONTHLY",
 			},
 		});
 
@@ -316,14 +317,12 @@ export const AuthController = {
 			company_id: user.companyId,
 		});
 
-		res
-			.status(StatusCodes.OK)
-			.json({
-				message: "OTP verified",
-				success: true,
-				jwtToken,
-				role: user.role,
-			});
+		res.status(StatusCodes.OK).json({
+			message: "OTP verified",
+			success: true,
+			jwtToken,
+			role: user.role,
+		});
 	},
 	resendOtp: async (req, res) => {
 		if (!req.body.email) {
@@ -332,14 +331,16 @@ export const AuthController = {
 				.json({ msg: "Email is required", success: false });
 		}
 
-		const existingUser = await prisma.users.findUnique({
-			where: { email: req.body.email },
+		console.log(req.body);
+
+		const existingCompany = await prisma.company.findUnique({
+			where: { company_email: req.body.email },
 		});
 
-		if (!existingUser) {
+		if (!existingCompany) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
-				.json({ msg: "No user was found with that email" });
+				.json({ msg: "No company was found with that email" });
 		}
 
 		const existingToken = await prisma.otp.findFirst({
