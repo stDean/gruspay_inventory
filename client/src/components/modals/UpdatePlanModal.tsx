@@ -46,7 +46,7 @@ export const UpdatePlanModal = () => {
 
 	const headerContent = (
 		<>
-			<h1 className="text-xl font-semibold text-black">Add New User</h1>
+			<h1 className="text-xl font-semibold text-black">Update Plan</h1>
 		</>
 	);
 
