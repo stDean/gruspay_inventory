@@ -9,8 +9,6 @@ interface ModalProps {
 	onClose: () => void;
 	headerContent?: ReactElement;
 	body?: ReactElement;
-	secondaryAction?: () => void;
-	secondaryActionLabel?: string;
 	disabled?: boolean;
 	actionLabel?: string;
 	onSubmit: () => void;
@@ -25,8 +23,6 @@ export const Modal = ({
 	onClose,
 	headerContent,
 	body,
-	secondaryAction,
-	secondaryActionLabel,
 	disabled,
 	actionLabel,
 	onSubmit,
@@ -55,14 +51,6 @@ export const Modal = ({
 
 		onSubmit();
 	}, [onSubmit, disabled]);
-
-	const handleSecondaryAction = useCallback(() => {
-		if (disabled || !secondaryAction) {
-			return;
-		}
-
-		secondaryAction();
-	}, [secondaryAction, disabled]);
 
 	if (!isOpen) {
 		return null;
@@ -101,15 +89,6 @@ export const Modal = ({
 							{footer && (
 								<div className="border-t flex flex-col gap-2 px-6 py-6">
 									<div className="flex flex-row items-center gap-4 w-full">
-										{secondaryAction && secondaryActionLabel && (
-											<Button
-												disabled={disabled}
-												onClick={handleSecondaryAction}
-											>
-												{secondaryActionLabel}
-											</Button>
-										)}
-
 										{actionLabel && (
 											<Button
 												disabled={disabled}

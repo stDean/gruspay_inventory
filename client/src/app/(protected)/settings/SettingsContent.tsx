@@ -1,15 +1,11 @@
 "use client";
 
-import { cancelCompanyPlan, getUser, updateCompanyPlan } from "@/actions/user";
-import { useAppDispatch } from "@/app/redux";
 import { UserSettingsForm } from "@/components/auth/UserSettingsForm";
 import { Billing } from "@/components/Billing";
 import { Tab } from "@/components/Tab";
 import { useReduxState } from "@/hook/useRedux";
 import { BillingPlanType } from "@/lib/utils";
-import { setUser } from "@/state";
-import { useCallback, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
 enum Plans {
 	"Personal" = 0,
@@ -18,9 +14,7 @@ enum Plans {
 }
 
 export const SettingsContent = () => {
-	const dispatch = useAppDispatch();
-	const { token, user, companyDetails } = useReduxState();
-	const [isPending, startTransition] = useTransition();
+	const { user, companyDetails } = useReduxState();
 	const [tab, setTab] = useState<{
 		billing: boolean;
 		security: boolean;
@@ -33,7 +27,9 @@ export const SettingsContent = () => {
 	const planKey = Object.keys(Plans)
 		.filter(key => isNaN(Number(key))) // Filter out numeric values from enum
 		.find(key =>
-			key.toLowerCase().includes(companyDetails?.billingPlan?.toLowerCase() as string)
+			key
+				.toLowerCase()
+				.includes(companyDetails?.billingPlan?.toLowerCase() as string)
 		);
 
 	// Get the corresponding index (numeric value) of the plan from the enum
@@ -50,52 +46,8 @@ export const SettingsContent = () => {
 		}));
 	};
 
-	// re fetch user
-	const setUserState = useCallback(async () => {
-		const { data } = await getUser({ token });
-		dispatch(setUser(data.userInDb));
-	}, [token, user]);
-
-	const matchers = {
-		Personal: "PERSONAL",
-		Team: "TEAM",
-		Enterprise: "ENTERPRISE",
-	};
-
-	const handleUpdate = () => {
-		startTransition(async () => {
-			const { error } = await updateCompanyPlan({
-				token,
-				payment_plan: matchers[options.billingPlan.title].toUpperCase(),
-				billingType: billingType === "monthly" ? "month" : "year",
-			});
-
-			if (error) {
-				toast.error("Error", { description: error });
-				return;
-			}
-
-			toast.success("Success", {
-				description:
-					"Subscription updated. Your plan will change when the current one expires.",
-			});
-			setUserState();
-		});
-	};
-
-	const handleCancelPlan = () => {
-		startTransition(async () => {
-			const { error } = await cancelCompanyPlan({ token });
-			if (error) {
-				toast.error("Error", { description: error });
-				return;
-			}
-
-			toast.success("Success", {
-				description: "Your subscription has been successfully canceled.",
-			});
-			setUserState();
-		});
+	const sendPlanAndType = () => {
+		return { billingType: billingType === "monthly" ? "month" : "year" };
 	};
 
 	return (
@@ -175,9 +127,7 @@ export const SettingsContent = () => {
 					onChange={handleChange}
 					type={billingType}
 					plan={planKey}
-					handleClick={handleUpdate}
-					isPending={isPending}
-					handleCancelPlan={handleCancelPlan}
+					sendPlanAndType={sendPlanAndType}
 				/>
 			)}
 		</div>

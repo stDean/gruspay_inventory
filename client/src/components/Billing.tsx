@@ -8,9 +8,7 @@ interface BillingProps {
 	onChange: (value: (typeof BillingPlanType.options)[number]) => void;
 	type: string;
 	plan?: string;
-	handleClick: () => void;
-	isPending?: boolean;
-  handleCancelPlan: () => void
+	sendPlanAndType: () => { billingType: string };
 }
 
 export const Billing = ({
@@ -18,9 +16,7 @@ export const Billing = ({
 	onChange,
 	type,
 	plan,
-	handleClick,
-	isPending,
-  handleCancelPlan
+	sendPlanAndType,
 }: BillingProps) => {
 	return (
 		<div className="lg:w-[70vw]">
@@ -29,9 +25,7 @@ export const Billing = ({
 				onChange={onChange}
 				type={type}
 				plan={plan}
-				handleClick={handleClick}
-				isPending={isPending}
-        handleCancelPlan={handleCancelPlan}
+				sendPlanAndType={sendPlanAndType}
 			/>
 		</div>
 	);

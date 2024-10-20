@@ -1,19 +1,19 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import useCancelPlanModal from "@/hook/useCancelPlanModal";
 import { useReduxState } from "@/hook/useRedux";
+import useUpdatePlanModal from "@/hook/useUpdatePlanModal";
 import { BillingPlanType, cn } from "@/lib/utils";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
 import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface PlanButtonsProps {
 	options: { billingPlan: (typeof BillingPlanType.options)[number] };
 	onChange: (value: (typeof BillingPlanType.options)[number]) => void;
 	type: string;
 	plan?: string;
-	handleClick: () => void;
-	isPending?: boolean;
-	handleCancelPlan: () => void;
+	sendPlanAndType: () => { billingType: string };
 }
 
 export const PlanButtons = ({
@@ -21,11 +21,12 @@ export const PlanButtons = ({
 	onChange,
 	type,
 	plan,
-	handleClick,
-	isPending,
-	handleCancelPlan,
+	sendPlanAndType,
 }: PlanButtonsProps) => {
 	const { companyDetails } = useReduxState();
+	const cancelModal = useCancelPlanModal();
+	const updateModal = useUpdatePlanModal();
+
 	const matcher: { [key: string]: string } = {
 		MONTHLY: "monthly",
 		YEARLY: "yearly",
@@ -115,14 +116,25 @@ export const PlanButtons = ({
 													onClick={
 														option.title === plan &&
 														type === matcher[matchVal as string]
-															? handleCancelPlan
-															: handleClick
+															? () => {
+																	const res = sendPlanAndType();
+																	cancelModal.onOpen({
+																		payment_plan: option.title,
+																		billingType: res.billingType,
+																	});
+															  }
+															: () => {
+																	const res = sendPlanAndType();
+																	updateModal.onOpen({
+																		payment_plan: option.title,
+																		billingType: res.billingType,
+																	});
+															  }
 													}
 													disabled={
 														(option.title === plan &&
 															type === matcher[matchVal as string] &&
 															!companyDetails?.cancelable) ||
-														isPending ||
 														!companyDetails?.canUpdate
 													}
 												>
