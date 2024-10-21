@@ -1,4 +1,4 @@
-import { Creditor } from "../Creditor";
+import { Creditor } from "./Creditor";
 
 interface ProductsProps {
 	params: { creditorId: string };

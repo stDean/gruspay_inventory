@@ -44,53 +44,62 @@ export const SoldContent = () => {
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
 			if (tab.sold) {
-				const { error, data } = await getSoldProductsByCount({ token });
-				if (error) {
-					toast.error("Error", { description: error });
+				const soldRes = await getSoldProductsByCount({ token });
+				if (soldRes?.error) {
+					toast.error("Error", { description: soldRes?.error });
 					return;
 				}
 
-				setProducts({ ...products, soldProducts: data });
+				setProducts({ ...products, soldProducts: soldRes?.data });
 				return;
 			}
 
 			if (tab.swapped) {
-				const { error, data } = await getSwapProductsByCount({ token });
-				if (error) {
-					toast.error("Error", { description: error });
+				const swapRes = await getSwapProductsByCount({ token });
+				if (swapRes?.error) {
+					toast.error("Error", { description: swapRes?.error });
 					return;
 				}
 
-				setProducts({ ...products, swappedProducts: data });
+				setProducts({ ...products, swappedProducts: swapRes?.data });
 				return;
 			}
 		});
 	}, [token, tab]);
 
 	const getInventoryStat = useCallback(async () => {
-		const { data } = await getInventoryStats({ token });
+		const res = await getInventoryStats({ token });
+
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+
 		if (tab.sold) {
 			setStats({
-				allCategory: data.allCategorySold.length,
-				stockCount: data.totalSalesCount,
-				totalPrice: data.totalSoldPrice,
-				topSeller: data.topSoldProduct.product_name,
+				allCategory: res?.data.allCategorySold.length,
+				stockCount: res?.data.totalSalesCount,
+				totalPrice: res?.data.totalSoldPrice,
+				topSeller: res?.data.topSoldProduct.product_name,
 			});
 			return;
 		}
 
 		setStats({
-			allCategory: data.allCategorySwap.length,
-			stockCount: data.totalSwapCount,
-			totalPrice: data.totalSwapPrice,
-			topSeller: data.topSoldProduct.product_name,
+			allCategory: res?.data.allCategorySwap.length,
+			stockCount: res?.data.totalSwapCount,
+			totalPrice: res?.data.totalSwapPrice,
+			topSeller: res?.data.topSoldProduct.product_name,
 		});
 	}, [token, tab]);
 
 	useEffect(() => {
 		getProducts();
+	}, [getProducts]);
+
+	useEffect(() => {
 		getInventoryStat();
-	}, [getProducts, tab]);
+	}, [getInventoryStat]);
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
@@ -142,7 +151,9 @@ export const SoldContent = () => {
 						count="Sales"
 					/>
 				) : (
-					<p className="text-center font-semibold text-2xl mt-20">No Products Sold Yet!</p>
+					<p className="text-center font-semibold text-2xl mt-20">
+						No Products Sold Yet!
+					</p>
 				))}
 
 			{tab.swapped &&
@@ -156,7 +167,9 @@ export const SoldContent = () => {
 						count="Swap"
 					/>
 				) : (
-					<p className="text-center font-semibold text-2xl mt-20">No Products Swapped Yet!</p>
+					<p className="text-center font-semibold text-2xl mt-20">
+						No Products Swapped Yet!
+					</p>
 				))}
 		</div>
 	);

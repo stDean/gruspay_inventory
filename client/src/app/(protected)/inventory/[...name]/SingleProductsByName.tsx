@@ -35,7 +35,7 @@ export const SingleProductsByName = ({
 				type,
 				brand,
 			});
-			if ('error' in res) {
+			if ("error" in res) {
 				toast.error("Error", { description: res.error });
 				return;
 			}
@@ -56,21 +56,26 @@ export const SingleProductsByName = ({
 
 	const productName = name.replace(/%20/g, " ");
 
+	if (products.length === 0) {
+		router.push("/inventory");
+		return null;
+	}
+
 	return isPending ? (
 		<Spinner />
-	) : products.length !== 0 ? (
-		<div className="-mt-4">
-			<ItemsHeader
-				addBrand
-				brands={brands}
-				routeTo="/inventory"
-				types={types}
-				productName={productName}
-			/>
-
-			<ProductsTable products={products} page={page} />
-		</div>
 	) : (
-		<p>No Product found</p>
+		products.length !== 0 && (
+			<div className="-mt-4">
+				<ItemsHeader
+					addBrand
+					brands={brands}
+					routeTo="/inventory"
+					types={types}
+					productName={productName}
+				/>
+
+				<ProductsTable products={products} page={page} />
+			</div>
+		)
 	);
 };

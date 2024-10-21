@@ -12,6 +12,7 @@ import { BarChartProps, DashboardProps } from "@/lib/types";
 import { formatCurrency, months } from "@/lib/utils";
 import { setUser } from "@/state";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 export const DashboardContent = () => {
 	const dispatch = useAppDispatch();
@@ -22,8 +23,13 @@ export const DashboardContent = () => {
 	const [data, setData] = useState<BarChartProps[]>();
 
 	const setUserState = useCallback(async () => {
-		const { data } = await getUser({ token });
-		dispatch(setUser(data.userInDb));
+		const res = await getUser({ token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+
+		dispatch(setUser(res?.data.userInDb));
 	}, [token, user]);
 
 	// filters
@@ -60,7 +66,7 @@ export const DashboardContent = () => {
 
 	const dashboardStats = useCallback(async () => {
 		startTransition(async () => {
-			const { data } = await getDashboardStats({
+			const res = await getDashboardStats({
 				token,
 				soldYear: selectedYears["dashYear"],
 				soldMonth:
@@ -79,18 +85,29 @@ export const DashboardContent = () => {
 						: "",
 			});
 
-			setDashboardStat(data);
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			setDashboardStat(res?.data);
 		});
 	}, [token, selectedYears, selectedMonths]);
 
 	// Bar data only fetched when needed, no need to trigger on filter change
 	const getBarData = useCallback(async () => {
 		startTransition(async () => {
-			const { data } = await getBarChartData({
+			const res = await getBarChartData({
 				token,
 				barYear: selectedYears["bar"],
 			});
-			setData(data.data);
+
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			setData(res?.data.data);
 		});
 	}, [token, selectedYears]);
 

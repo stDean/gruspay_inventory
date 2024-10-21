@@ -19,10 +19,10 @@ export const CodeContent = () => {
 	const verifyOTP = () => {
 		startTransition(async () => {
 			// verifyOTP
-			const { error, success } = await verifyOTPToken({ email, otp: value });
-			if (success) {
+			const res = await verifyOTPToken({ email, otp: value });
+			if (res?.success) {
 				dispatch(setLoggedInUser(true));
-				dispatch(setToken(success.jwtToken));
+				dispatch(setToken(res?.success.jwtToken));
 
 				router.push("/dashboard");
 				toast.success("Success", {
@@ -31,8 +31,8 @@ export const CodeContent = () => {
 				return;
 			}
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 		});
@@ -40,13 +40,13 @@ export const CodeContent = () => {
 
 	const resendOTP = (email: string) => {
 		startTransition(async () => {
-			const { error, data } = await ResendOTP({ email });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await ResendOTP({ email });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 
-			toast.success("Success", { description: data.message });
+			toast.success("Success", { description: res?.data.message });
 		});
 	};
 

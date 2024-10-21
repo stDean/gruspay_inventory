@@ -100,13 +100,13 @@ export const PreviewTable = () => {
 
 	const handleAddProducts = () => {
 		startTransition(async () => {
-			const { error } = await addMultipleProduct({
+			const res = await addMultipleProduct({
 				token,
 				products: previewProducts,
 			});
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				dispatch(setPreviewProducts([]));
 				setTimeout(() => {
 					router.push("/inventory");

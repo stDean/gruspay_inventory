@@ -12,7 +12,7 @@ import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export const AddProductForm = () => {
 	const [isPending, startTransition] = useTransition();
@@ -35,9 +35,9 @@ export const AddProductForm = () => {
 	});
 	const handleAddProduct = (data: z.infer<typeof AddProductSchema>) => {
 		startTransition(async () => {
-			const { error, status } = await addSingleProduct({ val: data, token });
-			if (status === 400 && error) {
-				toast.error("Error", { description: error });
+			const res = await addSingleProduct({ val: data, token });
+			if (res?.status === 400 && res?.error) {
+				toast.error("Error", { description: res?.error });
 				setTimeout(() => {
 					addSingleProductModal.onClose();
 					form.reset();
@@ -45,8 +45,8 @@ export const AddProductForm = () => {
 				return;
 			}
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 

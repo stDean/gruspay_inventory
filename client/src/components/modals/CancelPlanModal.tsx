@@ -23,9 +23,9 @@ export const CancelPlanModal = () => {
 
 	const handleCancelPlan = () => {
 		startTransition(async () => {
-			const { error } = await cancelCompanyPlan({ token });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await cancelCompanyPlan({ token });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 

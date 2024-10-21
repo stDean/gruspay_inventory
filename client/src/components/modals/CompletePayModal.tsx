@@ -30,14 +30,14 @@ export const CompletePayModal = () => {
 
 	const handlePay = useCallback((id: string, amount: string) => {
 		startTransition(async () => {
-			const { error } = await updateSoldProduct({
+			const res = await updateSoldProduct({
 				token,
 				amount,
 				id,
 			});
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 

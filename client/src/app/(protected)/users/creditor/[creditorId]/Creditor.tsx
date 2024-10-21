@@ -8,7 +8,7 @@ import useCompletePayModal from "@/hook/useCompletePayModal";
 import { useReduxState } from "@/hook/useRedux";
 import { CreditorProps } from "@/lib/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const Creditor = ({ id }: { id: string }) => {
@@ -21,27 +21,27 @@ export const Creditor = ({ id }: { id: string }) => {
 	const [isPending, startTransition] = useTransition();
 	const [creditor, setCreditor] = useState<CreditorProps | null>(null);
 
-	const getCreditorData = () => {
+	const getCreditorData = useCallback(() => {
 		startTransition(async () => {
-			const { data, error } = await getCreditor({ token, id });
-			if (error === "the redirect") {
+			const res = await getCreditor({ token, id });
+			if (res?.error === "the redirect") {
 				router.push("/users");
 				return;
 			}
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 
 				return;
 			}
 
-			setCreditor(data.creditor);
+			setCreditor(res?.data.creditor);
 		});
-	};
+	}, [id, token, router]);
 
 	useEffect(() => {
 		getCreditorData();
-	}, [completeModal.isOpen]);
+	}, [completeModal.isOpen, getCreditorData]);
 
 	// Early redirect if the company is on the PERSONAL plan
 	if (companyDetails?.billingPlan !== "ENTERPRISE") {

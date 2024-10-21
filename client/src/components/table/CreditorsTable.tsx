@@ -36,12 +36,12 @@ export const CreditorsTable = () => {
 
 	const getAllCreditors = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getCreditors({ token });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await getCreditors({ token });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
-			setCreditors(data.creditors);
+			setCreditors(res?.data.creditors);
 		});
 	}, [token]);
 

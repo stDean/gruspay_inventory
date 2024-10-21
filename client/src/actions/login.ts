@@ -67,7 +67,7 @@ export const ResetOTP = async ({
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/resetOtp`,
 			{ email, password }
 		);
-		return data;
+		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };

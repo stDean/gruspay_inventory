@@ -37,16 +37,16 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 	});
 
 	const showProduct = async (serialNo: string) => {
-		const { data, error } = await getProduct({
+		const res = await getProduct({
 			token,
 			serialNo,
 		});
-		if (error) {
-			toast.error("Error", { description: error });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
 			return;
 		}
 
-		productDetails.onOpen(data);
+		productDetails.onOpen(res?.data);
 	};
 
 	const tableHeaders = (

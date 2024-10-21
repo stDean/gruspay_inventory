@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { SelectContainer } from "./SelectContainer";
-import { SelectItem } from "./ui/select";
+import { SelectContainer } from "@/components/SelectContainer";
+import { SelectItem } from "@/components/ui/select";
 
 export const YearSelect = ({
 	startYear,

@@ -11,7 +11,7 @@ import useSwapProductModal, { ItemProps } from "@/hook/useSwapModal";
 import { setSingleData } from "@/state";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export const ShowProductModal = () => {
 	const showProductModal = useShowProductModal();
@@ -67,14 +67,14 @@ export const ShowProductModal = () => {
 					return;
 				}
 
-				const { error } = await sellProduct({
+				const res = await sellProduct({
 					token,
 					serialNo: singleData?.serial_no as string,
 					customerInfo,
 				});
 
-				if (error) {
-					toast.error("Error", { description: error });
+				if (res?.error) {
+					toast.error("Error", { description: res?.error });
 					handleClose();
 					return;
 				}

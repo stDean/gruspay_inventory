@@ -12,7 +12,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-
 export const ResetForm = () => {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
@@ -32,11 +31,9 @@ export const ResetForm = () => {
 
 	const handleSubmit = (data: z.infer<typeof ResetSchema>) => {
 		startTransition(async () => {
-			const { error } = await ResetOTP({ values: data });
-			if (error) {
-				toast.error("Error", {
-					description: error,
-				});
+			const res = await ResetOTP({ values: data });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 

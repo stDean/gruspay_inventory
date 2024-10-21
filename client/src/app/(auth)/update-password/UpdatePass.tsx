@@ -20,12 +20,12 @@ export const UpdatePass = () => {
 	const verifyOTP = () => {
 		startTransition(async () => {
 			// verifyOTP
-			const { error, success } = await VerifyOTPAndUpdatePass({
+			const res = await VerifyOTPAndUpdatePass({
 				email,
 				password,
 				otp: value,
 			});
-			if (success) {
+			if (res?.success) {
 				router.push("/login");
 				toast.success("Success", {
 					description: "Password has been updated successfully",
@@ -33,19 +33,21 @@ export const UpdatePass = () => {
 
 				typeof localStorage !== "undefined" && localStorage.removeItem("user");
 			}
-      
-			if (error) {
-				toast.error("Error", {
-					description: error,
-				});
-        return
+
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
 			}
 		});
 	};
 
 	const resendOTP = () => {
 		startTransition(async () => {
-			await ResendOTP({ email });
+			const res = await ResendOTP({ email });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
 		});
 	};
 

@@ -38,13 +38,13 @@ export const SwapProductTable = ({
 	});
 
 	const handleClick = async (serialNo: string) => {
-		const { data, error } = await getProduct({ serialNo, token });
-		if (error) {
-			toast.error("Error", { description: error });
+		const res = await getProduct({ serialNo, token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
 			return;
 		}
 
-		swapProductDetails.onOpen(data);
+		swapProductDetails.onOpen(res?.data);
 	};
 
 	const tableHeaders = (

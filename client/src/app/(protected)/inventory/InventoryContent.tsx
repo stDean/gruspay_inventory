@@ -44,7 +44,7 @@ export const InventoryContent = () => {
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
 			const res = await getProductsByStock({ token });
-			if ('error' in res) {
+			if ("error" in res) {
 				toast.error("Error", { description: res.error });
 				return;
 			}
@@ -53,13 +53,20 @@ export const InventoryContent = () => {
 	}, [token, addSingleProductModal.isOpen, addMultipleProductModal.isOpen]);
 
 	const setUserState = useCallback(async () => {
-		const { data } = await getUser({ token });
-		dispatch(setUser(data.userInDb));
+		const res = await getUser({ token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+
+		dispatch(setUser(res?.data.userInDb));
 	}, [token, user]);
 
 	const getInventoryStat = async () => {
-		const { data, error } = await getInventoryStats({ token });
-		if (error) {
+		const res = await getInventoryStats({ token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+
 			setStats({
 				allCategory: 0,
 				stockCount: 0,
@@ -70,10 +77,10 @@ export const InventoryContent = () => {
 		}
 
 		setStats({
-			allCategory: data.allCategoryNotSold.length,
-			stockCount: data.totalInventoryCount,
-			totalPrice: data.totalPrice,
-			topSeller: data.topSoldProduct.product_name,
+			allCategory: res?.data.allCategoryNotSold.length,
+			stockCount: res?.data.totalInventoryCount,
+			totalPrice: res?.data.totalPrice,
+			topSeller: res?.data.topSoldProduct.product_name,
 		});
 	};
 

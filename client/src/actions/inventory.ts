@@ -9,8 +9,7 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 		return { error: "No token provided" };
 	}
 
-	const URI =
-		`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProductsByStock`;
+	const URI = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProductsByStock`;
 	try {
 		const { data } = await axios.get(URI, {
 			headers: {
@@ -111,7 +110,7 @@ export const addSingleProduct = async ({
 			}
 		);
 
-		return data;
+		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg, status: 400 };
@@ -143,7 +142,7 @@ export const addMultipleProduct = async ({
 			}
 		);
 
-		return data;
+		return { data };
 	} catch (e: any) {
 		if (e.response?.status === 400) {
 			return { error: e.response.data.msg };

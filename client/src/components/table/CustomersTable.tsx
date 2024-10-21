@@ -36,12 +36,12 @@ export const CustomersTable = () => {
 
 	const getAllCustomers = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getCustomers({ token });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await getCustomers({ token });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
-			setCustomers(data.customers);
+			setCustomers(res?.data.customers);
 		});
 	}, [token]);
 

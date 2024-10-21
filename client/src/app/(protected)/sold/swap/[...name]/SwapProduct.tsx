@@ -27,17 +27,17 @@ export const SwapProduct = ({
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getSwapProductsByName({
+			const res = await getSwapProductsByName({
 				name,
 				token,
 				type,
 				brand,
 			});
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
-			setProducts(data.swapProducts);
+			setProducts(res?.data.swapProducts);
 		});
 	}, [token, name]);
 

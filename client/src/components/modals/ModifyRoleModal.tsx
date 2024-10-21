@@ -9,7 +9,7 @@ import useModifyRoleModal from "@/hook/useUpdateRoleModal";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CustomSelect } from "../auth/CustomSelect";
-import { Modal } from "./Modal";
+import { Modal } from "@/components/modals/Modal";
 
 export const ModifyRoleModal = () => {
 	const modifyModal = useModifyRoleModal();
@@ -27,10 +27,10 @@ export const ModifyRoleModal = () => {
 	);
 
 	const handleUpdate = async (id: string) => {
-		const { error } = await updateUserRole({ token, id, role });
+		const res = await updateUserRole({ token, id, role });
 
-		if (error) {
-			toast.error("Error", { description: error });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
 			return;
 		}
 

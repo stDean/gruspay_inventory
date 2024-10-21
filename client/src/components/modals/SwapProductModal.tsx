@@ -150,13 +150,13 @@ export const SwapProductModal = () => {
 			};
 
 			// Submit to backend (separate async from state setter)
-			const { data, error } = await swapProducts({ token, ...dataToDb });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await swapProducts({ token, ...dataToDb });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 
-			toast.success("Success", { description: data?.msg });
+			toast.success("Success", { description: res?.data?.msg });
 			// Reset incoming product
 			setIncoming({
 				product_name: "",
@@ -182,11 +182,16 @@ export const SwapProductModal = () => {
 	const handleAddAnotherItem = async (serial_no: string) => {
 		if (!serial_no) return;
 
-		const { data } = await getProduct({ serialNo: serial_no, token });
+		const res = await getProduct({ serialNo: serial_no, token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+
 		swapProductModal.addItem({
-			serial_no: data.serial_no,
-			price: data.price,
-			product_name: data.product_name,
+			serial_no: res?.data.serial_no,
+			price: res?.data.price,
+			product_name: res?.data.product_name,
 		});
 	};
 
@@ -378,7 +383,7 @@ export const SwapProductModal = () => {
 			onClose={swapProductModal.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
-      onSubmit={() => {}}
+			onSubmit={() => {}}
 		/>
 	);
 };

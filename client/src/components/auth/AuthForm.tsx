@@ -69,23 +69,23 @@ export const AuthForm = () => {
 					return;
 				}
 
-				const { error, success } = await SendOTP({
+				const res = await SendOTP({
 					values,
 					billingType: payment.type,
 				});
 
-				if (error) {
+				if (res?.error) {
 					toast.error("Error", {
-						description: error,
+						description: res?.error,
 					});
 				}
 
-				if (success) {
+				if (res?.success) {
 					dispatch(setEmail(values.email));
 					toast.success("Success", {
 						description: "OTP sent successfully",
 					});
-					router.push(success.transaction.authorization_url);
+					router.push(res?.success.transaction.authorization_url);
 
 					form.reset();
 					typeof localStorage !== "undefined" &&
@@ -94,17 +94,17 @@ export const AuthForm = () => {
 				return;
 			}
 
-			const { error, success } = await Login({ values: data });
-			if (error) {
+			const res = await Login({ values: data });
+			if (res?.error) {
 				toast.error("Error", {
-					description: error,
+					description: res?.error,
 				});
 				return;
 			}
 
-			if (success) {
+			if (res?.success) {
 				dispatch(setLoggedInUser(true));
-				dispatch(setToken(success.jwtToken));
+				dispatch(setToken(res?.success.jwtToken));
 
 				toast.success("Success", {
 					description: "Login successfully",

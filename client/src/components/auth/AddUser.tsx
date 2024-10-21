@@ -35,14 +35,14 @@ export const AddUser = () => {
 
 	const handleAddUser = (data: z.infer<typeof AddUserSchema>) => {
 		startTransition(async () => {
-			const { error } = await createUser({
+			const res = await createUser({
 				token,
 				role,
 				userData: data,
 			});
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 

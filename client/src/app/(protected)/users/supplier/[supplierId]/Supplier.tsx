@@ -21,13 +21,13 @@ export const Supplier = ({ id }: { id: string }) => {
 
 	const getSupplierData = useCallback(() => {
 		startTransition(async () => {
-			const { data, error } = await getSupplier({ token, id });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await getSupplier({ token, id });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 
-			setSupplier(data.supplier);
+			setSupplier(res?.data.supplier);
 		});
 	}, [token, id]);
 

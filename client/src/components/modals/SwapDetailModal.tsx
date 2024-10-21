@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "./Modal";
+import { Modal } from "@/components/modals/Modal";
 import useSwapProductDetailModal from "@/hook/useSwapProductDetailModal";
 import { Input } from "@/components/ui/input";
 

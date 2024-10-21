@@ -71,11 +71,11 @@ export const UserSettingsForm = () => {
 			}
 
 			// Proceed with updating the user even if the password is not provided
-			const { error } = await updateUser({ token, userData });
+			const res = await updateUser({ token, userData });
 
-			if (error) {
+			if (res?.error) {
 				toast.error("Error", {
-					description: error,
+					description: res?.error,
 				});
 				return;
 			}

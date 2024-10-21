@@ -1,7 +1,7 @@
 "use client";
 
 import { BillingPlanType } from "@/lib/utils";
-import { PlanButtons } from "./Plan";
+import { PlanButtons } from "@/components/Plan";
 
 interface BillingProps {
 	options: { billingPlan: (typeof BillingPlanType.options)[number] };

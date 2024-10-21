@@ -1,6 +1,6 @@
-import { FormControl, FormField, FormLabel } from "../ui/form";
+import { FormControl, FormField, FormLabel } from "@/components/ui/form";
 import { Control, FieldPath } from "react-hook-form";
-import { Textarea } from "../ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 
 interface CustomTexAreaProps {
   control: Control<any>;

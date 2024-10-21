@@ -1,7 +1,7 @@
 "use client";
 
 import useUpdatePlanModal from "@/hook/useUpdatePlanModal";
-import { Modal } from "./Modal";
+import { Modal } from "@/components/modals/Modal";
 import { Button } from "@/components/ui/button";
 import { useCallback, useTransition } from "react";
 import { toast } from "sonner";
@@ -17,21 +17,25 @@ export const UpdatePlanModal = () => {
 	const { token, user } = useReduxState();
 
 	const setUserState = useCallback(async () => {
-		const { data } = await getUser({ token });
-		dispatch(setUser(data.userInDb));
+		const res = await getUser({ token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+    
+		dispatch(setUser(res?.data.userInDb));
 	}, [token, user]);
 
 	const handleUpdate = () => {
 		startTransition(async () => {
-			console.log({ d: updateModal.data });
-			const { error } = await updateCompanyPlan({
+			const res = await updateCompanyPlan({
 				token,
 				payment_plan: updateModal?.data?.payment_plan.toUpperCase() as string,
 				billingType: updateModal?.data?.billingType as string,
 			});
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 

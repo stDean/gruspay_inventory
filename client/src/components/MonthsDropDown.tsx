@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { SelectContainer } from "./SelectContainer";
-import { SelectItem } from "./ui/select";
+import { SelectContainer } from "@/components/SelectContainer";
+import { SelectItem } from "@/components/ui/select";
 import { months } from "@/lib/utils";
 
 export const MonthsDropDown = ({

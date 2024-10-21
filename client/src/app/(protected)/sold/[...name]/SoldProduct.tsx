@@ -27,12 +27,12 @@ export const SoldProduct = ({
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getSoldProductsByName({ name, token, type, brand });
-			if (error) {
-				toast.error("Error", { description: error });
+			const res = await getSoldProductsByName({ name, token, type, brand });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
-			setProducts(data);
+			setProducts(res?.data);
 		});
 	}, [token, name]);
 

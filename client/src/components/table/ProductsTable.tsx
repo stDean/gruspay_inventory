@@ -40,16 +40,16 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 	});
 
 	const showProduct = async (serialNo: string) => {
-		const { data, error } = await getProduct({ token, serialNo });
+		const res = await getProduct({ token, serialNo });
 
-		if (error) {
+		if (res?.error) {
 			toast.error("Error", {
-				description: error,
+				description: res?.error,
 			});
 			return;
 		}
 
-		dispatch(setSingleData(data));
+		dispatch(setSingleData(res?.data));
 		showProductModal.onOpen();
 	};
 

@@ -36,25 +36,25 @@ export const EmployeeTable = () => {
 
 	const getAllUsers = useCallback(() => {
 		startTransition(async () => {
-			const { error, data } = await getUsers({ token });
+			const res = await getUsers({ token });
 
-			if (error) {
-				toast.error("Error", { description: error });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
 				return;
 			}
 
-			setUsers(data.users);
+			setUsers(res?.data.users);
 		});
 	}, [token]);
 
 	const handleClick = async (id: string) => {
-		const { data, error } = await getUserById({ token, id });
-		if (error) {
-			toast.error("Error", { description: error });
+		const res = await getUserById({ token, id });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
 			return;
 		}
 
-		modifyModal.onOpen(data.user);
+		modifyModal.onOpen(res?.data.user);
 	};
 
 	useEffect(() => {
