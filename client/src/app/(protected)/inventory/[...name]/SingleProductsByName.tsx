@@ -7,7 +7,7 @@ import { ProductsTable } from "@/components/table/ProductsTable";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
 import { ProductProps } from "@/lib/types";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ export const SingleProductsByName = ({
 	type: string;
 	brand: string;
 }) => {
+  const router = useRouter();
 	const [products, setProducts] = useState<ProductProps[]>([]);
 	const { token } = useReduxState();
 	const searchParams = useSearchParams();
