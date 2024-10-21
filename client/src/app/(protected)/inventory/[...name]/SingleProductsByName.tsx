@@ -20,7 +20,7 @@ export const SingleProductsByName = ({
 	type: string;
 	brand: string;
 }) => {
-  const router = useRouter();
+	const router = useRouter();
 	const [products, setProducts] = useState<ProductProps[]>([]);
 	const { token } = useReduxState();
 	const searchParams = useSearchParams();
@@ -57,26 +57,21 @@ export const SingleProductsByName = ({
 
 	const productName = name.replace(/%20/g, " ");
 
-	if (products.length === 0) {
-		router.push("/inventory");
-		return null;
-	}
-
 	return isPending ? (
 		<Spinner />
-	) : (
-		products.length !== 0 && (
-			<div className="-mt-4">
-				<ItemsHeader
-					addBrand
-					brands={brands}
-					routeTo="/inventory"
-					types={types}
-					productName={productName}
-				/>
+	) : products.length !== 0 ? (
+		<div className="-mt-4">
+			<ItemsHeader
+				addBrand
+				brands={brands}
+				routeTo="/inventory"
+				types={types}
+				productName={productName}
+			/>
 
-				<ProductsTable products={products} page={page} />
-			</div>
-		)
+			<ProductsTable products={products} page={page} />
+		</div>
+	) : (
+		<p>No Products Found</p>
 	);
 };

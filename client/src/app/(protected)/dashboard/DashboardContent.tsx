@@ -150,7 +150,7 @@ export const DashboardContent = () => {
 							Total Purchases
 						</p>
 						<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
-							{formatCurrency(Number(dashboardStat?.totalPurchasePrice))}
+							{formatCurrency(Number(dashboardStat?.totalPurchasePrice) || 0)}
 						</h1>
 						<p className="font-semibold md:text-lg">
 							{dashboardStat?.totalPurchasesCount} item(s)

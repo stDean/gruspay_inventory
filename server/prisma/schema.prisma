@@ -145,7 +145,7 @@ model Swaps {
   swapDate         DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
   companyId        String?
-  Company          Company?   @relation(fields: [companyId], references: [id])
+  Company          Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   incomingProducts Products[] @relation("Incoming")
   outgoingProducts Products[]
 }
@@ -157,7 +157,7 @@ model Supplier {
   supplier_phone_no String
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
-  Company           Company?   @relation(fields: [companyId], references: [id])
+  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId         String?
   Products          Products[]
 
@@ -169,7 +169,7 @@ model Buyer {
   buyer_name     String
   buyer_email    String?
   buyer_phone_no String
-  Company        Company?   @relation(fields: [companyId], references: [id])
+  Company        Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId      String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
@@ -183,7 +183,7 @@ model Creditor {
   creditor_name     String
   creditor_email    String
   creditor_phone_no String
-  Company           Company?   @relation(fields: [companyId], references: [id])
+  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId         String?
   Products          Products[]
   createdAt         DateTime   @default(now())

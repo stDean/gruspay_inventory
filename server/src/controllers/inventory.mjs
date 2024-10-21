@@ -341,7 +341,7 @@ export const InventoryCtrl = {
 				.json({ msg: "Product not found", success: false });
 		}
 
-		if (product.sold) {
+		if (product.sales_status === "SOLD") {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
 				.json({ msg: "Product already sold", success: false });
