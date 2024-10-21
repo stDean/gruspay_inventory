@@ -558,6 +558,7 @@ export const InventoryCtrl = {
 				SoldByUser: { connect: { id: user.id } },
 				date_sold: new Date(),
 				bought_for: customerInfo.amount_paid,
+        balance_owed: 0,
 				Customer: {
 					connectOrCreate: {
 						where: {

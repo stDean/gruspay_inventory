@@ -246,7 +246,7 @@ export const DashboardContent = () => {
 							{dashboardStat?.topSellerDetail.first_name || ""}{" "}
 							{dashboardStat?.topSellerDetail.last_name}
 						</p>
-						<p className="space-x-10 font-semibold text-lg">
+						<p className="space-x-10 font-semibold text-lg md:flex md:flex-col md:space-x-0 lg:block lg:space-x-4 xl:space-x-10">
 							<span>
 								{formatCurrency(
 									Number(dashboardStat?.topSellerDetail.totalPrice) || 0

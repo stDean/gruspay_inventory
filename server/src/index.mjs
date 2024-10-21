@@ -38,8 +38,6 @@ app.post("/webhook", async (req, res) => {
 	// Extract data from the webhook payload
 	const payload = req.body;
 
-	console.log({ payload });
-
 	switch (payload.event) {
 		case "subscription.create":
 			res.status(200).json({ msg: "Subscription created" });
@@ -101,6 +99,19 @@ const start = async () => {
 	try {
 		app.listen(PORT, () => {
 			console.log(`server started on port: ${PORT}`);
+		});
+
+		// Gracefully close Prisma client when the process terminates
+		process.on("SIGINT", async () => {
+			console.log("SIGINT received: closing Prisma client");
+			await prisma.$disconnect();
+			process.exit(0);
+		});
+
+		process.on("SIGTERM", async () => {
+			console.log("SIGTERM received: closing Prisma client");
+			await prisma.$disconnect();
+			process.exit(0);
 		});
 	} catch (error) {
 		console.log(error);
