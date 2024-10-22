@@ -8,8 +8,6 @@ import { customRateLimiter } from "../utils/customRateLimiter.mjs";
 const router = Router();
 const authRateLimiter = customRateLimiter(15 * 60 * 1000, 5); // 15 minutes, max 5 requests
 
-const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
-
 router.post("/createCompany", authRateLimiter, AuthController.createCompany);
 router.post("/verifyOTP", authRateLimiter, AuthController.verifyOtp);
 router.post("/resendOTP", authRateLimiter, AuthController.resendOtp);

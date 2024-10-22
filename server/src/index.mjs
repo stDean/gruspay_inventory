@@ -37,6 +37,7 @@ app.post("/webhook", async (req, res) => {
 
 	// Extract data from the webhook payload
 	const payload = req.body;
+	console.log({ payload });
 
 	switch (payload.event) {
 		case "subscription.create":
@@ -55,6 +56,7 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id },
 				data: {
 					paymentStatus: "ACTIVE",
+          transId: payload.data.id,
 					payStackAuth: {
 						connectOrCreate: {
 							where: {

@@ -10,6 +10,7 @@ import {
 	getCustomer,
 	cancelSubscription,
 	getCustomerSubscriptions,
+	refundInitialFee,
 } from "./paystack.c.mjs";
 import { my_plans } from "../utils/constants.mjs";
 
@@ -316,6 +317,17 @@ export const AuthController = {
 			email: user.email,
 			company_id: user.companyId,
 		});
+
+		const { error: resErr, refund } = await refundInitialFee({
+			transId: Number(company.transId),
+			amount: "5000",
+		});
+
+		if (resErr) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: resErr });
+		}
 
 		res.status(StatusCodes.OK).json({
 			message: "OTP verified",

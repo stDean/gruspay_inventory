@@ -84,3 +84,15 @@ export const getCustomerSubscriptions = async customer_id => {
 
 	return { subscriptions };
 };
+
+export const refundInitialFee = async ({ transId, amount }) => {
+	const refundRes = await paystack.refund.create({
+		transaction: transId,
+		amount,
+	});
+	if (refundRes === false) {
+		return { error: refundRes.message, transaction: null };
+	}
+
+	return { refund: refundRes.data, error: null };
+};
