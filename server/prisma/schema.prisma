@@ -54,7 +54,7 @@ model Company {
   cancelable    Boolean       @default(true)
   canUpdate     Boolean       @default(true)
   expires       DateTime?
-  transId       BigInt?
+  transId       BigInt
   billingPlan   Payment_Plan  @default(PERSONAL)
   billingType   BillType      @default(MONTHLY)
   paymentStatus PlanStatus    @default(INACTIVE)
