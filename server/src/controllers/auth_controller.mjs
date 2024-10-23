@@ -217,7 +217,6 @@ export const AuthController = {
 				billingPlan: billingPlan.toUpperCase(),
 				billingType:
 					billingType.toLowerCase() === "year" ? "YEARLY" : "MONTHLY",
-				transId: 0,
 			},
 		});
 
