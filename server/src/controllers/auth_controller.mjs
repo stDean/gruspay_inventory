@@ -318,8 +318,8 @@ export const AuthController = {
 			company_id: user.companyId,
 		});
 
-		const { error: resErr, refund } = await refundInitialFee({
-			transId: Number(company.transId),
+		const { error: resErr } = await refundInitialFee({
+			transId: Number(company.transactionId),
 			amount: "5000",
 		});
 

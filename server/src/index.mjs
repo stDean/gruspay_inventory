@@ -56,7 +56,7 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id },
 				data: {
 					paymentStatus: "ACTIVE",
-					transId: payload.data.id,
+					transactionId: String(payload.data.id),
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
