@@ -272,7 +272,7 @@ export const AuthController = {
 			{
 				customer: auth.customerCode,
 				plan: my_plans[planName],
-				start_date: startDate,
+				start_date: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
 				authorization: auth.authorization_code,
 			}
 		);

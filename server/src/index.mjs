@@ -56,7 +56,7 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id },
 				data: {
 					paymentStatus: "ACTIVE",
-          transId: payload.data.id,
+					transId: payload.data.id,
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
@@ -88,7 +88,21 @@ app.post("/webhook", async (req, res) => {
 			console.log({ msg: "Payment successful" });
 			break;
 		case "invoice.payment_failed":
-			console.log("Payment failed");
+			const comp = await prisma.company.findUnique({
+				where: { company_email: payload.data.customer.email },
+			});
+
+			if (!comp) {
+				return res.status(400).json({ msg: "Company not found" });
+			}
+
+			await prisma.company.update({
+				where: { id: comp.id },
+				data: {
+					paymentStatus: "INACTIVE",
+					transId: payload.data.id,
+				},
+			});
 			break;
 		default:
 			console.log("Unhandled event type: ", payload.type);
