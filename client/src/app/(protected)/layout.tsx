@@ -19,19 +19,20 @@ export default function RootLayout({
 }>) {
 	return (
 		<>
-			<AddProductsModal />
-			<AddSingleProductModal />
-			<AddMultipleProductsModal />
-			<ShowProductModal />
-			<SwapProductModal />
-			<AddUserModal />
-			<SoldDetailModal />
-			<SwapDetailModal />
-			<ModifyRoleModal />
-			<CompletePayModal />
-      <CancelPlanModal />
-      <UpdatePlanModal />
-
+			<>
+				<AddProductsModal />
+				<AddSingleProductModal />
+				<AddMultipleProductsModal />
+				<ShowProductModal />
+				<SwapProductModal />
+				<AddUserModal />
+				<SoldDetailModal />
+				<SwapDetailModal />
+				<ModifyRoleModal />
+				<CompletePayModal />
+				<CancelPlanModal />
+				<UpdatePlanModal />
+			</>
 			<DashboardWrapper>{children}</DashboardWrapper>
 		</>
 	);

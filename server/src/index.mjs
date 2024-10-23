@@ -41,7 +41,7 @@ app.post("/webhook", async (req, res) => {
 
 	switch (payload.event) {
 		case "subscription.create":
-			res.status(200).json({ msg: "Subscription created" });
+			console.log({ msg: "Subscription created" });
 			break;
 		case "charge.success":
 			const getCompany = await prisma.company.findUnique({
@@ -56,6 +56,7 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id, company_email: getCompany.company_email },
 				data: {
 					paymentStatus: "ACTIVE",
+					transactionId: payload.data.id.toString(),
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
@@ -67,7 +68,6 @@ app.post("/webhook", async (req, res) => {
 								companyId: getCompany.id,
 							},
 							create: {
-								transactionId: payload.data.id.toString(),
 								authorization_code:
 									payload.data.authorization.authorization_code,
 								reusable: payload.data.authorization.reusable,
@@ -103,11 +103,10 @@ app.post("/webhook", async (req, res) => {
 
 			await prisma.company.update({
 				where: { id: comp.id },
-				data: {
-					paymentStatus: "INACTIVE",
-					transId: payload.data.id,
-				},
+				data: { paymentStatus: "INACTIVE", transactionId: payload.data.id },
 			});
+
+			console.log({ msg: "Payment failed" });
 			break;
 		default:
 			console.log("Unhandled event type: ", payload.type);
