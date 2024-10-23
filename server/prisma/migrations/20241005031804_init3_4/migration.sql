@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `balance_owed` VARCHAR(191) NULL;
+ALTER TABLE `Products` ADD COLUMN `balance_owed` VARCHAR(191) NULL;

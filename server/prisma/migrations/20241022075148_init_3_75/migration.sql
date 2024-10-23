@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `company` ADD COLUMN `transId` INTEGER NULL;
+ALTER TABLE `Company` ADD COLUMN `transId` INTEGER NULL;

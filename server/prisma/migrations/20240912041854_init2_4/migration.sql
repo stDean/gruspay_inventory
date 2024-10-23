@@ -7,10 +7,10 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `sales` DROP FOREIGN KEY `Sales_productsId_fkey`;
+ALTER TABLE `Sales` DROP FOREIGN KEY `Sales_productsId_fkey`;
 
 -- AlterTable
-ALTER TABLE `sales` DROP COLUMN `productsId`,
+ALTER TABLE `Sales` DROP COLUMN `productsId`,
     ADD COLUMN `productId` VARCHAR(191) NOT NULL;
 
 -- CreateIndex

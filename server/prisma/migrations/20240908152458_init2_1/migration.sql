@@ -6,7 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `company` DROP COLUMN `secretKey`;
+ALTER TABLE `Company` DROP COLUMN `secretKey`;
 
 -- AlterTable
-ALTER TABLE `users` DROP COLUMN `secretKey`;
+ALTER TABLE `Users` DROP COLUMN `secretKey`;

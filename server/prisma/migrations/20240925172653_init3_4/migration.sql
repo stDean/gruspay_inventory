@@ -9,17 +9,17 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_swapInId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_swapInId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_swapOutId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_swapOutId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` DROP COLUMN `swapInId`,
+ALTER TABLE `Products` DROP COLUMN `swapInId`,
     DROP COLUMN `swapOutId`;
 
 -- AlterTable
-ALTER TABLE `swaps` DROP PRIMARY KEY,
+ALTER TABLE `Swaps` DROP PRIMARY KEY,
     DROP COLUMN `createdAt`,
     ADD COLUMN `swapDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     MODIFY `id` INTEGER NOT NULL AUTO_INCREMENT,

@@ -14,21 +14,21 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `company` DROP FOREIGN KEY `Company_companyPaymentsId_fkey`;
+ALTER TABLE `Company` DROP FOREIGN KEY `Company_companyPaymentsId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `paystackauth` DROP FOREIGN KEY `PayStackAuth_companyId_fkey`;
+ALTER TABLE `PayStackAuth` DROP FOREIGN KEY `PayStackAuth_companyId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `paystackauth` DROP FOREIGN KEY `PayStackAuth_companyPaymentsId_fkey`;
+ALTER TABLE `PayStackAuth` DROP FOREIGN KEY `PayStackAuth_companyPaymentsId_fkey`;
 
 -- AlterTable
-ALTER TABLE `company` DROP COLUMN `companyPaymentsId`,
+ALTER TABLE `Company` DROP COLUMN `companyPaymentsId`,
     ADD COLUMN `billingPlan` ENUM('PERSONAL', 'TEAM', 'ENTERPRISE') NOT NULL DEFAULT 'PERSONAL',
     ADD COLUMN `billingType` ENUM('MONTHLY', 'YEARLY') NOT NULL DEFAULT 'MONTHLY';
 
 -- AlterTable
-ALTER TABLE `paystackauth` DROP COLUMN `bin`,
+ALTER TABLE `PayStackAuth` DROP COLUMN `bin`,
     DROP COLUMN `brand`,
     DROP COLUMN `channel`,
     DROP COLUMN `companyPaymentsId`,
@@ -37,7 +37,7 @@ ALTER TABLE `paystackauth` DROP COLUMN `bin`,
     MODIFY `companyId` VARCHAR(191) NOT NULL;
 
 -- DropTable
-DROP TABLE `companypayments`;
+DROP TABLE `CompanyPayments`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `PayStackAuth_companyId_key` ON `PayStackAuth`(`companyId`);

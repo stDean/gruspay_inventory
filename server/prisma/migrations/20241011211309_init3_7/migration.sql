@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `company` ADD COLUMN `cancelable` BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE `Company` ADD COLUMN `cancelable` BOOLEAN NOT NULL DEFAULT true;
 
 -- AlterTable
-ALTER TABLE `companypayments` ADD COLUMN `expires` DATETIME(3) NULL;
+ALTER TABLE `CompanyPayments` ADD COLUMN `expires` DATETIME(3) NULL;

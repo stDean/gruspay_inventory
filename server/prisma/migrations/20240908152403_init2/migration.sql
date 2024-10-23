@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `company` MODIFY `secretKey` INTEGER NULL;
+ALTER TABLE `Company` MODIFY `secretKey` INTEGER NULL;
 
 -- CreateTable
 CREATE TABLE `OTP` (

@@ -5,10 +5,10 @@
 
 */
 -- DropIndex
-DROP INDEX `PayStackAuth_authorization_code_key` ON `paystackauth`;
+DROP INDEX `PayStackAuth_authorization_code_key` ON `PayStackAuth`;
 
 -- DropIndex
-DROP INDEX `PayStackAuth_signature_key` ON `paystackauth`;
+DROP INDEX `PayStackAuth_signature_key` ON `PayStackAuth`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `PayStackAuth_authorization_code_signature_key` ON `PayStackAuth`(`authorization_code`, `signature`);

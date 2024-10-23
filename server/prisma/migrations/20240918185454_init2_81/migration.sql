@@ -5,7 +5,7 @@
 
 */
 -- DropIndex
-DROP INDEX `Supplier_supplier_name_key` ON `supplier`;
+DROP INDEX `Supplier_supplier_name_key` ON `Supplier`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Supplier_supplier_email_key` ON `Supplier`(`supplier_email`);

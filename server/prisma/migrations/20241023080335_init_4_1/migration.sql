@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `company` MODIFY `transId` BIGINT NOT NULL;
+ALTER TABLE `Company` MODIFY `transId` BIGINT NOT NULL;

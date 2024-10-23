@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `buyer` DROP COLUMN `amount_paid`;
+ALTER TABLE `Buyer` DROP COLUMN `amount_paid`;
 
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `bought_for` VARCHAR(191) NULL;
+ALTER TABLE `Products` ADD COLUMN `bought_for` VARCHAR(191) NULL;

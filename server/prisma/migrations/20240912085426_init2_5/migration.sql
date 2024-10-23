@@ -7,12 +7,12 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `productsupplier` DROP FOREIGN KEY `ProductSupplier_productId_fkey`;
+ALTER TABLE `ProductSupplier` DROP FOREIGN KEY `ProductSupplier_productId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `supplierEmail` VARCHAR(191) NULL,
+ALTER TABLE `Products` ADD COLUMN `supplierEmail` VARCHAR(191) NULL,
     ADD COLUMN `supplierPhoneNo` VARCHAR(191) NOT NULL,
     ADD COLUMN `supplier_name` VARCHAR(191) NOT NULL;
 
 -- DropTable
-DROP TABLE `productsupplier`;
+DROP TABLE `ProductSupplier`;

@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `company` MODIFY `transId` BIGINT NULL;
+ALTER TABLE `Company` MODIFY `transId` BIGINT NULL;

@@ -5,10 +5,10 @@
 
 */
 -- AlterTable
-ALTER TABLE `buyer` DROP COLUMN `creditor`;
+ALTER TABLE `Buyer` DROP COLUMN `creditor`;
 
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `creditorId` VARCHAR(191) NULL;
+ALTER TABLE `Products` ADD COLUMN `creditorId` VARCHAR(191) NULL;
 
 -- CreateTable
 CREATE TABLE `Creditor` (

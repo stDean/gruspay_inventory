@@ -6,13 +6,13 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `supplier` DROP FOREIGN KEY `Supplier_productId_fkey`;
+ALTER TABLE `Supplier` DROP FOREIGN KEY `Supplier_productId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `supplierId` VARCHAR(191) NOT NULL;
+ALTER TABLE `Products` ADD COLUMN `supplierId` VARCHAR(191) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `supplier` DROP COLUMN `productId`;
+ALTER TABLE `Supplier` DROP COLUMN `productId`;
 
 -- AddForeignKey
 ALTER TABLE `Products` ADD CONSTRAINT `Products_supplierId_fkey` FOREIGN KEY (`supplierId`) REFERENCES `Supplier`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

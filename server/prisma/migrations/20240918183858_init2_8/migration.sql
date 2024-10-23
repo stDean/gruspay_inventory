@@ -25,19 +25,19 @@
 
 */
 -- DropIndex
-DROP INDEX `Products_serialNo_key` ON `products`;
+DROP INDEX `Products_serialNo_key` ON `Products`;
 
 -- DropIndex
-DROP INDEX `Supplier_name_key` ON `supplier`;
+DROP INDEX `Supplier_name_key` ON `Supplier`;
 
 -- AlterTable
-ALTER TABLE `buyer` DROP COLUMN `full_name`,
+ALTER TABLE `Buyer` DROP COLUMN `full_name`,
     DROP COLUMN `phone_number`,
     ADD COLUMN `buyer_name` VARCHAR(191) NOT NULL,
     ADD COLUMN `buyer_phone_no` VARCHAR(191) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `products` DROP COLUMN `customersName`,
+ALTER TABLE `Products` DROP COLUMN `customersName`,
     DROP COLUMN `customersPhoneNo`,
     DROP COLUMN `other_meta_data`,
     DROP COLUMN `salesStatus`,
@@ -52,7 +52,7 @@ ALTER TABLE `products` DROP COLUMN `customersName`,
     ADD COLUMN `supplierId` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `supplier` DROP COLUMN `email`,
+ALTER TABLE `Supplier` DROP COLUMN `email`,
     DROP COLUMN `name`,
     DROP COLUMN `phoneNo`,
     ADD COLUMN `supplier_email` VARCHAR(191) NULL,

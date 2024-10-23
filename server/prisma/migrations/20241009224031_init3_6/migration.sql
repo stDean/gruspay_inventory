@@ -7,10 +7,10 @@
 
 */
 -- DropIndex
-DROP INDEX `Company_company_name_key` ON `company`;
+DROP INDEX `Company_company_name_key` ON `Company`;
 
 -- AlterTable
-ALTER TABLE `company` DROP COLUMN `payment_plan`,
+ALTER TABLE `Company` DROP COLUMN `payment_plan`,
     ADD COLUMN `companyPaymentsId` VARCHAR(191) NOT NULL,
     ADD COLUMN `paymentStatus` ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'INACTIVE';
 

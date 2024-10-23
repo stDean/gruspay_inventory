@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient();
-
-// prisma.$on("beforeExit", async () => {
-// 	await prisma.$disconnect();
-// });
+export const prisma = new PrismaClient({
+	log: ["query", "info", "warn", "error"],
+});

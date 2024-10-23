@@ -7,25 +7,25 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `_incomingproducts` DROP FOREIGN KEY `_incomingProducts_A_fkey`;
+ALTER TABLE `_incomingProducts` DROP FOREIGN KEY `_incomingProducts_A_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `_incomingproducts` DROP FOREIGN KEY `_incomingProducts_B_fkey`;
+ALTER TABLE `_incomingProducts` DROP FOREIGN KEY `_incomingProducts_B_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `_outgoingproducts` DROP FOREIGN KEY `_outgoingProducts_A_fkey`;
+ALTER TABLE `_outgoingProducts` DROP FOREIGN KEY `_outgoingProducts_A_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `_outgoingproducts` DROP FOREIGN KEY `_outgoingProducts_B_fkey`;
+ALTER TABLE `_outgoingProducts` DROP FOREIGN KEY `_outgoingProducts_B_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `swapsId` VARCHAR(191) NULL;
+ALTER TABLE `Products` ADD COLUMN `swapsId` VARCHAR(191) NULL;
 
 -- DropTable
-DROP TABLE `_incomingproducts`;
+DROP TABLE `_incomingProducts`;
 
 -- DropTable
-DROP TABLE `_outgoingproducts`;
+DROP TABLE `_outgoingProducts`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Swaps_id_key` ON `Swaps`(`id`);

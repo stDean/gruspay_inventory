@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `company` ADD COLUMN `country` VARCHAR(191) NOT NULL;
+ALTER TABLE `Company` ADD COLUMN `country` VARCHAR(191) NOT NULL;

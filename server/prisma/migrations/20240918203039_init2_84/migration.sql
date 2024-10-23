@@ -6,13 +6,13 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_added_by_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_added_by_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_companyId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_companyId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` MODIFY `companyId` VARCHAR(191) NOT NULL,
+ALTER TABLE `Products` MODIFY `companyId` VARCHAR(191) NOT NULL,
     MODIFY `added_by` VARCHAR(191) NOT NULL;
 
 -- AddForeignKey

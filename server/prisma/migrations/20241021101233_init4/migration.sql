@@ -1,14 +1,14 @@
 -- DropForeignKey
-ALTER TABLE `buyer` DROP FOREIGN KEY `Buyer_companyId_fkey`;
+ALTER TABLE `Buyer` DROP FOREIGN KEY `Buyer_companyId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `creditor` DROP FOREIGN KEY `Creditor_companyId_fkey`;
+ALTER TABLE `Creditor` DROP FOREIGN KEY `Creditor_companyId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `supplier` DROP FOREIGN KEY `Supplier_companyId_fkey`;
+ALTER TABLE `Supplier` DROP FOREIGN KEY `Supplier_companyId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `swaps` DROP FOREIGN KEY `Swaps_companyId_fkey`;
+ALTER TABLE `Swaps` DROP FOREIGN KEY `Swaps_companyId_fkey`;
 
 -- AddForeignKey
 ALTER TABLE `Swaps` ADD CONSTRAINT `Swaps_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

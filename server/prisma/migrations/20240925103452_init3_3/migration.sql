@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `swapInId` VARCHAR(191) NULL,
+ALTER TABLE `Products` ADD COLUMN `swapInId` VARCHAR(191) NULL,
     ADD COLUMN `swapOutId` VARCHAR(191) NULL;
 
 -- CreateTable

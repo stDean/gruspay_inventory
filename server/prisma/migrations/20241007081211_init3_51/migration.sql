@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `company` MODIFY `payment_plan` ENUM('FREE', 'PERSONAL', 'TEAM', 'ENTERPRISE') NOT NULL DEFAULT 'FREE';
+ALTER TABLE `Company` MODIFY `payment_plan` ENUM('FREE', 'PERSONAL', 'TEAM', 'ENTERPRISE') NOT NULL DEFAULT 'FREE';

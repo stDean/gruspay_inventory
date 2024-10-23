@@ -5,7 +5,7 @@
 
 */
 -- DropIndex
-DROP INDEX `Products_serial_no_key` ON `products`;
+DROP INDEX `Products_serial_no_key` ON `Products`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Products_serial_no_companyId_key` ON `Products`(`serial_no`, `companyId`);

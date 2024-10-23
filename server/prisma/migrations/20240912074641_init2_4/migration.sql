@@ -7,13 +7,13 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `productsupplier` DROP FOREIGN KEY `ProductSupplier_productsId_fkey`;
+ALTER TABLE `ProductSupplier` DROP FOREIGN KEY `ProductSupplier_productsId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` MODIFY `other_meta_data` VARCHAR(191) NULL;
+ALTER TABLE `Products` MODIFY `other_meta_data` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `productsupplier` DROP COLUMN `productsId`,
+ALTER TABLE `ProductSupplier` DROP COLUMN `productsId`,
     ADD COLUMN `productId` VARCHAR(191) NOT NULL;
 
 -- CreateIndex

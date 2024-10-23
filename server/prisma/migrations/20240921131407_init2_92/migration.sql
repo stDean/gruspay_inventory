@@ -6,16 +6,16 @@
 
 */
 -- DropIndex
-DROP INDEX `Buyer_buyer_email_key` ON `buyer`;
+DROP INDEX `Buyer_buyer_email_key` ON `Buyer`;
 
 -- DropIndex
-DROP INDEX `Buyer_buyer_name_key` ON `buyer`;
+DROP INDEX `Buyer_buyer_name_key` ON `Buyer`;
 
 -- DropIndex
-DROP INDEX `Supplier_supplier_email_key` ON `supplier`;
+DROP INDEX `Supplier_supplier_email_key` ON `Supplier`;
 
 -- DropIndex
-DROP INDEX `Supplier_supplier_name_key` ON `supplier`;
+DROP INDEX `Supplier_supplier_name_key` ON `Supplier`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Buyer_buyer_email_buyer_name_key` ON `Buyer`(`buyer_email`, `buyer_name`);

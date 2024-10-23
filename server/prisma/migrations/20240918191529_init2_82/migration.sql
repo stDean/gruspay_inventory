@@ -6,10 +6,10 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_supplierId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_supplierId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` MODIFY `supplierId` VARCHAR(191) NOT NULL;
+ALTER TABLE `Products` MODIFY `supplierId` VARCHAR(191) NOT NULL;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Products_supplierId_key` ON `Products`(`supplierId`);

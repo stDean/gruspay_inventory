@@ -9,10 +9,10 @@
 
 */
 -- DropIndex
-DROP INDEX `Buyer_email_key` ON `buyer`;
+DROP INDEX `Buyer_email_key` ON `Buyer`;
 
 -- AlterTable
-ALTER TABLE `buyer` DROP COLUMN `amountPaid`,
+ALTER TABLE `Buyer` DROP COLUMN `amountPaid`,
     DROP COLUMN `email`,
     ADD COLUMN `amount_paid` VARCHAR(191) NOT NULL,
     ADD COLUMN `buyer_email` VARCHAR(191) NULL;

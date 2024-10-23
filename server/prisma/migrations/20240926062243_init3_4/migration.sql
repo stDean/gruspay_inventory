@@ -5,19 +5,19 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `_incomingproducts` DROP FOREIGN KEY `_incomingProducts_B_fkey`;
+ALTER TABLE `_incomingProducts` DROP FOREIGN KEY `_incomingProducts_B_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `_outgoingproducts` DROP FOREIGN KEY `_outgoingProducts_B_fkey`;
+ALTER TABLE `_outgoingProducts` DROP FOREIGN KEY `_outgoingProducts_B_fkey`;
 
 -- AlterTable
-ALTER TABLE `_incomingproducts` MODIFY `B` VARCHAR(191) NOT NULL;
+ALTER TABLE `_incomingProducts` MODIFY `B` VARCHAR(191) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `_outgoingproducts` MODIFY `B` VARCHAR(191) NOT NULL;
+ALTER TABLE `_outgoingProducts` MODIFY `B` VARCHAR(191) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `swaps` DROP PRIMARY KEY,
+ALTER TABLE `Swaps` DROP PRIMARY KEY,
     MODIFY `id` VARCHAR(191) NOT NULL,
     ADD PRIMARY KEY (`id`);
 

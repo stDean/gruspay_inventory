@@ -5,10 +5,10 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_swapsId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_swapsId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` DROP COLUMN `swapsId`,
+ALTER TABLE `Products` DROP COLUMN `swapsId`,
     ADD COLUMN `swapsInId` VARCHAR(191) NULL,
     ADD COLUMN `swapsOutId` VARCHAR(191) NULL;
 

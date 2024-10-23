@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `company` ADD COLUMN `transactionId` VARCHAR(191) NULL;
+ALTER TABLE `Company` ADD COLUMN `transactionId` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `paystackauth` DROP COLUMN `transactionId`;
+ALTER TABLE `PayStackAuth` DROP COLUMN `transactionId`;

@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `products` DROP COLUMN `sold`,
+ALTER TABLE `Products` DROP COLUMN `sold`,
     ADD COLUMN `salesStatus` ENUM('SOLD', 'SWAP', 'NOT_SOLD') NOT NULL DEFAULT 'NOT_SOLD',
     ADD COLUMN `sold_by` VARCHAR(191) NULL;
 

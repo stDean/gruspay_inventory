@@ -1,8 +1,8 @@
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_buyerId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_buyerId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_supplierId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_supplierId_fkey`;
 
 -- AddForeignKey
 ALTER TABLE `Products` ADD CONSTRAINT `Products_supplierId_fkey` FOREIGN KEY (`supplierId`) REFERENCES `Supplier`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

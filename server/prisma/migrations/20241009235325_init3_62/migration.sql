@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `paystackauth` ADD COLUMN `brand` VARCHAR(191) NOT NULL;
+ALTER TABLE `PayStackAuth` ADD COLUMN `brand` VARCHAR(191) NOT NULL;

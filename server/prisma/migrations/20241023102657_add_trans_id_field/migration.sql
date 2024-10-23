@@ -5,5 +5,5 @@
 
 */
 -- AlterTable
-ALTER TABLE `company` DROP COLUMN `transId`,
+ALTER TABLE `Company` DROP COLUMN `transId`,
     ADD COLUMN `transactionId` VARCHAR(191) NULL;
