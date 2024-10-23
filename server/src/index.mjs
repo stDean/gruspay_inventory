@@ -56,7 +56,6 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id, company_email: getCompany.company_email },
 				data: {
 					paymentStatus: "ACTIVE",
-					transactionId: payload.data.id.toString(),
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
@@ -68,6 +67,7 @@ app.post("/webhook", async (req, res) => {
 								companyId: getCompany.id,
 							},
 							create: {
+								transactionId: payload.data.id.toString(),
 								authorization_code:
 									payload.data.authorization.authorization_code,
 								reusable: payload.data.authorization.reusable,
