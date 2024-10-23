@@ -2,7 +2,7 @@
 ALTER TABLE `Company` MODIFY `secretKey` INTEGER NULL;
 
 -- CreateTable
-CREATE TABLE `OTP` (
+CREATE TABLE `Otp` (
     `id` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `otp` VARCHAR(191) NOT NULL,
