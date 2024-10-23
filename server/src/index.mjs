@@ -53,10 +53,10 @@ app.post("/webhook", async (req, res) => {
 			}
 
 			await prisma.company.update({
-				where: { id: getCompany.id },
+				where: { id: getCompany.id, company_email: getCompany.company_email },
 				data: {
 					paymentStatus: "ACTIVE",
-					transactionId: String(payload.data.id),
+					transactionId: payload.data.id.toString(),
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
@@ -83,6 +83,11 @@ app.post("/webhook", async (req, res) => {
 						},
 					},
 				},
+			});
+
+			await prisma.company.update({
+				where: { id: getCompany.id },
+				data: {},
 			});
 
 			console.log({ msg: "Payment successful" });
