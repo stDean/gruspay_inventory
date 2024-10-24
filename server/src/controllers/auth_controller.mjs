@@ -215,7 +215,6 @@ export const AuthController = {
 				password: hashedPassword,
 				paymentStatus: "INACTIVE",
 				billingPlan: billingPlan.toUpperCase(),
-				transactionCode: verify.id.toString(),
 				billingType:
 					billingType.toLowerCase() === "year" ? "YEARLY" : "MONTHLY",
 			},
