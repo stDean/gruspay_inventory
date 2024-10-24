@@ -78,6 +78,7 @@ app.post("/webhook", async (req, res) => {
 								signature: payload.data.authorization.signature,
 								account_name: payload.data.authorization.account_name,
 								customerCode: payload.data.customer.customer_code,
+                transactionId: payload.data.id
 							},
 						},
 					},

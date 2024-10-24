@@ -223,18 +223,6 @@ export const AuthController = {
 		// Send OTP for verification
 		await handleOtpForCompany(company.company_email);
 
-		// refund initial fee
-		const { error: resErr } = await refundInitialFee({
-			transId: Number(verify.id),
-			amount: "5000",
-		});
-
-		if (resErr) {
-			return res
-				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: resErr });
-		}
-
 		return res.status(StatusCodes.OK).json({
 			message: "Company has been created.",
 			transaction,
@@ -311,6 +299,18 @@ export const AuthController = {
 		await prisma.otp.delete({
 			where: { id: existingOtp.id },
 		});
+
+    		// refund initial fee
+		const { error: resErr } = await refundInitialFee({
+			transId: Number(company.payStackAuth.transactionId),
+			amount: "5000",
+		});
+
+		if (resErr) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: resErr });
+		}
 
 		// create user
 		let user;
