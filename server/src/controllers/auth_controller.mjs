@@ -224,6 +224,18 @@ export const AuthController = {
 		// Send OTP for verification
 		await handleOtpForCompany(company.company_email);
 
+		// refund initial fee
+		const { error: resErr } = await refundInitialFee({
+			transId: Number(verify.id),
+			amount: "5000",
+		});
+
+		if (resErr) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: resErr });
+		}
+
 		return res.status(StatusCodes.OK).json({
 			message: "Company has been created.",
 			transaction,
@@ -318,17 +330,6 @@ export const AuthController = {
 			email: user.email,
 			company_id: user.companyId,
 		});
-
-		const { error: resErr } = await refundInitialFee({
-			transId: Number(company.transactionCode),
-			amount: "5000",
-		});
-
-		if (resErr) {
-			return res
-				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: resErr });
-		}
 
 		res.status(StatusCodes.OK).json({
 			message: "OTP verified",
