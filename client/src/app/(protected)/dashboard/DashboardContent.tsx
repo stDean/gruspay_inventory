@@ -1,6 +1,7 @@
 "use client";
 
 import { getBarChartData, getDashboardStats } from "@/actions/inventory";
+import { Logout } from "@/actions/logout";
 import { getUser } from "@/actions/user";
 import { useAppDispatch } from "@/app/redux";
 import { BarChartContent } from "@/components/BarChartContent";
@@ -26,6 +27,7 @@ export const DashboardContent = () => {
 		const res = await getUser({ token });
 		if (res?.error) {
 			toast.error("Error", { description: res?.error });
+      Logout();
 			return;
 		}
 
