@@ -54,7 +54,7 @@ model Company {
   cancelable      Boolean       @default(true)
   canUpdate       Boolean       @default(true)
   expires         DateTime?
-  transactionCode String?
+  transactionCode String
   billingPlan     Payment_Plan  @default(PERSONAL)
   billingType     BillType      @default(MONTHLY)
   paymentStatus   PlanStatus    @default(INACTIVE)

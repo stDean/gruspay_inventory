@@ -1,5 +1,6 @@
 import Paystack from "@paystack/paystack-sdk";
 import { my_plans } from "../utils/constants.mjs";
+import { verify } from "crypto";
 const paystack = new Paystack(process.env.PAYSTACKSECRETKEY);
 
 // this makes you get the customer and authorization keys from pay-stack
@@ -16,7 +17,19 @@ export const initializeSubscription = async ({ email, amount }) => {
 		return { error: initializeTransactionRes.message, transaction: null };
 	}
 
-	return { transaction: initializeTransactionRes.data, error: null };
+	const verifyTransRes = await paystack.transaction.verify({
+		reference: initializeTransactionRes.data.reference,
+	});
+
+	if (verifyTransRes.status === false) {
+		return { error: verifyTransRes.message, transaction: null };
+	}
+
+	return {
+		transaction: initializeTransactionRes.data,
+		verify: verifyTransRes.data,
+		error: null,
+	};
 };
 
 // this is the main way we want to create a subscription we just use the above to get customer details

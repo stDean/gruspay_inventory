@@ -194,7 +194,7 @@ export const AuthController = {
 		}
 
 		// Initialize the company as a customer
-		const { transaction, error } = await initializeSubscription({
+		const { transaction, error, verify } = await initializeSubscription({
 			email: company_email,
 			amount: "5000",
 		});
@@ -215,6 +215,7 @@ export const AuthController = {
 				password: hashedPassword,
 				paymentStatus: "INACTIVE",
 				billingPlan: billingPlan.toUpperCase(),
+				transactionCode: verify.id.toString(),
 				billingType:
 					billingType.toLowerCase() === "year" ? "YEARLY" : "MONTHLY",
 			},

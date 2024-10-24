@@ -56,7 +56,6 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id, company_email: getCompany.company_email },
 				data: {
 					paymentStatus: "ACTIVE",
-					transactionCode: payload.data.id.toString(),
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
