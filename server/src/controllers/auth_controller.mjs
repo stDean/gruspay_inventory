@@ -70,7 +70,7 @@ const updateBillingPlan = async (
 							signature: auth.signature,
 							account_name: auth.account_name,
 							customerCode,
-              transactionId: ""
+							transactionId: "",
 						},
 					},
 				},
@@ -268,12 +268,14 @@ export const AuthController = {
 			where: { id: company.payStackAuth.id },
 		});
 
+		// new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+
 		// create company subscription plan
 		const { subscription, error: subscriptionError } = await createSubscription(
 			{
 				customer: auth.customerCode,
 				plan: my_plans[planName],
-				start_date: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+				start_date: startDate,
 				authorization: auth.authorization_code,
 			}
 		);
@@ -301,7 +303,7 @@ export const AuthController = {
 			where: { id: existingOtp.id },
 		});
 
-    		// refund initial fee
+		// refund initial fee
 		const { error: resErr } = await refundInitialFee({
 			transId: Number(company.payStackAuth.transactionId),
 			amount: "5000",
