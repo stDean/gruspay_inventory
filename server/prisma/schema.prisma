@@ -78,6 +78,7 @@ model PayStackAuth {
   account_name       String?
   comany             Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId          String?  @unique
+  transactionId      String
 
   @@unique([authorization_code, signature])
 }
