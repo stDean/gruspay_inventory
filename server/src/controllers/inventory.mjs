@@ -42,44 +42,44 @@ const getOrCreateSupplier = async supplierData => {
 };
 
 // check product length based on the payment plan
-const checkProductLength = (company, newProductsCount) => {
-	const productLimits = {
-		PERSONAL: 70,
-		TEAM: 150,
-		ENTERPRISE: 250,
-	};
+// const checkProductLength = (company, newProductsCount) => {
+// 	const productLimits = {
+// 		PERSONAL: 70,
+// 		TEAM: 150,
+// 		ENTERPRISE: 250,
+// 	};
 
-	const limit = productLimits[company.payment_plan];
-	const currentProductCount = company.Products.length; // Assuming this is the list of current products in the company
+// 	const limit = productLimits[company.payment_plan];
+// 	const currentProductCount = company.Products.length; // Assuming this is the list of current products in the company
 
-	// Check if adding the new products will exceed the limit
-	if (limit && currentProductCount + newProductsCount > limit) {
-		return {
-			error: true,
-			msg: `Cannot add more products. Your plan allows a maximum of ${limit} products, and you currently have ${currentProductCount}. Please upgrade your plan.`,
-		};
-	}
+// 	// Check if adding the new products will exceed the limit
+// 	if (limit && currentProductCount + newProductsCount > limit) {
+// 		return {
+// 			error: true,
+// 			msg: `Cannot add more products. Your plan allows a maximum of ${limit} products, and you currently have ${currentProductCount}. Please upgrade your plan.`,
+// 		};
+// 	}
 
-	return {};
-};
+// 	return {};
+// };
 
-const checkToAddSingleProduct = company => {
-	const productLimits = {
-		PERSONAL: 70,
-		TEAM: 150,
-		ENTERPRISE: 250,
-	};
+// const checkToAddSingleProduct = company => {
+// 	const productLimits = {
+// 		PERSONAL: 70,
+// 		TEAM: 150,
+// 		ENTERPRISE: 250,
+// 	};
 
-	const limit = productLimits[company.payment_plan];
-	if (limit && company.Products.length >= limit) {
-		return {
-			error: true,
-			msg: `Maximum limit of ${limit} products reached. Upgrade your plan to add more.`,
-		};
-	}
+// 	const limit = productLimits[company.payment_plan];
+// 	if (limit && company.Products.length >= limit) {
+// 		return {
+// 			error: true,
+// 			msg: `Maximum limit of ${limit} products reached. Upgrade your plan to add more.`,
+// 		};
+// 	}
 
-	return {};
-};
+// 	return {};
+// };
 
 export const InventoryCtrl = {
 	createProduct: async (req, res) => {
@@ -108,12 +108,12 @@ export const InventoryCtrl = {
 
 		const { company, user } = await useUserAndCompany({ company_id, email });
 
-		const productLengthCheck = checkToAddSingleProduct(company);
-		if (productLengthCheck.error) {
-			return res.status(StatusCodes.BAD_REQUEST).json({
-				msg: productLengthCheck.msg,
-			});
-		}
+		// const productLengthCheck = checkToAddSingleProduct(company);
+		// if (productLengthCheck.error) {
+		// 	return res.status(StatusCodes.BAD_REQUEST).json({
+		// 		msg: productLengthCheck.msg,
+		// 	});
+		// }
 
 		const supplier = await getOrCreateSupplier({
 			supplier_email: supplier_email || null,
@@ -152,12 +152,12 @@ export const InventoryCtrl = {
 		const results = [];
 
 		// Check the product length synchronously (handle errors via return)
-		const productLengthCheck = checkProductLength(company, req.body.length);
-		if (productLengthCheck.error) {
-			return res.status(StatusCodes.BAD_REQUEST).json({
-				msg: productLengthCheck.msg,
-			});
-		}
+		// const productLengthCheck = checkProductLength(company, req.body.length);
+		// if (productLengthCheck.error) {
+		// 	return res.status(StatusCodes.BAD_REQUEST).json({
+		// 		msg: productLengthCheck.msg,
+		// 	});
+		// }
 
 		for (const product of req.body) {
 			try {
@@ -318,93 +318,116 @@ export const InventoryCtrl = {
 
 		res.status(StatusCodes.OK).json({ msg: "updateProduct", updatedProduct });
 	},
-	sellProduct: async (req, res) => {
-		const { serialNo } = req.params;
+	sellProductsBulk: async (req, res) => {
+		let { serialNos } = req.body; // Extract serial numbers from request body
 		const {
 			buyer_name,
 			buyer_email,
 			amount_paid,
 			buyer_phone_no,
 			balance_owed,
-		} = req.body;
-		const { company_id, email } = req.user;
+		} = req.body; // Extract buyer info and payment details
+		const { company_id, email } = req.user; // Extract company ID and user email from the authenticated user
 
-		const product = await prisma.products.findUnique({
-			where: {
-				serial_no_companyId: { serial_no: serialNo, companyId: company_id },
-			},
-		});
-
-		if (!product) {
-			return res
-				.status(StatusCodes.NOT_FOUND)
-				.json({ msg: "Product not found", success: false });
+		// Ensure serialNos is always an array for uniform processing
+		if (!Array.isArray(serialNos)) {
+			serialNos = [serialNos]; // Convert single serial number input to an array
 		}
 
-		if (product.sales_status === "SOLD") {
-			return res
-				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "Product already sold", success: false });
-		}
-
+		// Retrieve the user making the request
 		const user = await prisma.users.findUnique({ where: { email } });
+		const results = { success: [], failed: [] }; // Initialize results object to store success and failure info
 
-		const updateData = {
-			sales_status: "SOLD",
-			SoldByUser: { connect: { id: user.id } },
-			date_sold: new Date(),
-			bought_for: amount_paid,
-			balance_owed: balance_owed || "0",
-		};
+		// Loop through each serial number to process them individually
+		for (let serialNo of serialNos) {
+			try {
+				// Find the product by serial number and company ID
+				const product = await prisma.products.findUnique({
+					where: {
+						serial_no_companyId: { serial_no: serialNo, companyId: company_id },
+					},
+				});
 
-		if (balance_owed) {
-			updateData["Creditor"] = {
-				connectOrCreate: {
-					where: {
-						creditor_email_creditor_name_companyId: {
-							creditor_name: buyer_name,
-							creditor_email: buyer_email,
-							companyId: company_id,
+				// If the product is not found or already sold, record as a failure and continue to the next
+				if (!product || product.sales_status === "SOLD") {
+					results.failed.push({
+						serialNo,
+						reason: product ? "Already sold" : "Not found",
+					});
+					continue; // Skip to the next serial number in the loop
+				}
+
+				// Prepare update data to mark the product as sold
+				const updateData = {
+					sales_status: "SOLD",
+					SoldByUser: { connect: { id: user.id } }, // Connect the product to the user who sold it
+					date_sold: new Date(),
+					bought_for: amount_paid,
+					balance_owed: balance_owed || "0", // Default to "0" if no balance owed
+				};
+
+				// Determine if the buyer should be recorded as a Creditor or Customer
+				if (balance_owed) {
+					// If there is a balance owed, connect or create a Creditor entry
+					updateData["Creditor"] = {
+						connectOrCreate: {
+							where: {
+								creditor_email_creditor_name_companyId: {
+									creditor_name: buyer_name,
+									creditor_email: buyer_email,
+									companyId: company_id,
+								},
+							},
+							create: {
+								creditor_name: buyer_name,
+								creditor_email: buyer_email,
+								creditor_phone_no: buyer_phone_no,
+								companyId: company_id,
+							},
 						},
-					},
-					create: {
-						creditor_name: buyer_name,
-						creditor_email: buyer_email,
-						creditor_phone_no: buyer_phone_no,
-						companyId: company_id,
-					},
-				},
-			};
-		} else {
-			updateData["Customer"] = {
-				connectOrCreate: {
-					where: {
-						buyer_email_buyer_name_companyId: {
-							buyer_email,
-							buyer_name,
-							companyId: company_id,
+					};
+				} else {
+					// If no balance owed, connect or create a Customer entry
+					updateData["Customer"] = {
+						connectOrCreate: {
+							where: {
+								buyer_email_buyer_name_companyId: {
+									buyer_email,
+									buyer_name,
+									companyId: company_id,
+								},
+							},
+							create: {
+								buyer_name,
+								buyer_email: buyer_email || null,
+								buyer_phone_no,
+								companyId: company_id,
+							},
 						},
+					};
+				}
+
+				// Update the product in the database
+				const updatedProduct = await prisma.products.update({
+					where: {
+						serial_no_companyId: { serial_no: serialNo, companyId: company_id },
 					},
-					create: {
-						buyer_name,
-						buyer_email: buyer_email || null,
-						buyer_phone_no,
-						companyId: company_id,
-					},
-				},
-			};
+					data: updateData,
+				});
+
+				// Record successful update for the serial number
+				results.success.push({ serialNo, updatedProduct });
+			} catch (error) {
+				// Capture any errors and add them to the failed results
+				results.failed.push({ serialNo, reason: error.message });
+			}
 		}
 
-		const updatedProduct = await prisma.products.update({
-			where: {
-				serial_no_companyId: { serial_no: serialNo, companyId: company_id },
-			},
-			data: updateData,
+		// Send back the results of the bulk operation
+		return res.status(StatusCodes.OK).json({
+			msg: "Product(s) sale completed.",
+			results,
 		});
-
-		return res
-			.status(StatusCodes.OK)
-			.json({ msg: "Successfully sold", updatedProduct });
 	},
 	getSoldProductsByName: async (req, res) => {
 		const { product_name, type, brand } = req.params;
@@ -558,7 +581,7 @@ export const InventoryCtrl = {
 				SoldByUser: { connect: { id: user.id } },
 				date_sold: new Date(),
 				bought_for: customerInfo.amount_paid,
-        balance_owed: 0,
+				balance_owed: 0,
 				Customer: {
 					connectOrCreate: {
 						where: {

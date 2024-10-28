@@ -48,13 +48,19 @@ router
 	.get([AuthMiddleware], InventoryCtrl.getCountOfSoldProducts);
 router
 	.route("/getSoldProducts/:type/:brand/:product_name")
-	.get([AuthMiddleware, inventoryRateLimiter], InventoryCtrl.getSoldProductsByName);
+	.get(
+		[AuthMiddleware, inventoryRateLimiter],
+		InventoryCtrl.getSoldProductsByName
+	);
 router
 	.route("/getSwapProductsByCount")
 	.get([AuthMiddleware], InventoryCtrl.getCountOfSwapProducts);
 router
 	.route("/getSwapProducts/:type/:brand/:product_name")
-	.get([AuthMiddleware, inventoryRateLimiter], InventoryCtrl.getSwapProductsByName);
+	.get(
+		[AuthMiddleware, inventoryRateLimiter],
+		InventoryCtrl.getSwapProductsByName
+	);
 router
 	.route("/getBarChartData")
 	.get([AuthMiddleware], InventoryCtrl.getMonthlySalesAndPurchases);
@@ -77,10 +83,10 @@ router
 		InventoryCtrl.updateSoldProduct
 	);
 router
-	.route("/sellProduct/:serialNo")
+	.route("/sellProduct")
 	.patch(
 		[AuthMiddleware, checkSubscriptionStatus, inventoryChangeRateLimiter],
-		InventoryCtrl.sellProduct
+		InventoryCtrl.sellProductsBulk
 	);
 
 router

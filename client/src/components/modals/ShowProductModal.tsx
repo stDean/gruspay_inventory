@@ -1,6 +1,6 @@
 "use client";
 
-import { sellProduct } from "@/actions/inventory";
+import { getProduct, sellProduct } from "@/actions/inventory";
 import { useAppDispatch } from "@/app/redux";
 import { CustomerInfo } from "@/components/CustomerInfo";
 import { Modal } from "@/components/modals/Modal";
@@ -9,9 +9,11 @@ import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
 import useSwapProductModal, { ItemProps } from "@/hook/useSwapModal";
 import { setSingleData } from "@/state";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, PlusCircle, X } from "lucide-react";
+import { useProductsNotSold } from "@/hook/useAllProductsNotSold";
 
 export const ShowProductModal = () => {
 	const showProductModal = useShowProductModal();
@@ -35,6 +37,11 @@ export const ShowProductModal = () => {
 		phone_no: "",
 		amount_paid: "",
 		balance_owed: "",
+	});
+
+	const [search, setSearch] = useState<{ show: boolean; value: string }>({
+		show: false,
+		value: "",
 	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,9 +74,14 @@ export const ShowProductModal = () => {
 					return;
 				}
 
+				if (!showProductModal?.products) {
+					toast.error("Error", { description: "No products selected" });
+					return;
+				}
+
 				const res = await sellProduct({
 					token,
-					serialNo: singleData?.serial_no as string,
+					serialNos: showProductModal?.products?.map(item => item.serial_no),
 					customerInfo,
 				});
 
@@ -92,6 +104,40 @@ export const ShowProductModal = () => {
 		swapProductModal.onOpen(item);
 	};
 
+	const { allProducts } = useProductsNotSold({ token });
+
+	const filteredOption = allProducts?.filter((product: any) => {
+		if (search.value !== "") {
+			return product.serial_no
+				.toLowerCase()
+				.includes(search.value.toLowerCase());
+		} else {
+			return [];
+		}
+	});
+
+	const handleAddAnotherItem = async (serial_no: string) => {
+		if (!serial_no) return;
+
+		const res = await getProduct({ serialNo: serial_no, token });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+
+		showProductModal.addProduct({
+			serial_no: res?.data.serial_no,
+			price: res?.data.price,
+			name: res?.data.product_name,
+		});
+	};
+
+	useEffect(() => {
+		setSearch({ show: false, value: "" });
+	}, [showProductModal.isOpen]);
+
+	console.log({ a: showProductModal?.products });
+
 	const headerContent = (
 		<>
 			<h1 className="text-xl font-semibold text-black">Item Details</h1>
@@ -100,78 +146,94 @@ export const ShowProductModal = () => {
 
 	const bodyContent = (
 		<>
-			<div className="space-y-4 p-4">
-				<div className="flex items-center gap-4">
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-sm text-gray-500 font-semibold">Type</p>
-						<Input value={singleData?.type} className="capitalize" disabled />
-					</div>
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-sm text-gray-500 font-semibold">Brand</p>
-						<Input value={singleData?.brand} className="capitalize" disabled />
+			<div className="p-4 space-y-2">
+				<div className="flex justify-between items-center gap-4">
+					<p className="text-xs md:text-sm font-semibold md:w-44">
+						Outgoing Item(s)
+					</p>
+
+					<div className="flex flex-col gap-2 flex-1 relative">
+						<div className="relative border rounded-lg flex-1">
+							<Input
+								placeholder="serial number..."
+								value={search.value}
+								className="!border-none"
+								onChange={e => {
+									setSearch({ show: true, value: e.target.value });
+								}}
+							/>
+
+							<div
+								className="h-full bg-gray-100 border-l border-gray-400 rounded-tr-lg rounded-br-lg absolute right-0 w-11 flex items-center justify-center top-0 cursor-pointer"
+								onClick={() => {
+									handleAddAnotherItem(search.value);
+									setSearch({ show: false, value: "" });
+								}}
+							>
+								<ArrowRight className="w-5 h-5 " />
+							</div>
+						</div>
+
+						{search.value !== "" && (
+							<div className="bg-white border rounded-md w-full shadow-md absolute top-11 left-0">
+								{filteredOption.map((item: any) => (
+									<p
+										key={item.id}
+										className="p-3 cursor-pointer hover:bg-gray-100"
+										onClick={() => {
+											setSearch({ ...search, value: item.serial_no });
+										}}
+									>
+										{item.serial_no}
+									</p>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
 
-				<div className="flex items-center gap-4">
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-sm text-gray-500 font-semibold">Product Name</p>
-						<Input
-							value={singleData?.product_name}
-							className="capitalize"
-							disabled
-						/>
-					</div>
+				<hr />
+
+				{/* Container with fixed height and scroll for products */}
+				<div
+					className={`flex gap-4 items-center flex-wrap ${
+						showProductModal?.products &&
+						showProductModal?.products?.length > 10
+							? "max-h-64 overflow-y-auto custom-scrollbar"
+							: ""
+					} `}
+				>
+					{showProductModal?.products?.map(item => (
+						<div
+							className="flex items-center gap-2 border rounded-lg p-2 px-1"
+							key={item.serial_no}
+						>
+							<p className="flex flex-col gap-1 flex-1 text-sm">
+								<span>{item.serial_no}</span>
+								<span className="text-gray-500 text-sm font-semibold">
+									{item.name} | {item.price}
+								</span>
+							</p>
+
+							<X
+								className="text-red-500 cursor-pointer hover:text-red-400 h-[13px] w-[13px] self-start"
+								onClick={() => showProductModal.removeProduct(item.serial_no)}
+							/>
+						</div>
+					))}
 				</div>
 
-				<div className="flex items-center gap-4">
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-sm text-gray-500 font-semibold">Price</p>
-						<Input value={singleData?.price} className="capitalize" disabled />
-					</div>
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-sm text-gray-500 font-semibold">Serial No</p>
-						<Input
-							value={singleData?.serial_no}
-							className="capitalize"
-							disabled
-						/>
-					</div>
-				</div>
+				{showProductModal?.products?.length === 0 && (
+					<p
+						className="border p-1 rounded-lg border-blue-500 w-fit text-xs text-blue-500 cursor-pointer hover:border-blue-400 hover:text-blue-400 flex gap-1 items-center"
+						// onClick={() => setSearch({ show: true, value: "" })}
+					>
+						Add Outgoing Item <PlusCircle className="h-4 w-4" />
+					</p>
+				)}
 			</div>
 
 			<hr />
-
-			{!sold && (
-				<>
-					<div className="space-y-4 p-4">
-						<div className="flex items-center gap-4">
-							<div className="flex flex-col gap-1 flex-1">
-								<p className="text-sm text-gray-500 font-semibold">
-									Suppliers Full Name
-								</p>
-								<Input
-									value={singleData?.Supplier.supplier_name}
-									className="capitalize"
-									disabled
-								/>
-							</div>
-
-							<div className="flex flex-col gap-1 flex-1">
-								<p className="text-sm text-gray-500 font-semibold">
-									Suppliers Phone Number
-								</p>
-								<Input
-									value={singleData?.Supplier.supplier_phone_no}
-									className="capitalize"
-									disabled
-								/>
-							</div>
-						</div>
-					</div>
-
-					<hr />
-				</>
-			)}
 
 			{sold && (
 				<>
@@ -179,7 +241,7 @@ export const ShowProductModal = () => {
 						<CustomerInfo
 							customerInfo={customerInfo}
 							handleChange={handleChange}
-							balance_owed
+							balance_owed={(showProductModal?.products ?? []).length <= 1}
 						/>
 					</div>
 
@@ -196,7 +258,7 @@ export const ShowProductModal = () => {
 					{sold ? "Confirm Sale" : "Mark as Sold"}
 				</Button>
 
-				{!sold && (
+				{!sold && (showProductModal?.products ?? []).length <= 1 && (
 					<Button
 						className="w-full py-5"
 						onClick={() =>
@@ -220,7 +282,7 @@ export const ShowProductModal = () => {
 			onClose={handleClose}
 			headerContent={headerContent}
 			body={bodyContent}
-      onSubmit={() => {}}
+			onSubmit={() => {}}
 		/>
 	);
 };

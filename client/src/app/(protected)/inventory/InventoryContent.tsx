@@ -12,6 +12,7 @@ import useAddMultipleProductModal from "@/hook/useAddMultipleProductsModal";
 import useAddProductModal from "@/hook/useAddProductModal";
 import useAddSingleProductModal from "@/hook/useAddSingleProductModal";
 import { useReduxState } from "@/hook/useRedux";
+import useShowProductModal from "@/hook/useShowProduct";
 import { ProductStockProps } from "@/lib/types";
 import { setUser } from "@/state";
 import { useSearchParams } from "next/navigation";
@@ -27,6 +28,7 @@ export const InventoryContent = () => {
 	const addProductsModal = useAddProductModal();
 	const addSingleProductModal = useAddSingleProductModal();
 	const addMultipleProductModal = useAddMultipleProductModal();
+	const showProductModal = useShowProductModal();
 	const dispatch = useAppDispatch();
 
 	const [stats, setStats] = useState<{
@@ -106,7 +108,17 @@ export const InventoryContent = () => {
 			<div className="flex justify-between items-center mb-3 -mt-4">
 				<h1 className="text-2xl font-semibold">Inventory</h1>
 				{companyDetails?.paymentStatus === "ACTIVE" && (
-					<Button onClick={addProductsModal.onOpen}>Add Product(s)</Button>
+					<div className="flex flex-col gap-4 md:flex-row">
+						<Button onClick={() => showProductModal.onOpen(null)} variant="outline">
+							Sell Product(s)
+						</Button>
+						<Button
+							onClick={addProductsModal.onOpen}
+							className="hover:opacity-90"
+						>
+							Add Product(s)
+						</Button>
+					</div>
 				)}
 			</div>
 

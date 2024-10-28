@@ -50,7 +50,11 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 		}
 
 		dispatch(setSingleData(res?.data));
-		showProductModal.onOpen();
+		showProductModal.onOpen({
+			name: res?.data?.product_name,
+			serial_no: res?.data?.serial_no,
+			price: res?.data?.price,
+		});
 	};
 
 	const tableHeaders = (
@@ -102,7 +106,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 			placeHolder="Search serial no..."
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
-      handleClear={() => setFilter("")}
+			handleClear={() => setFilter("")}
 		/>
 	);
 };

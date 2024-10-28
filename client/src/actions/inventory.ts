@@ -190,11 +190,11 @@ export const getProduct = async ({
 
 export const sellProduct = async ({
 	token,
-	serialNo,
+	serialNos,
 	customerInfo,
 }: {
 	token: string;
-	serialNo: string;
+	serialNos: string[];
 	customerInfo: {
 		buyer_name: string;
 		buyer_email?: string;
@@ -204,8 +204,8 @@ export const sellProduct = async ({
 }) => {
 	try {
 		const { data } = await axios.patch(
-			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/sellProduct/${serialNo}`,
-			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no },
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/sellProduct`,
+			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no, serialNos },
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

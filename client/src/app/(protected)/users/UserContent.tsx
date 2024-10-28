@@ -17,12 +17,12 @@ export const UserContent = () => {
 		employees: boolean;
 		customers: boolean;
 		suppliers: boolean;
-		creditors: boolean;
+		debtors: boolean;
 	}>({
 		employees: user?.role === "ADMIN",
 		customers: false,
 		suppliers: user?.role !== "ADMIN",
-		creditors: false,
+		debtors: false,
 	});
 
 	return (
@@ -43,7 +43,7 @@ export const UserContent = () => {
 												employees: true,
 												customers: false,
 												suppliers: false,
-												creditors: false,
+												debtors: false,
 											});
 										}}
 										val={tab.employees}
@@ -58,7 +58,7 @@ export const UserContent = () => {
 											suppliers: true,
 											customers: false,
 											employees: false,
-											creditors: false,
+											debtors: false,
 										});
 									}}
 									val={tab.suppliers}
@@ -79,23 +79,23 @@ export const UserContent = () => {
 														customers: true,
 														employees: false,
 														suppliers: false,
-														creditors: false,
+														debtors: false,
 													});
 												}}
 												val={tab.customers}
 												styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] border-r"
 											/>
 											<Tab
-												title="Creditors"
+												title="Debtors"
 												handleTab={() => {
 													setTab({
 														customers: false,
 														employees: false,
 														suppliers: false,
-														creditors: true,
+														debtors: true,
 													});
 												}}
-												val={tab.creditors}
+												val={tab.debtors}
 												styles="bg-[#F5F8FF] border-[#0D039D] text-[#0D039D] rounded-r-md"
 											/>
 										</>
@@ -122,7 +122,7 @@ export const UserContent = () => {
 			{tab.employees && user?.role === "ADMIN" && <EmployeeTable />}
 			{tab.customers && <CustomersTable />}
 			{tab.suppliers && <SuppliersTable />}
-			{tab.creditors && <CreditorsTable />}
+			{tab.debtors && <CreditorsTable />}
 		</div>
 	);
 };

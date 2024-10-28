@@ -25,13 +25,13 @@ export const AddUserMiddleware = async (req, res, next) => {
 
 	switch (company.billingPlan) {
 		case "PERSONAL":
-			if (company.Users.length === 1) {
+			if (company.Users.length < 2) {
 				return res.status(StatusCodes.BAD_REQUEST).json({
 					msg: "Update plan to perform this action",
 				});
 			}
 		case "TEAM":
-			if (company.Users.length < 3) {
+			if (company.Users.length < 5) {
 				return next();
 			} else {
 				return res.status(StatusCodes.BAD_REQUEST).json({
@@ -39,7 +39,7 @@ export const AddUserMiddleware = async (req, res, next) => {
 				});
 			}
 		case "ENTERPRISE":
-			if (company.Users.length < 5) {
+			if (company.Users.length < 10) {
 				return next();
 			} else {
 				return res.status(StatusCodes.BAD_REQUEST).json({

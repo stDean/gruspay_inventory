@@ -218,8 +218,8 @@ export const SwapProductModal = () => {
 	const bodyContent = (
 		<>
 			<div className="p-4 space-y-2">
-				<div className="flex justify-between items-center">
-					<p className="text-sm font-semibold w-44">Outgoing Item(s)</p>
+				<div className="flex justify-between items-center gap-4">
+					<p className="text-xs md:text-sm font-semibold md:w-44">Outgoing Item(s)</p>
 					{search.show && (
 						<div className="flex flex-col gap-2 flex-1 relative">
 							<div className="relative border rounded-lg flex-1">
