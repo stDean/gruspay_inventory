@@ -58,7 +58,6 @@ export const Creditor = ({ id }: { id: string }) => {
 			<ItemsHeader
 				routeTo="/users"
 				types={creditor?.creditor_name}
-				productName="All Products Purchased"
 			/>
 
 			<CreditorTable products={creditor?.Products} page={page} />

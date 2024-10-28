@@ -50,7 +50,6 @@ export const Customer = ({ id }: { id: string }) => {
 			<ItemsHeader
 				routeTo="/users"
 				types={customer?.buyer_name}
-				productName="All Products Purchased"
 			/>
 
 			<CustomerTable products={customer?.Products} page={page} />

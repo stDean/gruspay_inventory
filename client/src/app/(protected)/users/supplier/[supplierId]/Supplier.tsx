@@ -47,11 +47,7 @@ export const Supplier = ({ id }: { id: string }) => {
 	// Render supplier details if available
 	return supplier ? (
 		<div className="-mt-4">
-			<ItemsHeader
-				routeTo="/users"
-				types={supplier.supplier_name}
-				productName="All Products Supplied"
-			/>
+			<ItemsHeader routeTo="/users" types={supplier.supplier_name} />
 
 			<SupplierTable products={supplier.Products || []} page={page} />
 		</div>
