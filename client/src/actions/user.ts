@@ -206,6 +206,39 @@ export const updateUserRole = async ({
 	}
 };
 
+export const deleteUser = async ({
+	token,
+	id,
+}: {
+	token: string;
+	id: string;
+}) => {
+  try {
+		const { data } = await axios.delete(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/deleteUser/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};
+
 // SUPPLIER
 export const getSuppliers = async ({ token }: { token: string }) => {
 	try {

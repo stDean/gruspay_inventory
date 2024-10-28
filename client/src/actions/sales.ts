@@ -26,18 +26,16 @@ export const getSoldProductsByCount = async ({ token }: { token: string }) => {
 
 export const getSoldProductsByName = async ({
 	token,
-	name,
 	type,
 	brand,
 }: {
 	token: string;
-	name: string;
 	type: string;
 	brand: string;
 }) => {
 	try {
 		const { data } = await axios.get(
-			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSoldProducts/${type}/${brand}/${name}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSoldProducts/${type}/${brand}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -82,18 +80,16 @@ export const getSwapProductsByCount = async ({ token }: { token: string }) => {
 
 export const getSwapProductsByName = async ({
 	token,
-	name,
 	type,
 	brand,
 }: {
 	token: string;
-	name: string;
 	type: string;
 	brand: string;
 }) => {
 	try {
 		const { data } = await axios.get(
-			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSwapProducts/${type}/${brand}/${name}`,
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getSwapProducts/${type}/${brand}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

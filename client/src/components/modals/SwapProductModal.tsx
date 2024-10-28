@@ -300,6 +300,7 @@ export const SwapProductModal = () => {
 				<CustomerInfo
 					customerInfo={customerInfo}
 					handleChange={handleChangeCustomerInfo}
+          amount
 				/>
 			</div>
 

@@ -203,4 +203,32 @@ export const UserCtrl = {
 
 		return res.status(StatusCodes.OK).json({ supplier });
 	},
+	deleteUser: async (req, res) => {
+		// delete a user that is not yourself
+		const {
+			user: { email, company_id },
+			params: { id },
+		} = req;
+
+		const user = await prisma.users.findUnique({ where: { email } });
+		if (user.id === id) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Cannot perform this action" });
+		}
+
+		const deletedUser = await prisma.users.delete({
+			where: { id: req.params.id, companyId: company_id },
+		});
+
+		if (!deletedUser) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "No user with that id" });
+		}
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "User deleted successfully" });
+	},
 };

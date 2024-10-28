@@ -61,10 +61,11 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 		<>
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
-			<TableHead className="px-2 border-r">Date Added</TableHead>
+			<TableHead className="px-2 border-r">Product Name</TableHead>
 			<TableHead className="px-2 border-r">Specifications</TableHead>
 			<TableHead className="px-2 border-r">Value(₦)</TableHead>
 			<TableHead className="px-2">Supplied By</TableHead>
+			<TableHead className="px-2 hidden md:block">Date Added</TableHead>
 		</>
 	);
 
@@ -82,7 +83,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 						{item.serial_no}
 					</TableCell>
 					<TableCell className="border-r capitalize">
-						{format(item?.createdAt, "PPP")}
+            {item.product_name}
 					</TableCell>
 					<TableCell className="border-r capitalize">
 						{item.description}
@@ -90,6 +91,9 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 					<TableCell className="border-r">{item.price}</TableCell>
 					<TableCell className="border-r">
 						{item.Supplier.supplier_name}
+					</TableCell>
+          <TableCell className="border-r hidden md:block">
+						{format(new Date(item.createdAt), "PPP")}
 					</TableCell>
 				</TableRow>
 			))}
@@ -107,6 +111,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
+      searchInput
 		/>
 	);
 };

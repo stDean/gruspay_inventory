@@ -27,6 +27,7 @@ interface TableContainerProps {
 	handleTypeChange?: (value: string) => void;
 	handleBrandChange?: (value: string) => void;
 	handleClear?: () => void;
+  searchInput?:boolean
 }
 
 const FilterSelect = ({
@@ -71,28 +72,31 @@ export const TableContainer = ({
 	handleTypeChange,
 	handleBrandChange,
 	handleClear,
+  searchInput
 }: TableContainerProps) => {
 	return (
 		<div className="rounded-md border w-full shadow-md">
 			{search && (
 				<div className="p-4 border-b flex flex-col gap-2 items-center md:flex-row">
-					<div className="flex-1 flex">
-						<Input
-							className="w-[350px] md:max-w-sm bg-white pr-8"
-							value={value}
-							placeholder={placeHolder}
-							onChange={handleChange}
-						/>
+					{searchInput && (
+						<div className="flex-1 flex">
+							<Input
+								className="w-[350px] md:max-w-sm bg-white pr-8"
+								value={value}
+								placeholder={placeHolder}
+								onChange={handleChange}
+							/>
 
-						{value?.trim() !== "" && (
-							<div className="-ml-6 mt-[9px]">
-								<X
-									className="w-4 h-4 text-red-500 hover:text-red-400 cursor-pointer"
-									onClick={handleClear}
-								/>
-							</div>
-						)}
-					</div>
+							{value?.trim() !== "" && (
+								<div className="-ml-6 mt-[9px]">
+									<X
+										className="w-4 h-4 text-red-500 hover:text-red-400 cursor-pointer"
+										onClick={handleClear}
+									/>
+								</div>
+							)}
+						</div>
+					)}
 
 					{dropFilter && (
 						<div className="flex-1 flex justify-center gap-4 md:justify-end">

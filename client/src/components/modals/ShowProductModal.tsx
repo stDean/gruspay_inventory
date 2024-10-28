@@ -62,31 +62,63 @@ export const ShowProductModal = () => {
 		});
 	};
 
+	// Handle the selling process
+	const [products, setProducts] = useState<
+		Array<{ serialNo: string; amount_paid: string }>
+	>([]);
+
 	const handleSold = () => {
 		if (sold) {
 			startTransition(async () => {
-				if (
-					customerInfo.buyer_name === "" ||
-					customerInfo.phone_no === "" ||
-					customerInfo.amount_paid === ""
-				) {
+				// Validation
+				if (customerInfo.buyer_name === "" || customerInfo.phone_no === "") {
 					toast.error("Error", { description: "Please fill all the fields!" });
 					return;
 				}
 
-				if (!showProductModal?.products) {
+				if (
+					!showProductModal?.products ||
+					showProductModal.products.length === 0
+				) {
 					toast.error("Error", { description: "No products selected" });
 					return;
 				}
 
+				let updatedProducts;
+
+				// Single sale logic
+				if (showProductModal?.products?.length === 1) {
+					updatedProducts = [
+						{
+							serialNo: showProductModal?.products[0].serial_no,
+							amount_paid: customerInfo.amount_paid, // Single product uses customer amount
+						},
+					];
+				}
+				// Bulk sale logic
+				else {
+					updatedProducts = showProductModal?.products?.map(
+						(product, index) => ({
+							serialNo: product.serial_no,
+							amount_paid: products[index]?.amount_paid || "", // Gets individual amount from input
+						})
+					);
+				}
+
+				console.log({ updatedProducts });
+
+				setProducts(updatedProducts);
+
+				// Send request to sell product(s)
 				const res = await sellProduct({
 					token,
-					serialNos: showProductModal?.products?.map(item => item.serial_no),
+					products: updatedProducts,
 					customerInfo,
 				});
 
+				// Handle response
 				if (res?.error) {
-					toast.error("Error", { description: res?.error });
+					toast.error("Error", { description: res.error });
 					handleClose();
 					return;
 				}
@@ -94,9 +126,9 @@ export const ShowProductModal = () => {
 				toast.success("Success", { description: "Product Sold successfully!" });
 				handleClose();
 			});
+		} else {
+			setSold(true);
 		}
-
-		setSold(true);
 	};
 
 	const handleSwap = (item: ItemProps) => {
@@ -106,6 +138,7 @@ export const ShowProductModal = () => {
 
 	const { allProducts } = useProductsNotSold({ token });
 
+	// Filter products based on search input
 	const filteredOption = allProducts?.filter((product: any) => {
 		if (search.value !== "") {
 			return product.serial_no
@@ -116,6 +149,7 @@ export const ShowProductModal = () => {
 		}
 	});
 
+	// Handle adding another item to the sale
 	const handleAddAnotherItem = async (serial_no: string) => {
 		if (!serial_no) return;
 
@@ -132,11 +166,28 @@ export const ShowProductModal = () => {
 		});
 	};
 
+	// Update the amount paid for each product
+	const handleAmountPaidChange = (index: number, value: string) => {
+		setProducts(prevProducts => {
+			const updatedProducts = [...prevProducts];
+			updatedProducts[index] = {
+				...updatedProducts[index],
+				amount_paid: value,
+			};
+			return updatedProducts;
+		});
+	};
+
 	useEffect(() => {
 		setSearch({ show: false, value: "" });
+		setProducts([]);
 	}, [showProductModal.isOpen]);
 
-	console.log({ a: showProductModal?.products });
+	useEffect(() => {
+		if (showProductModal?.products && showProductModal.products.length === 0) {
+			setProducts([]);
+		}
+	}, [showProductModal?.products?.length]);
 
 	const headerContent = (
 		<>
@@ -167,6 +218,10 @@ export const ShowProductModal = () => {
 								className="h-full bg-gray-100 border-l border-gray-400 rounded-tr-lg rounded-br-lg absolute right-0 w-11 flex items-center justify-center top-0 cursor-pointer"
 								onClick={() => {
 									handleAddAnotherItem(search.value);
+									setProducts([
+										...products,
+										{ serialNo: search.value, amount_paid: "" },
+									]);
 									setSearch({ show: false, value: "" });
 								}}
 							>
@@ -203,22 +258,29 @@ export const ShowProductModal = () => {
 							: ""
 					} `}
 				>
-					{showProductModal?.products?.map(item => (
-						<div
-							className="flex items-center gap-2 border rounded-lg p-2 px-1"
-							key={item.serial_no}
-						>
-							<p className="flex flex-col gap-1 flex-1 text-sm">
-								<span>{item.serial_no}</span>
-								<span className="text-gray-500 text-sm font-semibold">
-									{item.name} | {item.price}
-								</span>
-							</p>
+					{showProductModal?.products?.map((item, index) => (
+						<div key={item.serial_no} className="flex gap-4 items-center">
+							<div className="flex items-center gap-2 border rounded-lg p-2 px-1">
+								<p className="flex flex-col gap-1 flex-1 text-sm">
+									<span>{item.serial_no}</span>
+									<span className="text-gray-500 text-sm font-semibold">
+										{item.name} | {item.price}
+									</span>
+								</p>
 
-							<X
-								className="text-red-500 cursor-pointer hover:text-red-400 h-[13px] w-[13px] self-start"
-								onClick={() => showProductModal.removeProduct(item.serial_no)}
-							/>
+								<X
+									className="text-red-500 cursor-pointer hover:text-red-400 h-[13px] w-[13px] self-start"
+									onClick={() => showProductModal.removeProduct(item.serial_no)}
+								/>
+							</div>
+
+							{(showProductModal?.products ?? []).length > 1 && (
+								<Input
+									placeholder="selling price(not required)"
+									className="flex-1"
+									onChange={e => handleAmountPaidChange(index, e.target.value)}
+								/>
+							)}
 						</div>
 					))}
 				</div>
@@ -242,6 +304,7 @@ export const ShowProductModal = () => {
 							customerInfo={customerInfo}
 							handleChange={handleChange}
 							balance_owed={(showProductModal?.products ?? []).length <= 1}
+							amount={(showProductModal?.products ?? []).length <= 1}
 						/>
 					</div>
 

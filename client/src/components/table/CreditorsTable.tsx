@@ -96,6 +96,7 @@ export const CreditorsTable = () => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
+      searchInput
 		/>
 	) : (
 		<p>No Creditors yet</p>

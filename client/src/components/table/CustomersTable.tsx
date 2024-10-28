@@ -96,6 +96,7 @@ export const CustomersTable = () => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
       handleClear={() => setFilter("")}
+      searchInput
 		/>
 	) : (
 		<p>No Customers yet</p>

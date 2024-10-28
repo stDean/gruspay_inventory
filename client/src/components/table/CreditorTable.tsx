@@ -85,6 +85,7 @@ export const CreditorTable = ({
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
+      searchInput
 		/>
 	);
 };

@@ -51,12 +51,15 @@ export const SwapProductTable = ({
 		<>
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
-			<TableHead className="px-2 border-r">Date Swapped</TableHead>
+			<TableHead className="px-2 border-r">Product Name</TableHead>
 			<TableHead className="px-2 border-r">Value(₦)</TableHead>
-			<TableHead className="px-2">Swap By</TableHead>
+			<TableHead className="px-2 hidden md:block">Swap By</TableHead>
 			<TableHead className="px-2">Swap To</TableHead>
 			<TableHead className="px-2">Swap Count</TableHead>
 			<TableHead className="px-2">Amount Included(₦)</TableHead>
+			<TableHead className="px-2 border-r hidden md:block">
+				Date Swapped
+			</TableHead>
 		</>
 	);
 
@@ -74,14 +77,14 @@ export const SwapProductTable = ({
 						{product.serial_no}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
-						{format(product.date_sold as string, "PPP")}
+						{product.product_name}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.price}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell className="px-2 border-r w-5 md:w-10 hidden md:block">
 						{product.SoldByUser?.first_name
-							? `${product.SoldByUser?.first_name} ${product.SoldByUser?.last_name}`
+							? `${product.SoldByUser?.first_name}`
 							: `${product.SoldByUser?.email}`}
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
@@ -92,6 +95,9 @@ export const SwapProductTable = ({
 					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}
+					</TableCell>
+					<TableCell className="px-2 border-r w-5 md:w-10 hidden md:block">
+						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>
 			))}
@@ -108,6 +114,7 @@ export const SwapProductTable = ({
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
+      searchInput
 		/>
 	);
 };

@@ -5,11 +5,5 @@ interface ProductsProps {
 }
 
 export default function page({ params }: ProductsProps) {
-	return (
-		<SwapProduct
-			name={params.name[2]}
-			type={params.name[0]}
-			brand={params.name[1]}
-		/>
-	);
+	return <SwapProduct type={params.name[0]} brand={params.name[1]} />;
 }

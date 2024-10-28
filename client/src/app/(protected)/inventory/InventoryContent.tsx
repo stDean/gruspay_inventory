@@ -64,7 +64,7 @@ export const InventoryContent = () => {
 		dispatch(setUser(res?.data.userInDb));
 	}, [token, user]);
 
-	const getInventoryStat = async () => {
+	const getInventoryStat = useCallback(async () => {
 		const res = await getInventoryStats({ token });
 		if (res?.error) {
 			toast.error("Error", { description: res?.error });
@@ -84,12 +84,12 @@ export const InventoryContent = () => {
 			totalPrice: res?.data.totalPrice,
 			topSeller: res?.data.topSoldProduct.product_name,
 		});
-	};
+	}, [token, showProductModal.isOpen]);
 
 	useEffect(() => {
 		getProducts();
 		getInventoryStat();
-	}, [getProducts]);
+	}, [getProducts, getInventoryStat]);
 
 	useEffect(() => {
 		setUserState();
@@ -109,7 +109,10 @@ export const InventoryContent = () => {
 				<h1 className="text-2xl font-semibold">Inventory</h1>
 				{companyDetails?.paymentStatus === "ACTIVE" && (
 					<div className="flex flex-col gap-4 md:flex-row">
-						<Button onClick={() => showProductModal.onOpen(null)} variant="outline">
+						<Button
+							onClick={() => showProductModal.onOpen(null)}
+							variant="outline"
+						>
 							Sell Product(s)
 						</Button>
 						<Button

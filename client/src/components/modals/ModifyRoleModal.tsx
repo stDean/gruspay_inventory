@@ -1,6 +1,6 @@
 "use client";
 
-import { updateUserRole } from "@/actions/user";
+import { deleteUser, updateUserRole } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectItem } from "@/components/ui/select";
@@ -13,7 +13,7 @@ import { Modal } from "@/components/modals/Modal";
 
 export const ModifyRoleModal = () => {
 	const modifyModal = useModifyRoleModal();
-	const { token } = useReduxState();
+	const { token, user } = useReduxState();
 	const [role, setRole] = useState(modifyModal?.user?.role as string);
 
 	useEffect(() => {
@@ -39,6 +39,18 @@ export const ModifyRoleModal = () => {
 		});
 
 		modifyModal.onClose();
+	};
+
+	const handleDelete = async (id: string) => {
+		const res = await deleteUser({ token, id });
+
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			return;
+		}
+
+		toast.success("Success", { description: "User successfully removed." });
+    modifyModal.onClose();
 	};
 
 	const bodyContent = (
@@ -82,9 +94,21 @@ export const ModifyRoleModal = () => {
 
 			<hr />
 
-			<div className="px-6 py-4 flex justify-end">
+			<div className="px-6 py-4 gap-4 flex justify-end">
 				<Button onClick={() => handleUpdate(modifyModal?.user?.id as string)}>
 					Update Role
+				</Button>
+
+				<Button
+					onClick={() => {
+						handleDelete(modifyModal?.user?.id as string);
+					}}
+					className={`bg-red-500 hover:bg-red-400 text-white ${
+						modifyModal?.user?.id === user?.id && "cursor-not-allowed"
+					}`}
+					disabled={modifyModal?.user?.id === user?.id}
+				>
+					Delete User
 				</Button>
 			</div>
 		</>
@@ -96,7 +120,7 @@ export const ModifyRoleModal = () => {
 			onClose={modifyModal.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
-      onSubmit={() => {}}
+			onSubmit={() => {}}
 		/>
 	);
 };

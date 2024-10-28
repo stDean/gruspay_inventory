@@ -53,12 +53,13 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 		<>
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
-			<TableHead className="px-2 border-r">Date Sold</TableHead>
+			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
 			<TableHead className="px-2 border-r">Value</TableHead>
-			<TableHead className="px-2">Sold By</TableHead>
+			<TableHead className="px-2 hidden md:block">Sold By</TableHead>
 			<TableHead className="px-2">Sold To</TableHead>
 			<TableHead className="px-2">Amount Paid(₦)</TableHead>
 			<TableHead className="px-2">Balance Owed(₦)</TableHead>
+			<TableHead className="px-2 border-r hidden md:block">Date Sold</TableHead>
 		</>
 	);
 
@@ -76,12 +77,12 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 						{item.serial_no}
 					</TableCell>
 					<TableCell className="border-r capitalize">
-						{format(item.date_sold as string, "PPP")}
+						{item.product_name}
 					</TableCell>
 					<TableCell className="border-r capitalize">{item.price}</TableCell>
-					<TableCell className="border-r">
+					<TableCell className="border-r hidden md:block">
 						{item.SoldByUser?.first_name
-							? `${item.SoldByUser?.first_name} ${item.SoldByUser?.last_name}`
+							? `${item.SoldByUser?.first_name}`
 							: `${item.SoldByUser?.email}`}
 					</TableCell>
 					<TableCell className="border-r">
@@ -89,6 +90,9 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 					</TableCell>
 					<TableCell className="border-r">{item.bought_for}</TableCell>
 					<TableCell className="border-r">{item.balance_owed}</TableCell>
+					<TableCell className="border-r capitalize hidden md:block">
+						{format(item.date_sold as string, "PPP")}
+					</TableCell>
 				</TableRow>
 			))}
 		</>
@@ -105,6 +109,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
+      searchInput
 		/>
 	);
 };

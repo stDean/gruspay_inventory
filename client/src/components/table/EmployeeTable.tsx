@@ -1,25 +1,26 @@
 "use client";
 
-import { getUserById, getUsers } from "@/actions/user";
+import { getUserById } from "@/actions/user";
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import useAddUserModal from "@/hook/useAddUserModal";
 import { useReduxState } from "@/hook/useRedux";
 import useModifyRoleModal from "@/hook/useUpdateRoleModal";
 import { UserProps } from "@/lib/types";
 import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../Spinners";
 import { TableContainer } from "./Table";
 
-export const EmployeeTable = () => {
-	const userModal = useAddUserModal();
+export const EmployeeTable = ({
+	isPending,
+	users,
+}: {
+	isPending: boolean;
+	users: Array<UserProps>;
+}) => {
 	const modifyModal = useModifyRoleModal();
 
 	const { token } = useReduxState();
-	const [isPending, startTransition] = useTransition();
-	const [users, setUsers] = useState<Array<UserProps>>([]);
 
 	const searchParam = useSearchParams();
 	const rowsPerPage = 20;
@@ -34,19 +35,6 @@ export const EmployeeTable = () => {
 		indexOfLastTransaction
 	);
 
-	const getAllUsers = useCallback(() => {
-		startTransition(async () => {
-			const res = await getUsers({ token });
-
-			if (res?.error) {
-				toast.error("Error", { description: res?.error });
-				return;
-			}
-
-			setUsers(res?.data.users);
-		});
-	}, [token]);
-
 	const handleClick = async (id: string) => {
 		const res = await getUserById({ token, id });
 		if (res?.error) {
@@ -56,10 +44,6 @@ export const EmployeeTable = () => {
 
 		modifyModal.onOpen(res?.data.user);
 	};
-
-	useEffect(() => {
-		getAllUsers();
-	}, [userModal.isOpen, modifyModal.isOpen, getAllUsers]);
 
 	const tableHeaders = (
 		<>
@@ -106,6 +90,7 @@ export const EmployeeTable = () => {
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
+      
 		/>
 	);
 };

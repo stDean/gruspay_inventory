@@ -5,11 +5,5 @@ interface ProductsProps {
 }
 
 export default function page({ params }: ProductsProps) {
-	return (
-		<SoldProduct
-			name={params.name[2]}
-			type={params.name[0]}
-			brand={params.name[1]}
-		/>
-	);
+	return <SoldProduct type={params.name[0]} brand={params.name[1]} />;
 }

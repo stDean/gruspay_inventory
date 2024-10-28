@@ -11,11 +11,9 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const SoldProduct = ({
-	name,
 	type,
 	brand,
 }: {
-	name: string;
 	type: string;
 	brand: string;
 }) => {
@@ -27,7 +25,7 @@ export const SoldProduct = ({
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
-			const res = await getSoldProductsByName({ name, token, type, brand });
+			const res = await getSoldProductsByName({ token, type, brand });
 			if (res?.error) {
 				toast.error("Error", { description: res?.error });
 				return;
@@ -47,19 +45,11 @@ export const SoldProduct = ({
 		.map(p => p.brand)
 		.filter((v, i, a) => a.indexOf(v) === i)[0];
 
-	const productName = name.replace(/%20/g, " ");
-
 	return isPending ? (
 		<Spinner />
 	) : products.length !== 0 ? (
 		<div className="-mt-4">
-			<ItemsHeader
-				addBrand
-				brands={brands}
-				routeTo="/sold"
-				types={types}
-				productName={productName}
-			/>
+			<ItemsHeader addBrand brands={brands} routeTo="/sold" types={types} />
 			<SoldProductsTable products={products} page={page} />
 		</div>
 	) : (

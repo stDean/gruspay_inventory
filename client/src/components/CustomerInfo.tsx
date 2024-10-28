@@ -6,6 +6,7 @@ export const CustomerInfo = ({
 	customerInfo,
 	handleChange,
 	balance_owed,
+  amount
 }: {
 	customerInfo: {
 		buyer_name: string;
@@ -16,6 +17,7 @@ export const CustomerInfo = ({
 	};
 	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	balance_owed?: boolean;
+  amount?:boolean
 }) => {
 	return (
 		<>
@@ -64,16 +66,18 @@ export const CustomerInfo = ({
 						/>
 					</div>
 
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-xs text-gray-500 font-semibold">Amount Paid</p>
-						<Input
-							value={customerInfo?.amount_paid}
-							className=""
-							name="amount_paid"
-							placeholder="Amount Paid"
-							onChange={handleChange}
-						/>
-					</div>
+					{amount && (
+						<div className="flex flex-col gap-1 flex-1">
+							<p className="text-xs text-gray-500 font-semibold">Amount Paid</p>
+							<Input
+								value={customerInfo?.amount_paid}
+								className=""
+								name="amount_paid"
+								placeholder="Amount Paid"
+								onChange={handleChange}
+							/>
+						</div>
+					)}
 
 					{balance_owed && (
 						<div className="flex flex-col gap-1 flex-1">

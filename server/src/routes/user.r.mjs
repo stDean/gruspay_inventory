@@ -128,4 +128,17 @@ router
 		UserCtrl.createUser
 	);
 
+router
+	.route("/deleteUser/:id")
+	.delete(
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			checkSubscriptionStatus,
+			userChangeRateLimiter,
+		],
+		AuthMiddleware,
+		UserCtrl.deleteUser
+	);
+
 export default router;

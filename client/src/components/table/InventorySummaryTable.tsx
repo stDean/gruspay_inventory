@@ -74,14 +74,10 @@ export const InventorySummaryTable = ({
 	);
 
 	const filteredProducts = productsByPage.filter(item => {
-		const matchesSearch = item.product_name
-			.toLowerCase()
-			.includes(filter.search.trim().toLowerCase());
-
 		const matchesType = filter.type === "all" || item.type === filter.type;
 		const matchesBrand = filter.brand === "all" || item.brand === filter.brand;
 
-		return matchesSearch && matchesType && matchesBrand;
+		return matchesType && matchesBrand;
 	});
 
 	const tableHeaders = (
@@ -89,7 +85,6 @@ export const InventorySummaryTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className="px-2 border-r w-36">Type</TableHead>
 			<TableHead className="px-2 border-r w-36">Brand</TableHead>
-			<TableHead className="px-2 border-r w-36">Product Name</TableHead>
 			<TableHead className="px-2 w-28">{count} Count</TableHead>
 		</>
 	);
@@ -97,15 +92,14 @@ export const InventorySummaryTable = ({
 	const tableBody = (
 		<>
 			{filteredProducts.map((item, idx) => (
-				<TableRow key={item.product_name + idx} className="hover:!bg-none">
+				<TableRow key={item.brand + idx} className="hover:!bg-none">
 					<TableCell className="border-r">{idx + 1}</TableCell>
 					<TableCell className="border-r capitalize">{item.type}</TableCell>
-					<TableCell className="border-r capitalize">{item.brand}</TableCell>
 					<TableCell className="border-r capitalize hover:underline hover:underline-offset-3 text-blue-500 hover:text-blue-400">
 						<Link
-							href={`/${linkTo}/${item.type}/${item.brand}/${item.product_name}`}
+							href={`/${linkTo}/${item.type}/${item.brand}`}
 						>
-							{item.product_name}
+							{item.brand}
 						</Link>
 					</TableCell>
 					<TableCell className="border-r">{item._count["type"]}</TableCell>

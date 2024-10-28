@@ -96,6 +96,7 @@ export const SuppliersTable = () => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
+      searchInput
 		/>
 	) : (
 		<p>No Suppliers yet</p>

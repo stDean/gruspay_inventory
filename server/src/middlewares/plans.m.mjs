@@ -23,13 +23,16 @@ export const AddUserMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
+	console.log({ a: company.Users.length });
+
 	switch (company.billingPlan) {
 		case "PERSONAL":
 			if (company.Users.length < 2) {
-				return res.status(StatusCodes.BAD_REQUEST).json({
-					msg: "Update plan to perform this action",
-				});
+				return next();
 			}
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				msg: "Update plan to perform this action",
+			});
 		case "TEAM":
 			if (company.Users.length < 5) {
 				return next();

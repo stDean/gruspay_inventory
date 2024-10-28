@@ -32,17 +32,15 @@ export const getProductsByStock = async ({ token }: { token: string }) => {
 };
 
 export const getProductsByName = async ({
-	name,
 	token,
 	type,
 	brand,
 }: {
-	name: string;
 	token: string;
 	type: string;
 	brand: string;
 }) => {
-	const URI = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProducts/${type}/${brand}/${name}`;
+	const URI = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getProducts/${type}/${brand}`;
 	try {
 		const { data } = await axios.get(URI, {
 			headers: {
@@ -190,22 +188,21 @@ export const getProduct = async ({
 
 export const sellProduct = async ({
 	token,
-	serialNos,
+	products,
 	customerInfo,
 }: {
 	token: string;
-	serialNos: string[];
+	products: { amount_paid: string; serialNo: string }[];
 	customerInfo: {
 		buyer_name: string;
 		buyer_email?: string;
-		amount_paid: string;
 		phone_no: string;
 	};
 }) => {
 	try {
 		const { data } = await axios.patch(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/sellProduct`,
-			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no, serialNos },
+			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no, products },
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

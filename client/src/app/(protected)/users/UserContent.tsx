@@ -1,5 +1,6 @@
 "use client";
 
+import { getUsers } from "@/actions/user";
 import { Tab } from "@/components/Tab";
 import { CreditorsTable } from "@/components/table/CreditorsTable";
 import { CustomersTable } from "@/components/table/CustomersTable";
@@ -8,11 +9,15 @@ import { SuppliersTable } from "@/components/table/SuppliersTable";
 import { Button } from "@/components/ui/button";
 import useAddUserModal from "@/hook/useAddUserModal";
 import { useReduxState } from "@/hook/useRedux";
-import { useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { UserProps } from "@/lib/types";
+import { toast } from "sonner";
+import useModifyRoleModal from "@/hook/useUpdateRoleModal";
 
 export const UserContent = () => {
-	const { companyDetails, user } = useReduxState();
+	const { companyDetails, user, token } = useReduxState();
 	const userModal = useAddUserModal();
+	const modifyModal = useModifyRoleModal();
 	const [tab, setTab] = useState<{
 		employees: boolean;
 		customers: boolean;
@@ -24,6 +29,26 @@ export const UserContent = () => {
 		suppliers: user?.role !== "ADMIN",
 		debtors: false,
 	});
+
+	const [users, setUsers] = useState<Array<UserProps>>([]);
+	const [isPending, startTransition] = useTransition();
+
+	const getAllUsers = useCallback(() => {
+		startTransition(async () => {
+			const res = await getUsers({ token });
+
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			setUsers(res?.data.users);
+		});
+	}, [token]);
+
+	useEffect(() => {
+		getAllUsers();
+	}, [userModal.isOpen, modifyModal.isOpen, getAllUsers]);
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -105,13 +130,20 @@ export const UserContent = () => {
 				</div>
 
 				{tab.employees &&
-					companyDetails?.billingPlan !== "PERSONAL" &&
 					companyDetails?.paymentStatus === "ACTIVE" &&
 					user?.role === "ADMIN" && (
 						<>
 							<Button
 								className="text-sm md:text-base md:px-6 md:py-5 hover:opacity-90"
 								onClick={userModal.onOpen}
+								disabled={
+									(companyDetails?.billingPlan === "ENTERPRISE" &&
+										users.length === 10) ||
+									(companyDetails?.billingPlan === "TEAM" &&
+										users.length === 5) ||
+									(companyDetails?.billingPlan === "PERSONAL" &&
+										users.length === 2)
+								}
 							>
 								Add User
 							</Button>
@@ -119,7 +151,9 @@ export const UserContent = () => {
 					)}
 			</div>
 
-			{tab.employees && user?.role === "ADMIN" && <EmployeeTable />}
+			{tab.employees && user?.role === "ADMIN" && (
+				<EmployeeTable isPending={isPending} users={users} />
+			)}
 			{tab.customers && <CustomersTable />}
 			{tab.suppliers && <SuppliersTable />}
 			{tab.debtors && <CreditorsTable />}

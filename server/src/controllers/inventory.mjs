@@ -224,11 +224,10 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json(products);
 	},
 	getProducts: async (req, res) => {
-		const { product_name, type, brand } = req.params;
+		const { type, brand } = req.params;
 		const products = await prisma.products.findMany({
 			where: {
 				companyId: req.user.company_id,
-				product_name,
 				sales_status: "NOT_SOLD",
 				type,
 				brand,
@@ -255,7 +254,7 @@ export const InventoryCtrl = {
 	getProductWithCount: async (req, res) => {
 		const productsByCount = await prisma.products.groupBy({
 			where: { companyId: req.user.company_id, sales_status: "NOT_SOLD" },
-			by: ["type", "brand", "product_name"],
+			by: ["type", "brand"],
 			_count: {
 				type: true,
 			},
@@ -319,27 +318,21 @@ export const InventoryCtrl = {
 		res.status(StatusCodes.OK).json({ msg: "updateProduct", updatedProduct });
 	},
 	sellProductsBulk: async (req, res) => {
-		let { serialNos } = req.body; // Extract serial numbers from request body
-		const {
-			buyer_name,
-			buyer_email,
-			amount_paid,
-			buyer_phone_no,
-			balance_owed,
-		} = req.body; // Extract buyer info and payment details
-		const { company_id, email } = req.user; // Extract company ID and user email from the authenticated user
+		let { products, buyer_name, buyer_email, buyer_phone_no, balance_owed } =
+			req.body; // Array of products, each with serialNo and amount_paid
+		const { company_id, email } = req.user; // Authenticated user info
 
-		// Ensure serialNos is always an array for uniform processing
-		if (!Array.isArray(serialNos)) {
-			serialNos = [serialNos]; // Convert single serial number input to an array
+		// Ensure products is always an array for uniform processing
+		if (!Array.isArray(products)) {
+			products = [products]; // Convert single product input to an array
 		}
 
 		// Retrieve the user making the request
 		const user = await prisma.users.findUnique({ where: { email } });
 		const results = { success: [], failed: [] }; // Initialize results object to store success and failure info
 
-		// Loop through each serial number to process them individually
-		for (let serialNo of serialNos) {
+		// Loop through each product to process them individually
+		for (let { serialNo, amount_paid } of products) {
 			try {
 				// Find the product by serial number and company ID
 				const product = await prisma.products.findUnique({
@@ -354,15 +347,15 @@ export const InventoryCtrl = {
 						serialNo,
 						reason: product ? "Already sold" : "Not found",
 					});
-					continue; // Skip to the next serial number in the loop
+					continue; // Skip to the next product in the loop
 				}
 
-				// Prepare update data to mark the product as sold
+				// Prepare update data to mark the product as sold with a specific price
 				const updateData = {
 					sales_status: "SOLD",
 					SoldByUser: { connect: { id: user.id } }, // Connect the product to the user who sold it
 					date_sold: new Date(),
-					bought_for: amount_paid,
+					bought_for: amount_paid || product.price,
 					balance_owed: balance_owed || "0", // Default to "0" if no balance owed
 				};
 
@@ -430,12 +423,11 @@ export const InventoryCtrl = {
 		});
 	},
 	getSoldProductsByName: async (req, res) => {
-		const { product_name, type, brand } = req.params;
+		const { type, brand } = req.params;
 		const soldProducts = await prisma.products.findMany({
 			where: {
 				companyId: req.user.company_id,
 				sales_status: "SOLD",
-				product_name,
 				type,
 				brand,
 			},
@@ -458,7 +450,7 @@ export const InventoryCtrl = {
 	getCountOfSoldProducts: async (req, res) => {
 		const productsByCount = await prisma.products.groupBy({
 			where: { companyId: req.user.company_id, sales_status: "SOLD" },
-			by: ["type", "brand", "product_name"],
+			by: ["type", "brand"],
 			_count: {
 				type: true,
 			},
@@ -466,12 +458,11 @@ export const InventoryCtrl = {
 		return res.status(StatusCodes.OK).json(productsByCount);
 	},
 	getSwapProductsByName: async (req, res) => {
-		const { product_name, type, brand } = req.params;
+		const { type, brand } = req.params;
 		const swapProducts = await prisma.products.findMany({
 			where: {
 				companyId: req.user.company_id,
 				sales_status: "SWAP",
-				product_name,
 				type,
 				brand,
 			},
@@ -496,7 +487,7 @@ export const InventoryCtrl = {
 	getCountOfSwapProducts: async (req, res) => {
 		const productsByCount = await prisma.products.groupBy({
 			where: { companyId: req.user.company_id, sales_status: "SWAP" },
-			by: ["type", "brand", "product_name"],
+			by: ["type", "brand"],
 			_count: {
 				type: true,
 			},

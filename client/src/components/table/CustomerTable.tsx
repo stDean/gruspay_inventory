@@ -78,6 +78,7 @@ export const CustomerTable = ({
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
       handleClear={() => setFilter("")}
+      searchInput
 		/>
 	);
 };

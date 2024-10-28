@@ -11,11 +11,9 @@ import { useCallback, useTransition, useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export const SwapProduct = ({
-	name,
 	type,
 	brand,
 }: {
-	name: string;
 	type: string;
 	brand: string;
 }) => {
@@ -28,7 +26,6 @@ export const SwapProduct = ({
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
 			const res = await getSwapProductsByName({
-				name,
 				token,
 				type,
 				brand,
@@ -52,7 +49,6 @@ export const SwapProduct = ({
 		.map(p => p.brand)
 		.filter((v, i, a) => a.indexOf(v) === i)[0];
 
-	const productName = name.replace(/%20/g, " ");
 
 	return isPending ? (
 		<Spinner />
@@ -64,7 +60,6 @@ export const SwapProduct = ({
 					brands={brands}
 					routeTo="/sold"
 					types={types}
-					productName={productName}
 				/>
 
 				<SwapProductTable products={products} page={page} />

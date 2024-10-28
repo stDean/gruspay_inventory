@@ -6,13 +6,11 @@ export const ItemsHeader = ({
 	brands,
 	routeTo,
 	types,
-	productName,
 	addBrand,
 }: {
 	brands?: string;
 	routeTo: string;
 	types: string;
-	productName: string;
 	addBrand?: boolean;
 }) => {
 	const router = useRouter();
@@ -34,8 +32,7 @@ export const ItemsHeader = ({
 					</>
 				)}
 				<span className="text-xl">{types}</span>
-				<ChevronRight className="h-6 w-6" />
-				{productName}
+				
 			</h1>
 		</>
 	);
