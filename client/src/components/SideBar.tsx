@@ -4,21 +4,22 @@ import { Logout } from "@/actions/logout";
 import { useAppDispatch } from "@/app/redux";
 import { useReduxState } from "@/hook/useRedux";
 import {
-	setEmail,
-	setIsSidebarCollapsed,
-	setLoggedInUser,
-	setToken,
-	setUser,
+  setEmail,
+  setIsSidebarCollapsed,
+  setLoggedInUser,
+  setToken,
+  setUser,
 } from "@/state";
 import {
-	Archive,
-	ClipboardCheck,
-	Layout,
-	LogOut,
-	LucideIcon,
-	Menu,
-	SlidersHorizontal,
-	Users,
+  Archive,
+  ClipboardCheck,
+  FileText,
+  Layout,
+  LogOut,
+  LucideIcon,
+  Menu,
+  SlidersHorizontal,
+  Users
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -77,12 +78,12 @@ export const SideBar = () => {
 	};
 
 	const handleLogout = () => {
-		router.push("/welcome");
 		Logout();
 		dispatch(setLoggedInUser(false));
 		dispatch(setToken(""));
 		dispatch(setEmail(""));
 		dispatch(setUser({}));
+		router.push("/welcome");
 	};
 
 	const sidebarClassNames = `fixed flex flex-col ${
@@ -150,17 +151,18 @@ export const SideBar = () => {
 				/>
 
 				<SidebarLink
+					href="/invoice"
+					icon={FileText}
+					label="Invoice"
+					isCollapsed={isSidebarCollapsed}
+				/>
+
+				<SidebarLink
 					href="/settings"
 					icon={SlidersHorizontal}
 					label="Settings"
 					isCollapsed={isSidebarCollapsed}
 				/>
-				{/* <SidebarLink
-					href="/expenses"
-					icon={CircleDollarSign}
-					label="Expenses"
-					isCollapsed={isSidebarCollapsed}
-				/> */}
 			</div>
 
 			{/* FOOTER */}

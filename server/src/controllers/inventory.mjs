@@ -81,6 +81,12 @@ const getOrCreateSupplier = async supplierData => {
 // 	return {};
 // };
 
+/**
+ * TODO:
+ * for the sellProductsBulk and updateSoldProduct we need to create an invoice
+ * the invoice would be sent to both the backend and the users email.
+ */
+
 export const InventoryCtrl = {
 	createProduct: async (req, res) => {
 		const {

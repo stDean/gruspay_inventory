@@ -1,6 +1,7 @@
+"use client";
+
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 export const ItemsHeader = ({
 	brands,
@@ -10,7 +11,7 @@ export const ItemsHeader = ({
 }: {
 	brands?: string;
 	routeTo: string;
-	types: string;
+	types?: string;
 	addBrand?: boolean;
 }) => {
 	const router = useRouter();
@@ -24,16 +25,18 @@ export const ItemsHeader = ({
 			>
 				<ArrowLeft className="h-4 w-4" /> Back
 			</p>
-			<h1 className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3">
-				{addBrand && (
-					<>
-						<span className="text-xl">{brands}</span>
-						<ChevronRight className="h-5 w-5" />
-					</>
-				)}
-				<span className="text-xl">{types}</span>
-				
-			</h1>
+
+			{types && (
+				<h1 className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3">
+					{addBrand && (
+						<span>
+							<span className="text-xl">{brands}</span>
+							<ChevronRight className="h-5 w-5" />
+						</span>
+					)}
+					<span className="text-xl">{types}</span>
+				</h1>
+			)}
 		</>
 	);
 };
