@@ -511,6 +511,8 @@ export const InventoryCtrl = {
 			)
 		);
 
+		// TODO:send invoice to the user
+
 		return res.status(StatusCodes.OK).json({
 			msg: "Product(s) sale completed.",
 			results,
@@ -687,6 +689,8 @@ export const InventoryCtrl = {
 				OutgoingProduct: { connect: { id: swap.id } },
 			},
 		});
+
+    // TODO:Add a the invoice here too, and also send an email notification, the status === SWAP
 
 		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
 	},
@@ -1147,8 +1151,6 @@ export const InventoryCtrl = {
 				.status(StatusCodes.NOT_FOUND)
 				.json({ msg: "Product not found", success: false });
 		}
-		console.log({ product, amount, invoiceId, res: req.body, id });
-		return;
 
 		// Calculate the updated balance
 		const balance = Number(product.balance_owed) - Number(amount);
@@ -1197,7 +1199,6 @@ export const InventoryCtrl = {
 		// Find the invoice associated with this product
 		const invoice = await prisma.invoice.findUnique({
 			where: { companyId: company_id, id: invoiceId },
-			product: { contains: JSON.stringify([{ id: product.id }]) },
 		});
 
 		if (invoice) {
@@ -1236,6 +1237,8 @@ export const InventoryCtrl = {
 				});
 			}
 		}
+
+		// TODO:send invoice to the user with the money they paid and if their is a balance add it
 
 		// Return success message
 		return res

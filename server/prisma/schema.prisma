@@ -45,6 +45,7 @@ enum InvoiceStatus {
   DRAFT
   PAID
   OUTSTANDING
+  SWAP
 }
 
 model Company {

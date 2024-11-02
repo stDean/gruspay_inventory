@@ -1,3 +1,5 @@
+"use client";
+
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -10,6 +12,35 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { useReduxState } from "@/hook/useRedux";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { getSoldInvoice } from "@/actions/invoice";
+import { toast } from "sonner";
+
+interface InvoiceProps {
+	status: string;
+	invoiceNo: string;
+	balance_due: string;
+	createdAt: string;
+	updatedAt: string;
+	customer?: {
+		customerName: string;
+		customerNo: string;
+		customerEmail: string;
+	};
+	company: {
+		companyName: string;
+		companyEmail: string;
+		companyLocation: string;
+	};
+	itemsPurchased: {
+		name: string;
+		qty: number;
+		price: number;
+		totalPrice: number;
+	}[];
+	grandTotal: string;
+}
 
 const singleInvoice = {
 	id: 1,
@@ -80,7 +111,29 @@ const InvoiceTable = ({ itemsPurchased }: { itemsPurchased: ItemsProps[] }) => (
 	</Table>
 );
 
-export const SingleInvoice = () => {
+export const SingleInvoice = ({ id }: { id: string }) => {
+	const { token } = useReduxState();
+	const [isPending, startTransition] = useTransition();
+	const [invoice, setInvoice] = useState();
+
+	const getInvoice = useCallback(() => {
+		startTransition(async () => {
+			const res = await getSoldInvoice({ token, invoiceNo: id });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			setInvoice(res?.data?.invoice);
+		});
+	}, [token]);
+
+	useEffect(() => {
+		getInvoice();
+	}, [getInvoice]);
+
+	console.log({ invoice });
+
 	return (
 		<div className="w-full">
 			<ItemsHeader routeTo="/invoice" />

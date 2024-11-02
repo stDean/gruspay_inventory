@@ -5,5 +5,5 @@ interface ProductsProps {
 }
 
 export default function SingleInvoicePage({ params }: ProductsProps) {
-	return <SingleInvoice />;
+	return <SingleInvoice id={params.id} />;
 }

@@ -1,49 +1,44 @@
 "use client";
 
+import { getSoldInvoices } from "@/actions/invoice";
+import { Spinner } from "@/components/Spinners";
 import { Button } from "@/components/ui/button";
+import { useReduxState } from "@/hook/useRedux";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-
-const invoiceData = [
-	{
-		id: 1,
-		customer: "Dean",
-		date: "12-10-2023",
-		price: "400",
-		status: "Paid",
-	},
-	{
-		id: 2,
-		customer: "Dean2",
-		date: "12-10-2023",
-		price: "450",
-		status: "Paid",
-	},
-	{
-		id: 3,
-		customer: "Dean3",
-		date: "12-10-2023",
-		price: "500",
-		status: "Paid",
-	},
-	{
-		id: 4,
-		customer: "Dean4",
-		date: "12-10-2023",
-		price: "550",
-		status: "Paid",
-	},
-	{
-		id: 5,
-		customer: "Dean5",
-		date: "12-10-2023",
-		price: "400",
-		status: "Paid",
-	},
-];
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 export const InvoiceContent = () => {
 	const router = useRouter();
+	const [isPending, startTransition] = useTransition();
+	const { token } = useReduxState();
+	const [allSoldInvoices, setAllSoldInvoices] = useState<
+		{
+			id: string;
+			customer: string;
+			date: string;
+			status: string;
+			price: string;
+		}[]
+	>();
+
+	const getAllSoldInvoices = useCallback(() => {
+		startTransition(async () => {
+			const res = await getSoldInvoices({ token });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			setAllSoldInvoices(res?.data?.invoices);
+		});
+	}, [token]);
+
+	useEffect(() => {
+		getAllSoldInvoices();
+	}, [getAllSoldInvoices]);
 
 	return (
 		<div>
@@ -52,24 +47,44 @@ export const InvoiceContent = () => {
 				<Button>Add New</Button>
 			</div>
 
-			<div className="mx-10 space-y-5 md:text-lg">
-				{invoiceData.map(item => (
-					<div
-						key={item.id}
-						className="flex justify-between items-center py-7 px-6 bg-white/90 hover:bg-white hover:border hover:border-gray-300 rounded-lg cursor-pointer"
-						onClick={() => router.push(`/invoice/${String(item.id)}`)}
-					>
-						<p>{item.id}</p>
-						<p className="font-semibold text-center">{item.customer}</p>
-						<p>{format(new Date(item.date), "P")}</p>
-						<p>{item.price}</p>
-						<p className="text-[#067647] bg-[#e3faec] border-[#ABEFC6] px-2 md:px-4 py-1 md:py-2 text-sm rounded-lg">
-							{/* Draft Style: text-[#B54708] bg-[#FFFAEB] rounded-3xl text-sm border border-[#FEDF89] */}
-							{item.status}
-						</p>
-					</div>
-				))}
-			</div>
+			{isPending ? (
+				<Spinner />
+			) : allSoldInvoices?.length === 0 ? (
+				<div className="text-center">
+					<h1 className="text-xl font-semibold">No invoice(s) found</h1>
+				</div>
+			) : (
+				<div className="lg:mx-10 space-y-5 md:text-lg">
+					{allSoldInvoices?.map(item => (
+						<div
+							key={item.id}
+							className="flex justify-between items-center py-7 lg:px-6 px-2 bg-white/90 hover:bg-white hover:border hover:border-gray-300 rounded-lg cursor-pointer"
+							onClick={() => router.push(`/invoice/${String(item.id)}`)}
+						>
+							<p>{item.id}</p>
+							<p className="font-semibold text-center">{item.customer}</p>
+							<p>{format(new Date(item.date), "P")}</p>
+							<p>{item.price}</p>
+							<p
+								className={cn(
+									"px-2 md:px-4 py-1 md:py-2 bg-accent border text-sm rounded-lg capitalize",
+									{
+										"text-[#B54708] text-xs lg:text-sm bg-[#FFFAEB] border-[#FEDF89]":
+											item.status === "OUTSTANDING",
+										"text-[#B42318] bg-[#FEF3F2] border-[#FECDCA]":
+											item.status === "SWAP",
+										"text-[#067647] bg-[#e3faec] border-[#ABEFC6]":
+											item.status === "PAID",
+									}
+								)}
+							>
+								{/* Draft Style: text-[#B54708] bg-[#FFFAEB] rounded-3xl text-sm border border-[#FEDF89] */}
+								{item.status.toLowerCase()}
+							</p>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };
