@@ -168,6 +168,7 @@ export const UserCtrl = {
 						Creditor: true,
 						id: true,
 						date_sold: true,
+						invoiceId: true,
 					},
 				},
 			},

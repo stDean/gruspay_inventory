@@ -400,16 +400,18 @@ export const getBarChartData = async ({
 export const updateSoldProduct = async ({
 	token,
 	amount,
+  invoiceId,
 	id,
 }: {
 	token: string;
 	amount: string;
 	id: string;
+  invoiceId: string
 }) => {
 	try {
 		const { data } = await axios.patch(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/updateBalance/${id}`,
-			{ amount },
+			{ amount, invoiceId },
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

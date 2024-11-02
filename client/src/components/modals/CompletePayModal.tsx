@@ -28,24 +28,28 @@ export const CompletePayModal = () => {
 		setAmount("");
 	}, [completeModal.isOpen]);
 
-	const handlePay = useCallback((id: string, amount: string) => {
-		startTransition(async () => {
-			const res = await updateSoldProduct({
-				token,
-				amount,
-				id,
+	const handlePay = useCallback(
+		(id: string, amount: string, invoiceId: string) => {
+			startTransition(async () => {
+				const res = await updateSoldProduct({
+					token,
+					amount,
+					id,
+					invoiceId,
+				});
+
+				if (res?.error) {
+					toast.error("Error", { description: res?.error });
+					return;
+				}
+
+				toast.success("Success", { description: "Balance payment successful" });
+				setAmount("");
+				completeModal.onClose();
 			});
-
-			if (res?.error) {
-				toast.error("Error", { description: res?.error });
-				return;
-			}
-
-			toast.success("Success", { description: "Balance payment successful" });
-			setAmount("");
-			completeModal.onClose();
-		});
-	}, [token, completeModal]);
+		},
+		[token, completeModal]
+	);
 
 	const headerContent = (
 		<>
@@ -123,7 +127,13 @@ export const CompletePayModal = () => {
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					disabled={isPending}
-					onClick={() => handlePay(completeModal.product?.id as string, amount)}
+					onClick={() =>
+						handlePay(
+							completeModal.product?.id as string,
+							amount,
+							completeModal.product?.invoiceId as string
+						)
+					}
 				>
 					Complete Pay
 				</Button>
@@ -137,7 +147,7 @@ export const CompletePayModal = () => {
 			onClose={completeModal.onClose}
 			headerContent={headerContent}
 			body={bodyContent}
-      onSubmit={() => {}}
+			onSubmit={() => {}}
 		/>
 	);
 };

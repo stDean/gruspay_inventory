@@ -30,6 +30,7 @@ router
 	.get(
 		[
 			AuthMiddleware,
+      AdminMiddleware,
 			SupplierMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,
@@ -41,6 +42,7 @@ router
 	.get(
 		[
 			AuthMiddleware,
+      AdminMiddleware,
 			SupplierMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,
@@ -52,6 +54,7 @@ router
 	.get(
 		[
 			AuthMiddleware,
+      AdminMiddleware,
 			CustomerAndCreditorMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,
@@ -63,6 +66,7 @@ router
 	.get(
 		[
 			AuthMiddleware,
+      AdminMiddleware,
 			CustomerAndCreditorMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,
@@ -74,6 +78,7 @@ router
 	.get(
 		[
 			AuthMiddleware,
+			AdminMiddleware,
 			CustomerAndCreditorMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,
@@ -85,6 +90,7 @@ router
 	.get(
 		[
 			AuthMiddleware,
+			AdminMiddleware,
 			CustomerAndCreditorMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,

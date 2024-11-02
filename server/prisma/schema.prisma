@@ -41,6 +41,12 @@ enum BillType {
   YEARLY
 }
 
+enum InvoiceStatus {
+  DRAFT
+  PAID
+  OUTSTANDING
+}
+
 model Company {
   id            String        @id @default(uuid())
   company_name  String
@@ -63,6 +69,7 @@ model Company {
   swaps         Swaps[]
   creditors     Creditor[]
   payStackAuth  PayStackAuth?
+  Invoice       Invoice[]
 }
 
 model PayStackAuth {
@@ -81,6 +88,22 @@ model PayStackAuth {
   transactionId      String
 
   @@unique([authorization_code, signature])
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  invoiceNo   String        @unique
+  company     Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId   String
+  customer    Buyer?        @relation(fields: [customerId], references: [id])
+  customerId  String?
+  product     Products[]
+  creditor    Creditor?     @relation(fields: [creditorId], references: [id])
+  creditorId  String?
+  balance_due String?
+  status      InvoiceStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Otp {
@@ -135,8 +158,10 @@ model Products {
   OutgoingProduct  Swaps?     @relation(fields: [swapsOutId], references: [id])
   swapsOutId       String?
   balance_owed     String?
-  Creditor         Creditor?  @relation(fields: [creditorId], references: [id])
+  Creditor         Creditor?  @relation(fields: [creditorId], references: [id], onDelete: Cascade)
   creditorId       String?
+  Invoice          Invoice?   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId        String?
 
   @@unique([serial_no, companyId])
 }
@@ -175,6 +200,7 @@ model Buyer {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   Products       Products[]
+  Invoice        Invoice[]
 
   @@unique([buyer_email, buyer_name, companyId])
 }
@@ -189,6 +215,7 @@ model Creditor {
   Products          Products[]
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
+  Invoice           Invoice[]
 
   @@unique([creditor_email, creditor_name, companyId])
 }

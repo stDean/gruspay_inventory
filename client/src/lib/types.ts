@@ -44,6 +44,7 @@ export interface ProductProps {
 		creditor_email?: string;
 		creditor_phone_no: string;
 	};
+	invoiceId: string;
 }
 
 export interface ProductStockProps {

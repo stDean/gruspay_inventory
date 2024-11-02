@@ -27,15 +27,15 @@ export const ItemsHeader = ({
 			</p>
 
 			{types && (
-				<h1 className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3">
+				<div className="capitalize font-semibold text-2xl flex items-center gap-2 mb-3">
 					{addBrand && (
-						<span>
-							<span className="text-xl">{brands}</span>
+						<p className="flex gap-2 items-center">
+							<p className="text-xl">{brands}</p>
 							<ChevronRight className="h-5 w-5" />
-						</span>
+						</p>
 					)}
-					<span className="text-xl">{types}</span>
-				</h1>
+					<p className="text-xl">{types}</p>
+				</div>
 			)}
 		</>
 	);
