@@ -29,7 +29,7 @@ export const InvoiceCtrl = {
 					? invoice.creditor.creditor_name
 					: invoice.customer?.buyer_name || "Unknown",
 				date: invoice.createdAt.toLocaleDateString("en-GB"), // Format date as "dd-mm-yyyy"
-				price: totalPrice.toFixed(2), // Convert price to string with two decimal places
+				price: totalPrice, // Convert price to string with two decimal places
 				status:
 					invoice.status.charAt(0).toUpperCase() +
 					invoice.status.slice(1).toLowerCase(), // Capitalize status
@@ -76,27 +76,41 @@ export const InvoiceCtrl = {
 				.json({ msg: "No invoice with that id" });
 		}
 
-		// Calculate grandTotal and format response
-		const itemsPurchased = invoice.product.map(product => ({
-			name: product.name,
-			qty: 1, // Assuming each product entry is a single item
-			price: parseFloat(product.bought_for), // Convert bought_for to a number
-			totalPrice: parseFloat(product.bought_for), // Since qty is 1, totalPrice is same as price
+		// Group products by name and price
+		const productMap = new Map();
+
+		invoice.product.forEach(product => {
+			const price = parseFloat(product.bought_for);
+			const key = `${product.product_name}-${price}`;
+
+			if (!productMap.has(key)) {
+				productMap.set(key, { ...product, qty: 1, totalPrice: price });
+			} else {
+				const groupedProduct = productMap.get(key);
+				groupedProduct.qty += 1;
+				groupedProduct.totalPrice += price;
+			}
+		});
+
+		// Convert grouped products map to an array
+		const itemsPurchased = Array.from(productMap.values()).map(product => ({
+			name: product.product_name,
+			qty: product.qty,
+			price: parseFloat(product.bought_for),
+			totalPrice: product.totalPrice,
 		}));
 
-		const grandTotal = itemsPurchased
-			.reduce(
-				(acc, item) => acc + item.totalPrice,
-				parseFloat(invoice.balance_due) || 0 // Add balance_owed to grand total
-			)
-			.toFixed(2);
-
+		// Calculate grandTotal including balance owed
+		const grandTotal = itemsPurchased.reduce(
+			(acc, item) => acc + parseFloat(item.totalPrice),
+			parseFloat(invoice.balance_owed) || 0 // Add balance_owed to grand total
+		);
 		const formattedInvoice = {
 			status: invoice.status,
 			invoiceNo: invoice.invoiceNo,
-			balance_due: invoice.balance_due || "0.00",
-			createdAt: invoice.createdAt.toLocaleDateString("en-GB"),
-			updatedAt: invoice.updatedAt.toLocaleDateString("en-GB"),
+			balance_due: invoice.balance_due || "0",
+			createdAt: invoice.createdAt,
+			updatedAt: invoice.updatedAt,
 			customer: invoice.creditor
 				? {
 						customerName: invoice.creditor.creditor_name,

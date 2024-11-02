@@ -2,7 +2,7 @@
 
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import {
 	Table,
@@ -16,6 +16,14 @@ import { useReduxState } from "@/hook/useRedux";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { getSoldInvoice } from "@/actions/invoice";
 import { toast } from "sonner";
+import { Spinner } from "@/components/Spinners";
+
+interface ItemsProps {
+	name: string;
+	qty: number;
+	price: number;
+	totalPrice: number;
+}
 
 interface InvoiceProps {
 	status: string;
@@ -33,54 +41,8 @@ interface InvoiceProps {
 		companyEmail: string;
 		companyLocation: string;
 	};
-	itemsPurchased: {
-		name: string;
-		qty: number;
-		price: number;
-		totalPrice: number;
-	}[];
+	itemsPurchased: ItemsProps[];
 	grandTotal: string;
-}
-
-const singleInvoice = {
-	id: 1,
-	status: "Paid",
-	company: "The Company",
-	email: "thecompany@company.com",
-	invoiceDate: "12-10-2023",
-	paymentDate: "12-10-2023",
-	customer: "Dean",
-	customerNo: "23490909090",
-	customerEmail: "customer@customer.com",
-	location: "Nigeria",
-	itemsPurchased: [
-		{
-			name: "iPhone 12",
-			qty: 2,
-			price: 400,
-			totalPrice: 800,
-		},
-		{
-			name: "iPhone 13",
-			qty: 1,
-			price: 450,
-			totalPrice: 450,
-		},
-		{
-			name: "iPhone 14",
-			qty: 3,
-			price: 500,
-			totalPrice: 1500,
-		},
-	],
-	grandTotal: 2750,
-};
-
-interface ItemsProps {
-	name: string;
-	qty: number;
-	price: number;
-	totalPrice: number;
 }
 
 const InvoiceTable = ({ itemsPurchased }: { itemsPurchased: ItemsProps[] }) => (
@@ -96,7 +58,7 @@ const InvoiceTable = ({ itemsPurchased }: { itemsPurchased: ItemsProps[] }) => (
 		<TableBody>
 			{itemsPurchased.map(item => (
 				<TableRow
-					key={item.name}
+					key={`${item.name} ${item.qty}`}
 					className="border-b border-gray-200 py-4 items-center"
 				>
 					<TableCell className="md:flex-1 font-semibold">{item.name}</TableCell>
@@ -114,7 +76,7 @@ const InvoiceTable = ({ itemsPurchased }: { itemsPurchased: ItemsProps[] }) => (
 export const SingleInvoice = ({ id }: { id: string }) => {
 	const { token } = useReduxState();
 	const [isPending, startTransition] = useTransition();
-	const [invoice, setInvoice] = useState();
+	const [invoice, setInvoice] = useState<InvoiceProps>();
 
 	const getInvoice = useCallback(() => {
 		startTransition(async () => {
@@ -132,7 +94,13 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 		getInvoice();
 	}, [getInvoice]);
 
-	console.log({ invoice });
+	if (isPending) {
+		return <Spinner />;
+	}
+
+	if (!invoice) {
+		return <p>No Invoice Found!</p>;
+	}
 
 	return (
 		<div className="w-full">
@@ -143,31 +111,44 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 					<div className="flex gap-3 items-center">
 						<p className="font-semibold">Status</p>
 
-						<p className="text-[#067647] bg-[#e3faec] border-[#a2edc0] px-2 md:px-4 py-1 md:py-2 text-sm rounded-lg">
-							{/* Draft Style: text-[#B54708] bg-[#FFFAEB] rounded-3xl text-sm border border-[#FEDF89] */}
-							{singleInvoice.status}
+						<p
+							className={cn(
+								"px-2 md:px-4 py-1 md:py-2 bg-accent border text-xs lg:text-sm rounded-lg capitalize",
+								{
+									"text-[#B54708] bg-[#FFFAEB] border-[#FEDF89]":
+										invoice?.status === "OUTSTANDING",
+									"text-[#B42318] bg-[#FEF3F2] border-[#FECDCA]":
+										invoice?.status === "SWAP",
+									"text-[#067647] bg-[#e3faec] border-[#ABEFC6]":
+										invoice?.status === "PAID",
+								}
+							)}
+						>
+							{invoice?.status.toLowerCase()}
 						</p>
 					</div>
 
-					<div className="flex gap-4">
-						<Button className="bg-red-500 hover:bg-red-400">Delete</Button>
-						<Button variant="outline">Mark as sold</Button>
-					</div>
+					{invoice?.status === "Draft" && (
+						<div className="flex gap-4">
+							<Button className="bg-red-500 hover:bg-red-400">Delete</Button>
+							<Button variant="outline">Mark as sold</Button>
+						</div>
+					)}
 				</div>
 
 				<div className="bg-white/80 p-4 md:p-6 rounded-lg border-2 border-gray-300 space-y-6">
 					<div className="flex justify-between border-b border-gray-200 pb-4">
 						<div>
 							<h1 className="text-lg md:text-xl font-bold">
-								{singleInvoice.id}
+								{invoice?.invoiceNo}
 							</h1>
 							<p className="font-semibold">Invoice ID</p>
 						</div>
 
 						<div className="space-y-1 font-semibold text-gray-400">
-							<p>{singleInvoice.company}</p>
-							<p>{singleInvoice.email}</p>
-							<p>{singleInvoice.location}</p>
+							<p>{invoice?.company?.companyName}</p>
+							<p>{invoice?.company?.companyEmail}</p>
+							<p>{invoice?.company?.companyLocation}.</p>
 						</div>
 					</div>
 
@@ -176,40 +157,55 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 							<div>
 								<p className="font-[500] text-sm">Invoice Date</p>
 								<h1 className="text-lg md:text-xl font-semibold">
-									{format(singleInvoice.invoiceDate, "PPP")}
+									{format(invoice?.createdAt as string, "PPP")}
 								</h1>
 							</div>
 
 							<div>
 								<p className="font-[500] text-sm">Payment Date</p>
 								<h1 className="text-lg md:text-xl font-semibold">
-									{format(singleInvoice.paymentDate, "PPP")}
+									{format(invoice?.updatedAt as string, "PPP")}
 								</h1>
 							</div>
 						</div>
 
 						<div className="font-semibold space-y-1">
 							<p className="font-[500] text-sm">Bill To</p>
-							<h1 className="text-lg md:text-xl">{singleInvoice.customer}</h1>
-							<p className="text-sm md:text-base">{singleInvoice.customerNo}</p>
+							<h1 className="text-lg md:text-xl">
+								{invoice?.customer?.customerName}
+							</h1>
+							<p className="text-sm md:text-base">
+								{invoice?.customer?.customerNo}
+							</p>
 						</div>
 
 						<div className="font-semibold space-y-1">
 							<p className="font-[500] text-sm">Send To</p>
 							<p className="text-sm md:text-base truncate w-[100px] md:w-full">
-								{singleInvoice.customerEmail}
+								{invoice?.customer?.customerEmail}
 							</p>
 						</div>
 					</div>
 
 					<div className="bg-gray-100 rounded-lg p-6">
-						<InvoiceTable itemsPurchased={singleInvoice.itemsPurchased} />
+						{invoice?.itemsPurchased && (
+							<InvoiceTable itemsPurchased={invoice.itemsPurchased} />
+						)}
 					</div>
+
+					{invoice?.balance_due !== "0" && (
+						<div className="rounded-lg text-lg p-6 border-2 border-red-500 flex justify-between font-semibold">
+							<p>Balance Due</p>
+							<p className="text-2xl">
+								{formatCurrency(Number(invoice?.balance_due))}
+							</p>
+						</div>
+					)}
 
 					<div className="bg-gray-300 text-lg rounded-lg p-6 flex justify-between font-semibold">
 						<p>Grand Total</p>
 						<p className="text-2xl">
-							{formatCurrency(singleInvoice.grandTotal)}
+							{formatCurrency(Number(invoice?.grandTotal))}
 						</p>
 					</div>
 				</div>

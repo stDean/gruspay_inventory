@@ -105,8 +105,6 @@ export const ShowProductModal = () => {
 					);
 				}
 
-				console.log({ updatedProducts });
-
 				setProducts(updatedProducts);
 
 				// Send request to sell product(s)

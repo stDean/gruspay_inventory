@@ -353,7 +353,7 @@ export const InventoryCtrl = {
 			},
 		});
 
-		if (!retrievedProducts) {
+		if (retrievedProducts.length === 0) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
 				.json({ msg: "Products not found.", success: false });
@@ -363,14 +363,36 @@ export const InventoryCtrl = {
 			retrievedProducts.map(product => [product.serial_no, product])
 		);
 
+		// Generate a single invoice number for the transaction
+		const company = await prisma.company.findUnique({
+			where: { id: company_id },
+		});
+		const companyInitials = company.company_name
+			.split(" ")
+			.map(name => name[0])
+			.join("");
+		const getYearAndDate = new Date();
+		const yearLastTwo = getYearAndDate.getFullYear().toString().substr(-2);
+		const month = (getYearAndDate.getMonth() + 1).toString().padStart(2, "0");
+		const getPrevInvoice = await prisma.invoice.findMany({
+			where: { companyId: company_id },
+			orderBy: { invoiceNo: "desc" },
+			take: 1,
+		});
+		const prev =
+			getPrevInvoice[0]?.invoiceNo ||
+			`${companyInitials}${yearLastTwo}-${month}0001`;
+		const invoiceNumber = generateInvoice(prev);
+
+		// Update each product and prepare invoice creation data
 		for (let { serialNo, amount_paid } of products) {
 			const product = productMap.get(serialNo);
-
 			if (!product) {
 				results.failed.push({ serialNo, reason: "Not found or already sold" });
 				continue;
 			}
 
+			// Prepare product update data
 			const updateData = {
 				sales_status: "SOLD",
 				SoldByUser: { connect: { id: user.id } },
@@ -425,33 +447,10 @@ export const InventoryCtrl = {
 			results.success.push({ serialNo, updatedProduct: product });
 		}
 
-		// Step 2: Create the invoice
-		const company = await prisma.company.findUnique({
-			where: { id: company_id },
-		});
-		const companyInitials = company.company_name
-			.split(" ")
-			.map(name => name[0])
-			.join("");
-		const getYearAndDate = new Date();
-		const yearLastTwo = getYearAndDate.getFullYear().toString().substr(-2);
-		const month = getYearAndDate.getMonth() + 1;
-		const getPrevInvoice = await prisma.invoice.findMany({
-			where: {
-				company: { id: company_id },
-				product: { some: { serial_no: { in: serialNumbers } } },
-			},
-			orderBy: { invoiceNo: "desc" },
-			take: 1,
-		});
-		const prev =
-			getPrevInvoice[0]?.invoiceNo ||
-			`${companyInitials}${yearLastTwo}-${month}0001`;
-		const previousInvoice = generateInvoice(prev);
-
+		// Step 2: Create the invoice with all products connected
 		const baseInvoiceData = {
 			company: { connect: { id: company_id } },
-			invoiceNo: previousInvoice,
+			invoiceNo: invoiceNumber,
 			product: {
 				connect: retrievedProducts.map(product => ({ id: product.id })),
 			},
@@ -501,7 +500,7 @@ export const InventoryCtrl = {
 			data: baseInvoiceData,
 		});
 
-		// Step 3: Update each product with the created invoice ID
+		// Step 3: Link products to the created invoice
 		await Promise.all(
 			retrievedProducts.map(product =>
 				prisma.products.update({
@@ -510,8 +509,6 @@ export const InventoryCtrl = {
 				})
 			)
 		);
-
-		// TODO:send invoice to the user
 
 		return res.status(StatusCodes.OK).json({
 			msg: "Product(s) sale completed.",
@@ -690,7 +687,7 @@ export const InventoryCtrl = {
 			},
 		});
 
-    // TODO:Add a the invoice here too, and also send an email notification, the status === SWAP
+		// TODO:Add a the invoice here too, and also send an email notification, the status === SWAP
 
 		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
 	},

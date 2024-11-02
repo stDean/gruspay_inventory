@@ -61,25 +61,26 @@ export const InvoiceContent = () => {
 							className="flex justify-between items-center py-7 lg:px-6 px-2 bg-white/90 hover:bg-white hover:border hover:border-gray-300 rounded-lg cursor-pointer"
 							onClick={() => router.push(`/invoice/${String(item.id)}`)}
 						>
-							<p>{item.id}</p>
-							<p className="font-semibold text-center">{item.customer}</p>
-							<p>{format(new Date(item.date), "P")}</p>
-							<p>{item.price}</p>
+							<p className="w-fit">{item.id}</p>
+							<p className="font-semibold w-fit text-center">{item.customer}</p>
+							<p className="w-fit text-center">
+								{format(new Date(item.date), "P")}
+							</p>
+							<p className="w-fit text-center">{item.price}</p>
 							<p
 								className={cn(
-									"px-2 md:px-4 py-1 md:py-2 bg-accent border text-sm rounded-lg capitalize",
+									"px-2 md:px-4 py-1 md:py-2 bg-accent border text-xs lg:text-sm rounded-lg capitalize",
 									{
-										"text-[#B54708] text-xs lg:text-sm bg-[#FFFAEB] border-[#FEDF89]":
-											item.status === "OUTSTANDING",
+										"text-[#B54708] bg-[#FFFAEB] border-[#FEDF89]":
+											item.status === "Outstanding",
 										"text-[#B42318] bg-[#FEF3F2] border-[#FECDCA]":
-											item.status === "SWAP",
+											item.status === "Swap",
 										"text-[#067647] bg-[#e3faec] border-[#ABEFC6]":
-											item.status === "PAID",
+											item.status === "Paid",
 									}
 								)}
 							>
-								{/* Draft Style: text-[#B54708] bg-[#FFFAEB] rounded-3xl text-sm border border-[#FEDF89] */}
-								{item.status.toLowerCase()}
+								{item.status}
 							</p>
 						</div>
 					))}
