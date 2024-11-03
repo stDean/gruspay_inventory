@@ -5,10 +5,10 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `products` DROP FOREIGN KEY `Products_creditorId_fkey`;
+ALTER TABLE `Products` DROP FOREIGN KEY `Products_creditorId_fkey`;
 
 -- AlterTable
-ALTER TABLE `products` ADD COLUMN `invoiceId` VARCHAR(191) NOT NULL;
+ALTER TABLE `Products` ADD COLUMN `invoiceId` VARCHAR(191) NOT NULL;
 
 -- CreateTable
 CREATE TABLE `Invoice` (

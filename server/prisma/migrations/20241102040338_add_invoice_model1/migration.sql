@@ -6,7 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `invoice` ADD COLUMN `balance_due` VARCHAR(191) NULL,
+ALTER TABLE `Invoice` ADD COLUMN `balance_due` VARCHAR(191) NULL,
     ADD COLUMN `creditorId` VARCHAR(191) NOT NULL,
     ADD COLUMN `status` ENUM('DRAFT', 'PAID', 'OUTSTANDING') NOT NULL DEFAULT 'DRAFT';
 
