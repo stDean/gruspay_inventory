@@ -14,6 +14,7 @@ export const InvoiceCtrl = {
 				creditor: { select: { creditor_name: true } },
 				customer: { select: { buyer_name: true } },
 			},
+			orderBy: { invoiceNo: "desc" },
 		});
 
 		// Format each invoice to only include the desired fields
@@ -45,7 +46,12 @@ export const InvoiceCtrl = {
 				companyId: req.user.company_id,
 			},
 			include: {
-				product: true,
+				product: {
+					include: {
+						OutgoingProduct: true,
+						IncomingProducts: true,
+					},
+				},
 				creditor: {
 					select: {
 						creditor_name: true,
@@ -76,35 +82,85 @@ export const InvoiceCtrl = {
 				.json({ msg: "No invoice with that id" });
 		}
 
-		// Group products by name and price
-		const productMap = new Map();
+		let itemsPurchased = [];
+		let incomingItems = [];
 
-		invoice.product.forEach(product => {
-			const price = parseFloat(product.bought_for);
-			const key = `${product.product_name}-${price}`;
+		if (invoice.status === "SWAP") {
+			const swap = await prisma.swaps.findUnique({
+				where: { id: invoice.product[0].swapsOutId },
+				include: { incomingProducts: true, outgoingProducts: true },
+			});
 
-			if (!productMap.has(key)) {
-				productMap.set(key, { ...product, qty: 1, totalPrice: price });
-			} else {
-				const groupedProduct = productMap.get(key);
-				groupedProduct.qty += 1;
-				groupedProduct.totalPrice += price;
-			}
-		});
+			// Group outgoing products (itemsPurchased)
+			const outgoingMap = new Map();
+			swap.outgoingProducts.forEach(product => {
+				const price = parseFloat(product.bought_for);
+				const key = `${product.product_name}-${price}`;
 
-		// Convert grouped products map to an array
-		const itemsPurchased = Array.from(productMap.values()).map(product => ({
-			name: product.product_name,
-			qty: product.qty,
-			price: parseFloat(product.bought_for),
-			totalPrice: product.totalPrice,
-		}));
+				if (!outgoingMap.has(key)) {
+					outgoingMap.set(key, { ...product, qty: 1, totalPrice: price });
+				} else {
+					const groupedProduct = outgoingMap.get(key);
+					groupedProduct.qty += 1;
+					groupedProduct.totalPrice += price;
+				}
+			});
+			itemsPurchased = Array.from(outgoingMap.values()).map(product => ({
+				name: product.product_name,
+				qty: product.qty,
+				price: parseFloat(product.bought_for),
+				totalPrice: product.totalPrice,
+			}));
+
+			// Group incoming products (incomingItems)
+			const incomingMap = new Map();
+			swap.incomingProducts.forEach(product => {
+				const price = parseFloat(product.price);
+				const key = `${product.product_name}-${price}`;
+
+				if (!incomingMap.has(key)) {
+					incomingMap.set(key, { ...product, qty: 1, totalPrice: price });
+				} else {
+					const groupedProduct = incomingMap.get(key);
+					groupedProduct.qty += 1;
+					groupedProduct.totalPrice += price;
+				}
+			});
+			incomingItems = Array.from(incomingMap.values()).map(product => ({
+				name: product.product_name,
+				qty: product.qty,
+				price: parseFloat(product.price),
+				totalPrice: product.totalPrice,
+			}));
+		} else {
+			// Regular invoice items (not swap)
+			const productMap = new Map();
+			invoice.product.forEach(product => {
+				const price = parseFloat(product.bought_for);
+				const key = `${product.product_name}-${price}`;
+
+				if (!productMap.has(key)) {
+					productMap.set(key, { ...product, qty: 1, totalPrice: price });
+				} else {
+					const groupedProduct = productMap.get(key);
+					groupedProduct.qty += 1;
+					groupedProduct.totalPrice += price;
+				}
+			});
+			itemsPurchased = Array.from(productMap.values()).map(product => ({
+				name: product.product_name,
+				qty: product.qty,
+				price: parseFloat(product.bought_for),
+				totalPrice: product.totalPrice,
+			}));
+		}
 
 		// Calculate grandTotal including balance owed
 		const grandTotal = itemsPurchased.reduce(
 			(acc, item) => acc + parseFloat(item.totalPrice),
-			parseFloat(invoice.balance_owed) || 0 // Add balance_owed to grand total
+			parseFloat(invoice.balance_owed) || 0
 		);
+
 		const formattedInvoice = {
 			status: invoice.status,
 			invoiceNo: invoice.invoiceNo,
@@ -130,6 +186,7 @@ export const InvoiceCtrl = {
 				companyLocation: invoice.company.country,
 			},
 			itemsPurchased,
+			incomingItems,
 			grandTotal,
 		};
 

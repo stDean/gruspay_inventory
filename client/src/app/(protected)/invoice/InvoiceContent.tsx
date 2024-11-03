@@ -44,7 +44,7 @@ export const InvoiceContent = () => {
 		<div>
 			<div className="flex justify-between items-center pb-6">
 				<h1 className="text-xl md:text-3xl font-semibold">Invoice(s)</h1>
-				<Button>Add New</Button>
+				{/* <Button>Add New</Button> */}
 			</div>
 
 			{isPending ? (

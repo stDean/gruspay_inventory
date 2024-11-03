@@ -156,7 +156,7 @@ export const SwapProductModal = () => {
 				return;
 			}
 
-			toast.success("Success", { description: res?.data?.msg });
+			toast.success("Success", { description: "Product swa" });
 			// Reset incoming product
 			setIncoming({
 				product_name: "",
@@ -217,9 +217,11 @@ export const SwapProductModal = () => {
 
 	const bodyContent = (
 		<>
-			<div className="p-4 space-y-2">
+			<div className="p-3 px-4 space-y-2">
 				<div className="flex justify-between items-center gap-4">
-					<p className="text-xs md:text-sm font-semibold md:w-44">Outgoing Item(s)</p>
+					<p className="text-xs md:text-sm font-semibold md:w-44">
+						Outgoing Item
+					</p>
 					{search.show && (
 						<div className="flex flex-col gap-2 flex-1 relative">
 							<div className="relative border rounded-lg flex-1">
@@ -296,17 +298,51 @@ export const SwapProductModal = () => {
 
 			<hr />
 
-			<div className="p-4 pt-0 space-y-2">
+			{products.length !== 0 && (
+				<div className="space-y-1 p-3 px-4">
+					<p className="text-xs md:text-sm font-semibold md:w-44">
+						Incoming Item(s)
+					</p>
+
+					<div className="flex gap-4 items-center flex-wrap">
+						{products.map((item: any) => (
+							<div
+								className="flex items-center gap-2 border rounded-lg p-2 "
+								key={item.serial_no}
+							>
+								<p className="flex flex-col gap-1 flex-1 text-sm">
+									<span>{item.serial_no}</span>
+									<span className="text-gray-500 text-sm font-semibold">
+										{item.product_name} | {item.price}
+									</span>
+								</p>
+
+								<X
+									className="text-red-500 cursor-pointer hover:text-red-400 h-4 w-4 self-start"
+									onClick={() => {
+										products.splice(products.indexOf(item), 1);
+                    setProducts([...products]);
+									}}
+								/>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
+
+			<hr />
+
+			<div className="p-3 px-4 pt-0 space-y-2">
 				<CustomerInfo
 					customerInfo={customerInfo}
 					handleChange={handleChangeCustomerInfo}
-          amount
+					amount
 				/>
 			</div>
 
 			<hr />
 
-			<div className="p-4 space-y-3">
+			<div className="p-3 px-4 space-y-3">
 				<p className="font-semibold text-sm">Incoming Item(s)</p>
 
 				<div className="flex flex-col gap-4">
@@ -347,7 +383,7 @@ export const SwapProductModal = () => {
 					</div>
 					<Textarea
 						placeholder="product description"
-						className="h-16"
+						className="h-14"
 						name="description"
 						onChange={handleChange}
 						value={incoming.description}
@@ -366,11 +402,13 @@ export const SwapProductModal = () => {
 
 			<hr />
 
-			<div className="flex items-center p-6 gap-6">
+			<div className="flex items-center p-3 px-4 gap-6">
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					onClick={handleConfirmSwap}
-					disabled={isPending}
+					disabled={
+						isPending || Object.values(customerInfo).some(item => item === "")
+					}
 				>
 					Confirm Swap
 				</Button>

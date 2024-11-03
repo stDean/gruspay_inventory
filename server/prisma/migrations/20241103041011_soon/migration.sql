@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `invoice` MODIFY `status` ENUM('DRAFT', 'PAID', 'OUTSTANDING', 'SWAP') NOT NULL DEFAULT 'DRAFT';

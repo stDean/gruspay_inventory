@@ -42,6 +42,7 @@ interface InvoiceProps {
 		companyLocation: string;
 	};
 	itemsPurchased: ItemsProps[];
+	incomingItems: ItemsProps[];
 	grandTotal: string;
 }
 
@@ -187,7 +188,14 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 						</div>
 					</div>
 
-					<div className="bg-gray-100 rounded-lg p-6">
+					<div
+						className={cn("bg-gray-100 rounded-lg p-6", {
+							"space-y-2": invoice?.status === "SWAP",
+						})}
+					>
+						{invoice?.status === "SWAP" && (
+							<p className="font-semibold text-lg">Outgoing Item</p>
+						)}
 						{invoice?.itemsPurchased && (
 							<InvoiceTable itemsPurchased={invoice.itemsPurchased} />
 						)}
@@ -199,6 +207,15 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 							<p className="text-2xl">
 								{formatCurrency(Number(invoice?.balance_due))}
 							</p>
+						</div>
+					)}
+
+					{invoice.status === "SWAP" && (
+						<div className="rounded-lg p-6 border-t border-b border-blue-500 flex flex-col gap-2">
+							<p className="font-semibold text-lg">Incoming Item(s)</p>
+							{invoice?.incomingItems && (
+								<InvoiceTable itemsPurchased={invoice.incomingItems} />
+							)}
 						</div>
 					)}
 

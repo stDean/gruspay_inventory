@@ -658,14 +658,14 @@ export const InventoryCtrl = {
 			},
 		});
 
-		const updateProductWithSwap = await prisma.products.update({
+		const updatedProduct = await prisma.products.update({
 			where: { id: outgoingProduct.id },
 			data: {
 				sales_status: "SWAP",
 				SoldByUser: { connect: { id: user.id } },
 				date_sold: new Date(),
 				bought_for: customerInfo.amount_paid,
-				balance_owed: 0,
+				balance_owed: "0",
 				Customer: {
 					connectOrCreate: {
 						where: {
@@ -687,9 +687,41 @@ export const InventoryCtrl = {
 			},
 		});
 
-		// TODO:Add a the invoice here too, and also send an email notification, the status === SWAP
+		// Generate invoice for the swap transaction
+		const prevInvoice = await prisma.invoice.findMany({
+			where: { companyId: company.id },
+			orderBy: { invoiceNo: "desc" },
+			take: 1,
+		});
+		const invoiceNumber = generateInvoice(prevInvoice[0]?.invoiceNo);
+		await prisma.invoice.create({
+			data: {
+				company: { connect: { id: company.id } },
+				product: { connect: { id: updatedProduct.id } },
+				invoiceNo: invoiceNumber,
+				status: "SWAP",
+				balance_due: "0",
+				customer: {
+					connectOrCreate: {
+						where: {
+							buyer_email_buyer_name_companyId: {
+								buyer_name: customerInfo.buyer_name,
+								buyer_email: customerInfo.buyer_email || null,
+								companyId: company.id,
+							},
+						},
+						create: {
+							buyer_name: customerInfo.buyer_name,
+							buyer_email: customerInfo.buyer_email || null,
+							buyer_phone_no: customerInfo.phone_no,
+							companyId: company.id,
+						},
+					},
+				},
+			},
+		});
 
-		return res.status(StatusCodes.OK).json({ updateProductWithSwap });
+		return res.status(StatusCodes.OK).json({ updatedProduct });
 	},
 	getInventoryStats: async (req, res) => {
 		const companyId = req.user.company_id;
@@ -1188,7 +1220,7 @@ export const InventoryCtrl = {
 		}
 
 		// Update product with the new balance and customer info
-		await prisma.products.update({
+		const updatedProduct = await prisma.products.update({
 			where: { id: product.id },
 			data: updatedData,
 		});
@@ -1205,6 +1237,7 @@ export const InventoryCtrl = {
 			// If balance is zero, mark the invoice as paid in full
 			if (balance === 0) {
 				updatedInvoiceData["status"] = "PAID";
+        updatedInvoiceData["customerId"] = updatedProduct.buyerId || null;
 			}
 
 			// Update the invoice in the database
