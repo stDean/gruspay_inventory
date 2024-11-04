@@ -156,7 +156,7 @@ export const SwapProductModal = () => {
 				return;
 			}
 
-			toast.success("Success", { description: "Product swa" });
+			toast.success("Success", { description: "Product swapped successfully!" });
 			// Reset incoming product
 			setIncoming({
 				product_name: "",

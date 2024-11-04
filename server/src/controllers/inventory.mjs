@@ -1237,7 +1237,7 @@ export const InventoryCtrl = {
 			// If balance is zero, mark the invoice as paid in full
 			if (balance === 0) {
 				updatedInvoiceData["status"] = "PAID";
-        updatedInvoiceData["customerId"] = updatedProduct.buyerId || null;
+				updatedInvoiceData["customerId"] = updatedProduct.buyerId || null;
 			}
 
 			// Update the invoice in the database
@@ -1274,5 +1274,5 @@ export const InventoryCtrl = {
 		return res
 			.status(StatusCodes.OK)
 			.json({ msg: "Product sold successfully", success: true });
-	},
+	}
 };
