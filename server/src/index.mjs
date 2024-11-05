@@ -37,7 +37,6 @@ app.post("/webhook", async (req, res) => {
 
 	// Extract data from the webhook payload
 	const payload = req.body;
-	console.log({ payload });
 
 	switch (payload.event) {
 		case "subscription.create":
@@ -49,7 +48,8 @@ app.post("/webhook", async (req, res) => {
 			});
 
 			if (!getCompany) {
-				return res.status(400).json({ msg: "Company not found" });
+				console.log("Company not found");
+				return;
 			}
 
 			await prisma.company.update({
@@ -98,7 +98,8 @@ app.post("/webhook", async (req, res) => {
 			});
 
 			if (!comp) {
-				return res.status(400).json({ msg: "Company not found" });
+				console.log("Company not found");
+				return;
 			}
 
 			await prisma.company.update({
