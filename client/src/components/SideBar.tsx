@@ -88,7 +88,7 @@ export const SideBar = () => {
 
 	const sidebarClassNames = `fixed flex flex-col ${
 		isSidebarCollapsed ? "w-0 md:w-20" : "w-72 md:w-64"
-	} bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
+	} bg-white overflow-hidden h-full shadow-md z-40`;
 
 	const year = new Date().getFullYear();
 
