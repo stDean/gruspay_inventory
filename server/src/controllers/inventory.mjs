@@ -224,7 +224,7 @@ export const InventoryCtrl = {
 			return res.status(StatusCodes.BAD_REQUEST).json({ msg: errorMsg });
 		}
 
-		res.status(StatusCodes.OK).json({ msg: "Products created." });
+		res.status(StatusCodes.OK).json({ msg: "Products created!" });
 	},
 	getAllProductNotSold: async (req, res) => {
 		const products = await prisma.products.findMany({
