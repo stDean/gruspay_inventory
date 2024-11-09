@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../utils/db.mjs";
 import { InvoiceNumber } from "invoice-number";
+import { sendInvoice } from "../utils/sendInvoice.mjs";
 
 const useUserAndCompany = async ({ company_id, email }) => {
 	const company = await prisma.company.findUnique({
@@ -510,6 +511,9 @@ export const InventoryCtrl = {
 			)
 		);
 
+		// Step 4: Send invoice to the buyer
+		await sendInvoice(createdInvoice.invoiceNo);
+
 		return res.status(StatusCodes.OK).json({
 			msg: "Product(s) sale completed.",
 			results,
@@ -694,7 +698,7 @@ export const InventoryCtrl = {
 			take: 1,
 		});
 		const invoiceNumber = generateInvoice(prevInvoice[0]?.invoiceNo);
-		await prisma.invoice.create({
+		const createdInvoice = await prisma.invoice.create({
 			data: {
 				company: { connect: { id: company.id } },
 				product: { connect: { id: updatedProduct.id } },
@@ -720,6 +724,9 @@ export const InventoryCtrl = {
 				},
 			},
 		});
+
+		// Send Invoice
+		await sendInvoice(createdInvoice.invoiceNo);
 
 		return res.status(StatusCodes.OK).json({ updatedProduct });
 	},
@@ -1269,6 +1276,7 @@ export const InventoryCtrl = {
 		}
 
 		// TODO:send invoice to the user with the money they paid and if their is a balance add it
+		await sendInvoice(invoice.invoiceNo);
 
 		// Return success message
 		return res

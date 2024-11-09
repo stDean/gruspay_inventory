@@ -33,7 +33,7 @@ export const sendMail = (to, token, sub) => {
 	const mailOptions = {
 		from: SENDERS_EMAIL,
 		to: to,
-		subject: `Gruspay - ${sub}`,
+		subject: `Cauntr - ${sub}`,
 		generateTextFromHTML: true,
 		html: `
     <div style=" width: 700px; margin-left: auto; margin-right: auto;">
@@ -69,7 +69,7 @@ export const sendMail = (to, token, sub) => {
         </p>
       </div>
 
-      <p style="line-height: 1.4rem">Thanks,<br />Gruspsy Team</p>
+      <p style="line-height: 1.4rem">Thanks,<br />Cauntr Team</p>
     </div>
     `,
 	};

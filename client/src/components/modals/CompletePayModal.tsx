@@ -135,7 +135,7 @@ export const CompletePayModal = () => {
 						)
 					}
 				>
-					Complete Pay
+					Pay
 				</Button>
 			</div>
 		</>
