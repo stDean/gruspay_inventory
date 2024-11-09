@@ -1,4 +1,6 @@
-import { UserProps } from "@/lib/types";
+"use client";
+
+import { useReduxState } from "@/hook/useRedux";
 import { formatCurrency } from "@/lib/utils";
 
 interface SummaryStatsProps {
@@ -10,7 +12,6 @@ interface SummaryStatsProps {
 	totalText: string;
 	topSeller: string;
 	addClass?: string;
-	user: UserProps;
 }
 
 export const SummaryStats = ({
@@ -22,8 +23,9 @@ export const SummaryStats = ({
 	totalText,
 	topSeller,
 	addClass,
-	user,
 }: SummaryStatsProps) => {
+	const { user } = useReduxState();
+
 	return (
 		<div
 			className={`flex flex-col gap-4 border rounded-lg p-3 px-6 mb-3 shadow-lg ${addClass}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { getProductsByStock, getInventoryStats } from "@/actions/inventory";
+import { getInventoryStats, getProductsByStock } from "@/actions/inventory";
 import { getUser } from "@/actions/user";
 import { useAppDispatch } from "@/app/redux";
 import { AddButton } from "@/components/AddButton";
@@ -13,7 +13,7 @@ import useAddProductModal from "@/hook/useAddProductModal";
 import useAddSingleProductModal from "@/hook/useAddSingleProductModal";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
-import { ProductStockProps, UserProps } from "@/lib/types";
+import { ProductStockProps } from "@/lib/types";
 import { setUser } from "@/state";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
@@ -133,7 +133,6 @@ export const InventoryContent = () => {
 				topSeller={stats.topSeller}
 				totalPrice={stats.totalPrice}
 				totalText="Inventory Value"
-        user={user as UserProps}
 			/>
 
 			<InventorySummaryTable
