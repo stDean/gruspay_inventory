@@ -6,9 +6,9 @@ export default function page() {
 	return (
 		<div className="mx-10 pt-5 pb-10 lg:max-w-7xl lg:mx-auto flex flex-col min-h-screen gap-3">
 			{/* Nav Here */}
-			<div className="flex justify-between items-center pb-4 border-b border-gray-300">
+			<div className="flex justify-between items-center pb-2 border-b border-gray-300">
 				<div>
-					<img src="/logo.png" className="w-44 md:w-64" />
+					<img src="/logo.png" className="w-40 md:w-60" />
 				</div>
 
 				<Button

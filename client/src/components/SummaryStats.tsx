@@ -1,5 +1,5 @@
+import { UserProps } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
-import React from "react";
 
 interface SummaryStatsProps {
 	title: string;
@@ -10,6 +10,7 @@ interface SummaryStatsProps {
 	totalText: string;
 	topSeller: string;
 	addClass?: string;
+	user: UserProps;
 }
 
 export const SummaryStats = ({
@@ -21,6 +22,7 @@ export const SummaryStats = ({
 	totalText,
 	topSeller,
 	addClass,
+	user,
 }: SummaryStatsProps) => {
 	return (
 		<div
@@ -41,12 +43,14 @@ export const SummaryStats = ({
 					</p>
 				</div>
 
-				<div className="space-y-1">
-					<p className="text-xl md:text-4xl font-semibold">
-						{formatCurrency(Number(totalPrice) || 0)}
-					</p>
-					<p className="text-xs md:text-sm font-semibold">{totalText}</p>
-				</div>
+				{user?.role === "ADMIN" && (
+					<div className="space-y-1">
+						<p className="text-xl md:text-4xl font-semibold">
+							{formatCurrency(Number(totalPrice) || 0)}
+						</p>
+						<p className="text-xs md:text-sm font-semibold">{totalText}</p>
+					</div>
+				)}
 
 				<div className="space-y-1">
 					<p className="text-xl md:text-4xl font-semibold">{topSeller}</p>

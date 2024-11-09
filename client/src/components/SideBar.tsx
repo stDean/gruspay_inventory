@@ -101,7 +101,7 @@ export const SideBar = () => {
 				}`}
 			>
 				<Image
-					src={isSidebarCollapsed ? "/gup.PNG" : "/logo.png"}
+					src={isSidebarCollapsed ? "/logo1.png" : "/logo.png"}
 					alt="logo"
 					width={isSidebarCollapsed ? 250 : 150}
 					height={isSidebarCollapsed ? 250 : 150}
@@ -184,7 +184,7 @@ export const SideBar = () => {
 						isSidebarCollapsed ? "hidden" : "block"
 					}`}
 				>
-					&copy; {year} Gruspay
+					&copy; {year} Cauntr
 				</p>
 			</div>
 		</div>

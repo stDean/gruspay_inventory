@@ -2,8 +2,8 @@ import { create } from "zustand";
 
 interface ProductProps {
 	name: string;
-	price: string;
 	serial_no: string;
+  brand: string
 }
 
 interface showProductModalStore {

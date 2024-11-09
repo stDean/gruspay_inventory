@@ -18,7 +18,7 @@ export const SwapProductTable = ({
 	page?: number;
 }) => {
 	const swapProductDetails = useSwapProductDetailModal();
-	const { token } = useReduxState();
+	const { token, user } = useReduxState();
 
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
@@ -52,7 +52,9 @@ export const SwapProductTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
 			<TableHead className="px-2 border-r">Product Name</TableHead>
-			<TableHead className="px-2 border-r">Value(₦)</TableHead>
+			{user?.role === "ADMIN" && (
+				<TableHead className="px-2 border-r">Value(₦)</TableHead>
+			)}
 			<TableHead className="px-2 hidden md:block">Swap By</TableHead>
 			<TableHead className="px-2">Swap To</TableHead>
 			<TableHead className="px-2">Swap Count</TableHead>
@@ -79,9 +81,11 @@ export const SwapProductTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.product_name}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product.price}
-					</TableCell>
+					{user?.role === "ADMIN" && (
+						<TableCell className="px-2 border-r w-5 md:w-10">
+							{product.price}
+						</TableCell>
+					)}
 					<TableCell className="px-2 border-r w-5 md:w-10 hidden md:block">
 						{product.SoldByUser?.first_name
 							? `${product.SoldByUser?.first_name}`
@@ -114,7 +118,7 @@ export const SwapProductTable = ({
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
-      searchInput
+			searchInput
 		/>
 	);
 };

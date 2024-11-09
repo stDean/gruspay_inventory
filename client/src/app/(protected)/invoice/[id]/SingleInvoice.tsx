@@ -47,27 +47,25 @@ interface InvoiceProps {
 }
 
 const InvoiceTable = ({ itemsPurchased }: { itemsPurchased: ItemsProps[] }) => (
-	<Table className="bg-gray-100 rounded-lg p-6">
+	<Table className="bg-gray-100 rounded-lg p-6 w-full">
 		<TableHeader>
-			<TableRow className="border-b border-gray-200 pb-4 items-center text-sm md:text-base font-semibold">
-				<TableHead className="md:flex-1">Product Name</TableHead>
-				<TableHead className="md:flex-1 text-right">Qty</TableHead>
-				<TableHead className="md:flex-1 text-right">Price (₦)</TableHead>
-				<TableHead className="md:flex-1 text-right">Total Price (₦)</TableHead>
+			<TableRow className="border-b border-gray-200 pb-4 text-sm md:text-base font-semibold">
+				<TableHead className="w-1/5">Product Name</TableHead>
+				<TableHead className="w-1/5">Qty</TableHead>
+				<TableHead className="w-1/5">Price(₦)</TableHead>
+				<TableHead className="w-1/5">Total(₦)</TableHead>
 			</TableRow>
 		</TableHeader>
 		<TableBody>
 			{itemsPurchased.map(item => (
 				<TableRow
 					key={`${item.name} ${item.qty}`}
-					className="border-b border-gray-200 py-4 items-center"
+					className="border-b border-gray-200 py-4"
 				>
-					<TableCell className="md:flex-1 font-semibold">{item.name}</TableCell>
-					<TableCell className="md:flex-1 text-right">{item.qty}</TableCell>
-					<TableCell className="md:flex-1 text-right">{item.price}</TableCell>
-					<TableCell className="md:flex-1 text-right">
-						{item.totalPrice}
-					</TableCell>
+					<TableCell className="w-1/5 font-semibold">{item.name}</TableCell>
+					<TableCell className="w-1/5">{item.qty}</TableCell>
+					<TableCell className="w-1/5">{item.price}</TableCell>
+					<TableCell className="w-1/5">{item.totalPrice}</TableCell>
 				</TableRow>
 			))}
 		</TableBody>
@@ -157,14 +155,14 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 						<div className="space-y-4">
 							<div>
 								<p className="font-[500] text-sm">Invoice Date</p>
-								<h1 className="text-lg md:text-xl font-semibold">
+								<h1 className="text-base md:text-xl font-semibold">
 									{format(invoice?.createdAt as string, "PPP")}
 								</h1>
 							</div>
 
 							<div>
 								<p className="font-[500] text-sm">Payment Date</p>
-								<h1 className="text-lg md:text-xl font-semibold">
+								<h1 className="text-base md:text-xl font-semibold">
 									{format(invoice?.updatedAt as string, "PPP")}
 								</h1>
 							</div>

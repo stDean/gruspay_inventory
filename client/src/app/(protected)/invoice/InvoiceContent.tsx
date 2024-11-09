@@ -1,12 +1,13 @@
 "use client";
 
 import { getSoldInvoices } from "@/actions/invoice";
+import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinners";
-// import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useReduxState } from "@/hook/useRedux";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +15,8 @@ export const InvoiceContent = () => {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 	const { token } = useReduxState();
+	const searchParam = useSearchParams();
+
 	const [allSoldInvoices, setAllSoldInvoices] = useState<
 		{
 			id: string;
@@ -22,7 +25,25 @@ export const InvoiceContent = () => {
 			status: string;
 			price: string;
 		}[]
-	>();
+	>([]);
+
+	// Pagination
+	const rowsPerPage = 15;
+	const totalPages = Math.ceil(allSoldInvoices?.length / rowsPerPage);
+	const currentPage = Number(searchParam.get("page")) || 1;
+
+	const indexOfLastTransaction = currentPage * rowsPerPage;
+	const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+
+	const invoiceByPage = allSoldInvoices.slice(
+		indexOfFirstTransaction,
+		indexOfLastTransaction
+	);
+
+	const [filter, setFilter] = useState<string>("");
+	const filterBySearch = invoiceByPage.filter(item => {
+		return item.id.toLowerCase().includes(filter.toLowerCase());
+	});
 
 	const getAllSoldInvoices = useCallback(() => {
 		startTransition(async () => {
@@ -42,10 +63,21 @@ export const InvoiceContent = () => {
 
 	return (
 		<div>
-			<div className="flex justify-between items-center pb-6">
+			<div className="flex justify-between items-center pb-4 border-b border-gray-300">
 				<h1 className="text-xl md:text-3xl font-semibold">Invoice(s)</h1>
 				{/* <Button>Add New</Button> */}
 			</div>
+
+			{allSoldInvoices.length !== 0 && !isPending && (
+				<div className="flex justify-center md:justify-start py-6 md:ml-10">
+					<Input
+						className="w-[300px] md:w-[400px]"
+						placeholder="Search by invoice number"
+						onChange={e => setFilter(e.target.value)}
+						value={filter}
+					/>
+				</div>
+			)}
 
 			{isPending ? (
 				<Spinner />
@@ -55,7 +87,7 @@ export const InvoiceContent = () => {
 				</div>
 			) : (
 				<div className="lg:mx-10 space-y-5 md:text-lg">
-					{allSoldInvoices?.map(item => (
+					{filterBySearch?.map(item => (
 						<div
 							key={item.id}
 							className="flex justify-between items-center py-7 lg:px-6 px-2 bg-white/90 hover:bg-white hover:border hover:border-gray-300 rounded-lg cursor-pointer"
@@ -84,6 +116,15 @@ export const InvoiceContent = () => {
 							</p>
 						</div>
 					))}
+
+					{totalPages && totalPages > 1 && (
+						<div className=" w-full border-t">
+							<Pagination
+								totalPages={totalPages as number}
+								page={currentPage as number}
+							/>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

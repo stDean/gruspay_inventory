@@ -16,7 +16,7 @@ interface InventoryProps {
 }
 
 export const SoldProductsTable = ({ products, page }: InventoryProps) => {
-	const { token } = useReduxState();
+	const { token, user } = useReduxState();
 	const productDetails = useShowSoldInfoModal();
 
 	const rowsPerPage = 20;
@@ -54,7 +54,9 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
 			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
-			<TableHead className="px-2 border-r">Value</TableHead>
+			{user?.role === "ADMIN" && (
+				<TableHead className="px-2 border-r">Value</TableHead>
+			)}
 			<TableHead className="px-2 hidden md:block">Sold By</TableHead>
 			<TableHead className="px-2">Sold To</TableHead>
 			<TableHead className="px-2">Amount Paid(₦)</TableHead>
@@ -79,7 +81,9 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 					<TableCell className="border-r capitalize">
 						{item.product_name}
 					</TableCell>
-					<TableCell className="border-r capitalize">{item.price}</TableCell>
+					{user?.role === "ADMIN" && (
+						<TableCell className="border-r capitalize">{item.price}</TableCell>
+					)}
 					<TableCell className="border-r hidden md:block">
 						{item.SoldByUser?.first_name
 							? `${item.SoldByUser?.first_name}`
@@ -109,7 +113,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
-      searchInput
+			searchInput
 		/>
 	);
 };

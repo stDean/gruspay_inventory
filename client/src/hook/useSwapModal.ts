@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export interface ItemProps {
 	product_name: string;
-	price: string;
+	brand: string;
 	serial_no: string;
 }
 

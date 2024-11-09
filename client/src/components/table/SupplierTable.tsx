@@ -3,6 +3,7 @@ import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { TableContainer } from "./Table";
 import { format } from "date-fns";
 import { useState } from "react";
+import { useReduxState } from "@/hook/useRedux";
 
 export const SupplierTable = ({
 	products,
@@ -11,6 +12,7 @@ export const SupplierTable = ({
 	products: ProductProps[];
 	page?: number;
 }) => {
+	const { user } = useReduxState();
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -33,7 +35,9 @@ export const SupplierTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
 			<TableHead className="px-2 border-r">Serial Number</TableHead>
-			<TableHead className="px-2 border-r">Price(₦)</TableHead>
+			{user?.role === "ADMIN" && (
+				<TableHead className="px-2 border-r">Price(₦)</TableHead>
+			)}
 			<TableHead className="px-2 border-r">Sale Status</TableHead>
 			<TableHead className="px-2 border-r">Supply Date</TableHead>
 		</>
@@ -48,7 +52,9 @@ export const SupplierTable = ({
 						{product.product_name}
 					</TableCell>
 					<TableCell className="px-2 border-r">{product.serial_no}</TableCell>
-					<TableCell className="px-2 border-r">{product.price}</TableCell>
+					{user?.role === "ADMIN" && (
+						<TableCell className="px-2 border-r">{product.price}</TableCell>
+					)}
 					<TableCell className="px-2 border-r">
 						{product?.sales_status === "SWAP"
 							? "SWAPPED"
@@ -69,12 +75,12 @@ export const SupplierTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
-      search
+			search
 			placeHolder="Search serial no..."
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
-      handleClear={() => setFilter("")}
-      searchInput
+			handleClear={() => setFilter("")}
+			searchInput
 		/>
 	);
 };

@@ -36,6 +36,9 @@ export const SwapProductModal = () => {
 	const [isPending, startTransition] = useTransition();
 	const { token } = useReduxState();
 
+  console.log({a: swapProductModal.items});
+  
+
 	const [search, setSearch] = useState<{ show: boolean; value: string }>({
 		show: false,
 		value: "",
@@ -190,7 +193,7 @@ export const SwapProductModal = () => {
 
 		swapProductModal.addItem({
 			serial_no: res?.data.serial_no,
-			price: res?.data.price,
+			brand: res?.data.brand,
 			product_name: res?.data.product_name,
 		});
 	};
@@ -274,7 +277,7 @@ export const SwapProductModal = () => {
 							<p className="flex flex-col gap-1 flex-1 text-sm">
 								<span>{item.serial_no}</span>
 								<span className="text-gray-500 text-sm font-semibold">
-									{item.product_name} | {item.price}
+									{item.product_name} | {item.brand}
 								</span>
 							</p>
 

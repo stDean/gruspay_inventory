@@ -19,7 +19,7 @@ interface InventoryProps {
 
 export const ProductsTable = ({ products, page }: InventoryProps) => {
 	const showProductModal = useShowProductModal();
-	const { token } = useReduxState();
+	const { token, user } = useReduxState();
 	const dispatch = useAppDispatch();
 
 	const rowsPerPage = 20;
@@ -53,7 +53,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 		showProductModal.onOpen({
 			name: res?.data?.product_name,
 			serial_no: res?.data?.serial_no,
-			price: res?.data?.price,
+			brand: res?.data?.brand,
 		});
 	};
 
@@ -63,7 +63,9 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 			<TableHead className={`px-2 border-r`}>Serial No</TableHead>
 			<TableHead className="px-2 border-r">Product Name</TableHead>
 			<TableHead className="px-2 border-r">Specifications</TableHead>
-			<TableHead className="px-2 border-r">Value(₦)</TableHead>
+			{user?.role === "ADMIN" && (
+				<TableHead className="px-2 border-r">Value(₦)</TableHead>
+			)}
 			<TableHead className="px-2">Supplied By</TableHead>
 			<TableHead className="px-2 hidden md:block">Date Added</TableHead>
 		</>
@@ -83,16 +85,18 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 						{item.serial_no}
 					</TableCell>
 					<TableCell className="border-r capitalize">
-            {item.product_name}
+						{item.product_name}
 					</TableCell>
 					<TableCell className="border-r capitalize">
 						{item.description}
 					</TableCell>
-					<TableCell className="border-r">{item.price}</TableCell>
+					{user?.role === "ADMIN" && (
+						<TableCell className="border-r">{item.price}</TableCell>
+					)}
 					<TableCell className="border-r">
 						{item.Supplier.supplier_name}
 					</TableCell>
-          <TableCell className="border-r hidden md:block">
+					<TableCell className="border-r hidden md:block">
 						{format(new Date(item.createdAt), "PPP")}
 					</TableCell>
 				</TableRow>
@@ -111,7 +115,7 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
 			handleClear={() => setFilter("")}
-      searchInput
+			searchInput
 		/>
 	);
 };

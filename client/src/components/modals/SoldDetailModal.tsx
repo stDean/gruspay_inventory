@@ -39,8 +39,8 @@ export const SoldDetailModal = () => {
 				</div>
 				<div className="flex items-center gap-4">
 					<MyInput
-						label="Product Price"
-						value={productDetails.product?.price as string}
+						label="Product Brand"
+						value={productDetails.product?.brand as string}
 					/>
 					<MyInput
 						label="Bought For"

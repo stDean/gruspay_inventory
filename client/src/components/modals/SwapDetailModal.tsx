@@ -39,8 +39,8 @@ export const SwapDetailModal = () => {
 				</div>
 				<div className="flex items-center gap-4">
 					<MyInput
-						label="Product Price"
-						value={swapProductDetails.product?.price as string}
+						label="Product Brand"
+						value={swapProductDetails.product?.brand as string}
 					/>
 					<MyInput
 						label="Amount Included"

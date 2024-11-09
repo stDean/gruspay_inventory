@@ -216,7 +216,7 @@ export const InventoryCtrl = {
 		if (errors.length > 0) {
 			const serialNo = errors.map(error => error.product);
 			const errorMsg =
-				serialNo.length > 10
+				serialNo.length > 5
 					? "Some of the products already exist."
 					: `Products with serial numbers ${serialNo.join(
 							", "
@@ -1274,5 +1274,5 @@ export const InventoryCtrl = {
 		return res
 			.status(StatusCodes.OK)
 			.json({ msg: "Product sold successfully", success: true });
-	}
+	},
 };

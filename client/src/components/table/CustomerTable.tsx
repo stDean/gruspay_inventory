@@ -3,6 +3,7 @@ import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
 import { TableContainer } from "./Table";
 import { useState } from "react";
+import { useReduxState } from "@/hook/useRedux";
 
 export const CustomerTable = ({
 	products,
@@ -11,6 +12,7 @@ export const CustomerTable = ({
 	products: Array<ProductProps>;
 	page: number;
 }) => {
+	const { user } = useReduxState();
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
@@ -33,7 +35,9 @@ export const CustomerTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
 			<TableHead className="px-2 border-r">Serial Number</TableHead>
-			<TableHead className="px-2 border-r">Price(₦)</TableHead>
+			{user?.role === "ADMIN" && (
+				<TableHead className="px-2 border-r">Price(₦)</TableHead>
+			)}
 			<TableHead className="px-2 border-r">Price Paid(₦)</TableHead>
 			<TableHead className="px-2 border-r">Balance Owed(₦)</TableHead>
 			<TableHead className="px-2 border-r">Purchase Date</TableHead>
@@ -51,9 +55,11 @@ export const CustomerTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.serial_no}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
-						{product.price}
-					</TableCell>
+					{user?.role === "ADMIN" && (
+						<TableCell className="px-2 border-r w-5 md:w-10">
+							{product.price}
+						</TableCell>
+					)}
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}
 					</TableCell>
@@ -73,12 +79,12 @@ export const CustomerTable = ({
 			tableBody={bodyContent}
 			totalPages={totalPages}
 			currentPage={currentPage}
-      search
+			search
 			placeHolder="Search serial no..."
 			value={filter}
 			handleChange={e => setFilter(e.target.value)}
-      handleClear={() => setFilter("")}
-      searchInput
+			handleClear={() => setFilter("")}
+			searchInput
 		/>
 	);
 };

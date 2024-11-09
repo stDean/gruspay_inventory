@@ -159,7 +159,7 @@ export const ShowProductModal = () => {
 
 		showProductModal.addProduct({
 			serial_no: res?.data.serial_no,
-			price: res?.data.price,
+			brand: res?.data.brand,
 			name: res?.data.product_name,
 		});
 	};
@@ -262,7 +262,7 @@ export const ShowProductModal = () => {
 								<p className="flex flex-col gap-1 flex-1 text-sm">
 									<span>{item.serial_no}</span>
 									<span className="text-gray-500 text-sm font-semibold">
-										{item.name} | {item.price}
+										{item.name} | {item.brand}
 									</span>
 								</p>
 
@@ -326,7 +326,7 @@ export const ShowProductModal = () => {
 							handleSwap({
 								product_name: singleData?.product_name as string,
 								serial_no: singleData?.serial_no as string,
-								price: singleData?.price as string,
+								brand: singleData?.brand as string,
 							})
 						}
 					>

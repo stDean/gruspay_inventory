@@ -3,13 +3,14 @@ import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 import { UrlQueryParams } from "./types";
 import { Metadata } from "next";
+import millify from "millify";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
 export function constructMetadata({
-	title = "Gruspay - Inventory",
+	title = "Cauntr - Inventory",
 	description = "A seamless inventory management system",
 	icons = "/favicon.ico",
 }: {
@@ -39,13 +40,21 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 	);
 }
 
-export const formatCurrency = (val: number) => {
-	const formattedNumber = new Intl.NumberFormat("en-NG", {
-		style: "currency",
-		currency: "NGN",
-	});
+// export const formatCurrency = (val: number) => {
+// 	const formattedNumber = new Intl.NumberFormat("en-NG", {
+// 		style: "currency",
+// 		currency: "NGN",
+// 	});
 
-	return formattedNumber.format(val);
+// 	return formattedNumber.format(val);
+// };
+
+export const formatCurrency = (val: number) => {
+  // Abbreviate the number with millify
+  const abbreviatedNumber = millify(val, { precision: 1 });
+
+  // Manually append the currency symbol
+  return `₦${abbreviatedNumber}`;
 };
 
 export const AddProductsType = {
