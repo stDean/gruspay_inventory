@@ -4,22 +4,22 @@ import { Logout } from "@/actions/logout";
 import { useAppDispatch } from "@/app/redux";
 import { useReduxState } from "@/hook/useRedux";
 import {
-  setEmail,
-  setIsSidebarCollapsed,
-  setLoggedInUser,
-  setToken,
-  setUser,
+	setEmail,
+	setIsSidebarCollapsed,
+	setLoggedInUser,
+	setToken,
+	setUser,
 } from "@/state";
 import {
-  Archive,
-  ClipboardCheck,
-  FileText,
-  Layout,
-  LogOut,
-  LucideIcon,
-  Menu,
-  SlidersHorizontal,
-  Users
+	Archive,
+	ClipboardCheck,
+	FileText,
+	Layout,
+	LogOut,
+	LucideIcon,
+	Menu,
+	SlidersHorizontal,
+	Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -77,8 +77,8 @@ export const SideBar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
 	};
 
-	const handleLogout = () => {
-		Logout();
+	const handleLogout = async () => {
+		await Logout();
 		dispatch(setLoggedInUser(false));
 		dispatch(setToken(""));
 		dispatch(setEmail(""));
@@ -103,8 +103,8 @@ export const SideBar = () => {
 				<Image
 					src={isSidebarCollapsed ? "/logo1.png" : "/logo.png"}
 					alt="logo"
-					width={isSidebarCollapsed ? 250 : 150}
-					height={isSidebarCollapsed ? 250 : 150}
+					width={isSidebarCollapsed ? 100 : 150}
+					height={isSidebarCollapsed ? 100 : 150}
 					priority
 				/>
 

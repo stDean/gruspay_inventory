@@ -50,11 +50,11 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 // };
 
 export const formatCurrency = (val: number) => {
-  // Abbreviate the number with millify
-  const abbreviatedNumber = millify(val, { precision: 1 });
+	// Abbreviate the number with millify
+	const abbreviatedNumber = millify(val, { precision: 1 });
 
-  // Manually append the currency symbol
-  return `₦${abbreviatedNumber}`;
+	// Manually append the currency symbol
+	return `₦${abbreviatedNumber}`;
 };
 
 export const AddProductsType = {
@@ -81,7 +81,7 @@ export const BillingPlanType = {
 			yrAmount: formatCurrency(14800),
 			amountPY: formatCurrency(222000),
 			yrAmountPY: formatCurrency(177600),
-			subTitle: "Includes access to 1 user, 70 inventory items.",
+			subTitle: "Includes access to 2 user, unlimited inventory.",
 		},
 
 		{
@@ -90,8 +90,7 @@ export const BillingPlanType = {
 			yrAmount: formatCurrency(19200),
 			amountPY: formatCurrency(288000),
 			yrAmountPY: formatCurrency(230400),
-			subTitle:
-				"Includes access to 3 user, 150 inventory items and suppliers information.",
+			subTitle: "Includes access to 5 user, unlimited inventory, and suppliers information.",
 		},
 		{
 			title: "Enterprise",
@@ -100,7 +99,7 @@ export const BillingPlanType = {
 			amountPY: formatCurrency(435000),
 			yrAmountPY: formatCurrency(348000),
 			subTitle:
-				"Includes access to 5 user, 250 inventory items, suppliers, customers and creditor information.",
+				"Includes access to 10 user, unlimited inventory, suppliers, customers and creditor information.",
 		},
 	],
 } as const;

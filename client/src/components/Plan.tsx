@@ -99,14 +99,14 @@ export const PlanButtons = ({
 													</span>{" "}
 													per year
 												</Description>
-												<Description className="px-6">
+												<Description className="px-6 text-xs md:text-sm">
 													{option.subTitle}
 												</Description>
 											</div>
 
 											<div className="self-end pr-4 md:pr-8">
 												<Button
-													className=""
+													className="px-4 md:px-5 text-xs md:text-sm"
 													variant={
 														option.title === plan &&
 														type === matcher[matchVal as string]

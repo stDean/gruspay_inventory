@@ -26,8 +26,8 @@ export const DashboardContent = () => {
 	const setUserState = useCallback(async () => {
 		const res = await getUser({ token });
 		if (res?.error) {
-			toast.error("Error", { description: res?.error });
-      Logout();
+      await Logout();
+			// toast.error("Error", { description: res?.error });
 			return;
 		}
 
