@@ -89,12 +89,6 @@ function generateInvoice(previousInvoice = "INV-0001") {
 // 	return {};
 // };
 
-/**
- * TODO:
- * for the sellProductsBulk and updateSoldProduct we need to create an invoice
- * the invoice would be sent to both the backend and the users email.
- */
-
 export const InventoryCtrl = {
 	createProduct: async (req, res) => {
 		const {
@@ -1275,7 +1269,6 @@ export const InventoryCtrl = {
 			}
 		}
 
-		// TODO:send invoice to the user with the money they paid and if their is a balance add it
 		await sendInvoice(invoice.invoiceNo);
 
 		// Return success message

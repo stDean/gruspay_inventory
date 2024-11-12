@@ -47,8 +47,10 @@ export const UserContent = () => {
 	}, [token]);
 
 	useEffect(() => {
-		getAllUsers();
-	}, [userModal.isOpen, modifyModal.isOpen, getAllUsers]);
+		if (user?.role === "ADMIN") {
+			getAllUsers();
+		}
+	}, [userModal.isOpen, modifyModal.isOpen, getAllUsers, user]);
 
 	return (
 		<div className="flex flex-col gap-3">

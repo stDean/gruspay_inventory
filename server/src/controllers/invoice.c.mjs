@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../utils/db.mjs";
+import { sendInvoice } from "../utils/sendInvoice.mjs";
 
 export const InvoiceCtrl = {
 	getAllInvoices: async (req, res) => {
@@ -191,5 +192,23 @@ export const InvoiceCtrl = {
 		};
 
 		return res.status(StatusCodes.OK).json({ invoice: formattedInvoice });
+	},
+	resendInvoice: async (req, res) => {
+		const { invoiceNo } = req.params;
+		const invoice = await prisma.invoice.findUnique({
+			where: { invoiceNo, companyId: req.user.company_id },
+		});
+
+		if (!invoice) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Invoice not found" });
+		}
+
+		await sendInvoice(invoice.invoiceNo);
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Invoice sent successfully!" });
 	},
 };

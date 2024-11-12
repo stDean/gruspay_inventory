@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { useReduxState } from "@/hook/useRedux";
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { getSoldInvoice } from "@/actions/invoice";
+import { getSoldInvoice, resendInvoice } from "@/actions/invoice";
 import { toast } from "sonner";
 import { Spinner } from "@/components/Spinners";
 
@@ -76,6 +76,7 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 	const { token } = useReduxState();
 	const [isPending, startTransition] = useTransition();
 	const [invoice, setInvoice] = useState<InvoiceProps>();
+	const [pending, setPending] = useState<boolean>(false);
 
 	const getInvoice = useCallback(() => {
 		startTransition(async () => {
@@ -87,7 +88,20 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 
 			setInvoice(res?.data?.invoice);
 		});
-	}, [token]);
+	}, [token, id]);
+
+	const ResendInvoice = useCallback(async () => {
+		setPending(true);
+		const res = await resendInvoice({ token, invoiceNo: id });
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			setPending(false);
+			return;
+		}
+
+		toast.success("Success", { description: res?.data?.msg });
+		setPending(false);
+	}, [token, id]);
 
 	useEffect(() => {
 		getInvoice();
@@ -127,12 +141,15 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 						</p>
 					</div>
 
-					{invoice?.status === "Draft" && (
-						<div className="flex gap-4">
-							<Button className="bg-red-500 hover:bg-red-400">Delete</Button>
-							<Button variant="outline">Mark as sold</Button>
-						</div>
-					)}
+					<div className="flex gap-4">
+						<Button
+							variant="outline"
+							onClick={ResendInvoice}
+							disabled={pending}
+						>
+							Resend Invoice
+						</Button>
+					</div>
 				</div>
 
 				<div className="bg-white/80 p-4 md:p-6 rounded-lg border-2 border-gray-300 space-y-6">
@@ -155,14 +172,14 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 						<div className="space-y-4">
 							<div>
 								<p className="font-[500] text-sm">Invoice Date</p>
-								<h1 className="text-base md:text-xl font-semibold">
+								<h1 className="text-[15px] md:text-xl font-semibold">
 									{format(invoice?.createdAt as string, "PPP")}
 								</h1>
 							</div>
 
 							<div>
 								<p className="font-[500] text-sm">Payment Date</p>
-								<h1 className="text-base md:text-xl font-semibold">
+								<h1 className="text-[15px] md:text-xl font-semibold">
 									{format(invoice?.updatedAt as string, "PPP")}
 								</h1>
 							</div>
@@ -170,7 +187,7 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 
 						<div className="font-semibold space-y-1">
 							<p className="font-[500] text-sm">Bill To</p>
-							<h1 className="text-lg md:text-xl">
+							<h1 className="text-base md:text-xl">
 								{invoice?.customer?.customerName}
 							</h1>
 							<p className="text-sm md:text-base">
@@ -209,7 +226,7 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 					)}
 
 					{invoice.status === "SWAP" && (
-						<div className="rounded-lg p-6 border-t border-b border-blue-500 flex flex-col gap-2">
+						<div className="rounded-lg p-6 border border-blue-500 flex flex-col gap-2">
 							<p className="font-semibold text-lg">Incoming Item(s)</p>
 							{invoice?.incomingItems && (
 								<InvoiceTable itemsPurchased={invoice.incomingItems} />

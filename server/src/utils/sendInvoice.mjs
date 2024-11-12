@@ -115,7 +115,12 @@ export const sendInvoice = async invoiceNo => {
       <div style="width: 700px; margin: auto; font-family: Arial, sans-serif; color: #333;">
         <div style="margin-bottom: 1.5rem; font-size: 1.5rem;">
           <p>Hi, ${customerName}</p>
-          <p>Thank you for your business. Here is your invoice with the details:</p>
+          <p>Thank you for your business. Here is your invoice from <span style="font-weight: bold;">${
+						invoice?.company?.company_name
+					}</span> with the details:</p>
+          <p style="font-size: 0.8rem">Date Generated: ${new Date(
+						invoice?.updatedAt
+					).toLocaleDateString()}</p>
         </div>
 
         ${
