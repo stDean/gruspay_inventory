@@ -80,7 +80,6 @@ const Card = ({
 			</div>
 
 			<div className="pt-6">
-				{/* TODO:Onclick of this send to register page then set the plan in local-storage so you can get it on the register page */}
 				<Button
 					variant="outline"
 					className="w-full py-6 font-semibold"
@@ -126,29 +125,29 @@ export const ChoosePlan = () => {
 			<div className="space-y-4 md:space-y-0 md:flex md:gap-6 w-full lg:px-10 px-6">
 				<Card
 					plan="Personal"
-					amount={type === "yearly" ? "₦14,800" : "₦18,500"}
-					yearFees={type === "yearly" ? "₦177,600" : "₦222,000"}
+					amount={type === "yearly" ? "₦4,480" : "₦5,600"}
+					yearFees={type === "yearly" ? "₦53,760" : "₦67,200"}
 					per={type === "monthly" ? "Month" : "Year"}
-					val="70"
-					users="One User"
+					val="Unlimited Inventory"
+					users="2 User"
 				/>
 				<Card
 					plan="Team"
-					amount={type === "yearly" ? "₦19,200" : "₦24,000"}
-					yearFees={type === "yearly" ? "₦230,400" : "₦288,000"}
+					amount={type === "yearly" ? "₦7,280" : "₦9,100"}
+					yearFees={type === "yearly" ? "₦87,360" : "₦109,200"}
 					per={type === "monthly" ? "Month" : "Year"}
-					val="150"
-					users="Up to 3 users"
+					val="Unlimited Inventory"
+					users="Up to 5 users"
 					supplier
 					supplierText="Supplier's information"
 				/>
 				<Card
 					plan="Enterprise"
-					amount={type === "yearly" ? "₦29,000" : "₦36,500"}
-					yearFees={type === "yearly" ? "₦348,000" : "₦438,000"}
+					amount={type === "yearly" ? "₦9,040" : "₦11,300"}
+					yearFees={type === "yearly" ? "₦108,480" : "₦135,600"}
 					per={type === "monthly" ? "Month" : "Year"}
-					val="250"
-					users="Up to 5 users"
+					val="Unlimited Inventory"
+					users="Up to 10 users"
 					supplier
 					supplierText="Supplier's information"
 					customer

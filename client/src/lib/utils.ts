@@ -77,27 +77,28 @@ export const BillingPlanType = {
 	options: [
 		{
 			title: "Personal",
-			amount: formatCurrency(18500),
-			yrAmount: formatCurrency(14800),
-			amountPY: formatCurrency(222000),
-			yrAmountPY: formatCurrency(177600),
+			amount: "₦5,600",
+			yrAmount: "₦4,480",
+			amountPY: "₦67,200",
+			yrAmountPY: "₦53,760",
 			subTitle: "Includes access to 2 user, unlimited inventory.",
 		},
 
 		{
 			title: "Team",
-			amount: formatCurrency(24000),
-			yrAmount: formatCurrency(19200),
-			amountPY: formatCurrency(288000),
-			yrAmountPY: formatCurrency(230400),
-			subTitle: "Includes access to 5 user, unlimited inventory, and suppliers information.",
+			amount: "₦9,100",
+			yrAmount: "₦7,280",
+			amountPY: "₦109,200",
+			yrAmountPY: "₦87,360",
+			subTitle:
+				"Includes access to 5 user, unlimited inventory, and suppliers information.",
 		},
 		{
 			title: "Enterprise",
-			amount: formatCurrency(36500),
-			yrAmount: formatCurrency(29000),
-			amountPY: formatCurrency(435000),
-			yrAmountPY: formatCurrency(348000),
+			amount: "₦11,300",
+			yrAmount: "₦9,040",
+			amountPY: "₦135,600",
+			yrAmountPY: "₦108,480",
 			subTitle:
 				"Includes access to 10 user, unlimited inventory, suppliers, customers and creditor information.",
 		},
