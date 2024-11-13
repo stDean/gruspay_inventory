@@ -39,7 +39,7 @@ export const SupplierTable = ({
 				<TableHead className="px-2 border-r">Price(₦)</TableHead>
 			)}
 			<TableHead className="px-2 border-r">Sale Status</TableHead>
-			<TableHead className="px-2 border-r">Supply Date</TableHead>
+			<TableHead className="px-2">Supply Date</TableHead>
 		</>
 	);
 
@@ -62,7 +62,7 @@ export const SupplierTable = ({
 							? "AVAILABLE"
 							: product?.sales_status}
 					</TableCell>
-					<TableCell className="px-2 border-r">
+					<TableCell className="px-2">
 						{format(product.createdAt, "PPP")}
 					</TableCell>
 				</TableRow>

@@ -102,7 +102,7 @@ export const InventorySummaryTable = ({
 							{item.brand}
 						</Link>
 					</TableCell>
-					<TableCell className="border-r">{item._count["type"]}</TableCell>
+					<TableCell className="">{item._count["type"]}</TableCell>
 				</TableRow>
 			))}
 		</>

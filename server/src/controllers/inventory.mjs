@@ -130,13 +130,16 @@ export const InventoryCtrl = {
 			companyId: company.id,
 		});
 
+		// remove comma and space
+		const priceWithoutComma = price.replace(/^₦|,?\s*/g, "");
+
 		await prisma.products.create({
 			data: {
 				product_name,
 				brand,
 				description,
 				type,
-				price,
+				price: priceWithoutComma,
 				serial_no,
 				Company: {
 					connect: { id: company.id },
@@ -176,6 +179,9 @@ export const InventoryCtrl = {
 					companyId: company.id,
 				});
 
+				// Remove commas and space from price
+				const priceWithoutComma = product.Price.replace(/^₦|,?\s*/g, "");
+
 				// Now create the product with the connected supplier
 				const result = await prisma.products.create({
 					data: {
@@ -183,7 +189,7 @@ export const InventoryCtrl = {
 						brand: product.Brand,
 						description: product.Description,
 						type: product["Item Type"],
-						price: product.Price,
+						price: priceWithoutComma,
 						serial_no: product["Serial Number"],
 						Company: {
 							connect: { id: company.id },
@@ -246,6 +252,12 @@ export const InventoryCtrl = {
 						supplier_name: true,
 						supplier_email: true,
 						supplier_phone_no: true,
+					},
+				},
+				AddedByUser: {
+					select: {
+						first_name: true,
+						last_name: true,
 					},
 				},
 			},

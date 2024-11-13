@@ -59,7 +59,7 @@ export const SwapProductTable = ({
 			<TableHead className="px-2">Swap To</TableHead>
 			<TableHead className="px-2">Swap Count</TableHead>
 			<TableHead className="px-2">Amount Included(₦)</TableHead>
-			<TableHead className="px-2 border-r hidden md:block">
+			<TableHead className="px-2 hidden md:flex items-center">
 				Date Swapped
 			</TableHead>
 		</>
@@ -100,7 +100,7 @@ export const SwapProductTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10 hidden md:block">
+					<TableCell className="px-2 w-5 md:w-10 hidden md:block">
 						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>

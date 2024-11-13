@@ -57,11 +57,11 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 			{user?.role === "ADMIN" && (
 				<TableHead className="px-2 border-r">Value</TableHead>
 			)}
-			<TableHead className="px-2 hidden md:block">Sold By</TableHead>
-			<TableHead className="px-2">Sold To</TableHead>
-			<TableHead className="px-2">Amount Paid(₦)</TableHead>
-			<TableHead className="px-2">Balance Owed(₦)</TableHead>
-			<TableHead className="px-2 border-r hidden md:block">Date Sold</TableHead>
+			<TableHead className="px-2 md:flex items-center hidden border-r">Sold By</TableHead>
+			<TableHead className="px-2 border-r">Sold To</TableHead>
+			<TableHead className="px-2 border-r">Amount Paid(₦)</TableHead>
+			<TableHead className="px-2 border-r">Balance Owed(₦)</TableHead>
+			<TableHead className="px-2 hidden md:flex items-center">Date Sold</TableHead>
 		</>
 	);
 
@@ -94,7 +94,7 @@ export const SoldProductsTable = ({ products, page }: InventoryProps) => {
 					</TableCell>
 					<TableCell className="border-r">{item.bought_for}</TableCell>
 					<TableCell className="border-r">{item.balance_owed}</TableCell>
-					<TableCell className="border-r capitalize hidden md:block">
+					<TableCell className="capitalize hidden md:block">
 						{format(item.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>

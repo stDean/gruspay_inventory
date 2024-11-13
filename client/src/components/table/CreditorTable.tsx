@@ -42,7 +42,7 @@ export const CreditorTable = ({
 			)}
 			<TableHead className="px-2 border-r">Price Paid(₦)</TableHead>
 			<TableHead className="px-2 border-r">Balance Owed(₦)</TableHead>
-			<TableHead className="px-2 border-r">Purchase Date</TableHead>
+			<TableHead className="px-2">Purchase Date</TableHead>
 		</>
 	);
 
@@ -73,7 +73,7 @@ export const CreditorTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product?.balance_owed}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell className="px-2 w-5 md:w-10">
 						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>

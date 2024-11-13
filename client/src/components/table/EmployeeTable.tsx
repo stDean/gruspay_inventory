@@ -52,7 +52,7 @@ export const EmployeeTable = ({
 			<TableHead className="px-2 border-r">Last Name</TableHead>
 			<TableHead className="px-2 border-r">Email</TableHead>
 			<TableHead className="px-2 border-r">Role</TableHead>
-			<TableHead className="px-2 border-r">Date Added</TableHead>
+			<TableHead className="px-2">Date Added</TableHead>
 		</>
 	);
 
@@ -74,7 +74,7 @@ export const EmployeeTable = ({
 					</TableCell>
 					<TableCell className="px-2 border-r">{user.email}</TableCell>
 					<TableCell className="px-2 border-r">{user.role}</TableCell>
-					<TableCell className="px-2 border-r">
+					<TableCell className="px-2">
 						{format(user?.createdAt, "PPP")}
 					</TableCell>
 				</TableRow>

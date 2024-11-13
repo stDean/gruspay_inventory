@@ -55,7 +55,7 @@ export const SuppliersTable = () => {
 			<TableHead className={`px-2 border-r`}>Customer Name</TableHead>
 			<TableHead className="px-2 border-r">Email Address</TableHead>
 			<TableHead className="px-2 border-r">Phone Number</TableHead>
-			<TableHead className="px-2 border-r">Supplied Count</TableHead>
+			<TableHead className="px-2">Supplied Count</TableHead>
 		</>
 	);
 
@@ -75,7 +75,7 @@ export const SuppliersTable = () => {
 					<TableCell className="px-2 border-r">
 						{supplier.supplier_phone_no}
 					</TableCell>
-					<TableCell className="px-2 border-r">
+					<TableCell className="px-2">
 						{supplier.Products.length}
 					</TableCell>
 				</TableRow>

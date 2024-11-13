@@ -66,8 +66,11 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 			{user?.role === "ADMIN" && (
 				<TableHead className="px-2 border-r">Value(₦)</TableHead>
 			)}
-			<TableHead className="px-2">Supplied By</TableHead>
-			<TableHead className="px-2 hidden md:block">Date Added</TableHead>
+			<TableHead className="px-2 border-r">Added By</TableHead>
+			<TableHead className="px-2 border-r">Supplied By</TableHead>
+			<TableHead className="px-2 hidden md:flex items-center">
+				Date Added
+			</TableHead>
 		</>
 	);
 
@@ -94,9 +97,12 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 						<TableCell className="border-r">{item.price}</TableCell>
 					)}
 					<TableCell className="border-r">
+						{item.AddedByUser?.first_name}
+					</TableCell>
+					<TableCell className="border-r">
 						{item.Supplier.supplier_name}
 					</TableCell>
-					<TableCell className="border-r hidden md:block">
+					<TableCell className="hidden md:block">
 						{format(new Date(item.createdAt), "PPP")}
 					</TableCell>
 				</TableRow>
