@@ -43,7 +43,7 @@ export const CreditorsTable = () => {
 			}
 			setCreditors(res?.data.creditors);
 		});
-	}, [token]);
+	}, []);
 
 	useEffect(() => {
 		getAllCreditors();

@@ -29,7 +29,7 @@ export const Supplier = ({ id }: { id: string }) => {
 
 			setSupplier(res?.data.supplier);
 		});
-	}, [token, id]);
+	}, [id]);
 
 	useEffect(() => {
 		getSupplierData();

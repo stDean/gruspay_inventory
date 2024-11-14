@@ -1,19 +1,19 @@
 "use client";
 
-import { InventorySummaryTable } from "@/components/table/InventorySummaryTable";
-import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useTransition, useCallback } from "react";
-import { Tab } from "@/components/Tab";
-import { useReduxState } from "@/hook/useRedux";
-import { toast } from "sonner";
-import {
-	getSoldProductsByCount,
-	getSwapProductsByCount,
-} from "@/actions/sales";
-import { ProductStockProps } from "@/lib/types";
-import { Spinner } from "@/components/Spinners";
 import { getInventoryStats } from "@/actions/inventory";
+import {
+  getSoldProductsByCount,
+  getSwapProductsByCount,
+} from "@/actions/sales";
+import { Spinner } from "@/components/Spinners";
 import { SummaryStats } from "@/components/SummaryStats";
+import { Tab } from "@/components/Tab";
+import { InventorySummaryTable } from "@/components/table/InventorySummaryTable";
+import { useReduxState } from "@/hook/useRedux";
+import { ProductStockProps } from "@/lib/types";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 export const SoldContent = () => {
 	const searchParam = useSearchParams();
@@ -24,6 +24,7 @@ export const SoldContent = () => {
 		soldProducts: Array<ProductStockProps>;
 		swappedProducts: Array<ProductStockProps>;
 	}>({ soldProducts: [], swappedProducts: [] });
+
 	const [tab, setTab] = useState<{
 		sold: boolean;
 		swapped: boolean;
@@ -65,7 +66,7 @@ export const SoldContent = () => {
 				return;
 			}
 		});
-	}, [token, tab]);
+	}, [tab]);
 
 	const getInventoryStat = useCallback(async () => {
 		const res = await getInventoryStats({ token });
@@ -91,7 +92,7 @@ export const SoldContent = () => {
 			totalPrice: res?.data.totalSwapPrice,
 			topSeller: res?.data.topSoldProduct.product_name,
 		});
-	}, [token, tab]);
+	}, [tab]);
 
 	useEffect(() => {
 		getProducts();
@@ -116,6 +117,7 @@ export const SoldContent = () => {
 						totalPrice={stats.totalPrice}
 						totalText={tab.sold ? "Total Sales" : "Total Amount Received"}
 						addClass="flex-1 w-full"
+						isPending={isPending}
 					/>
 
 					<div className="flex text-xs bg-white text-[#344054] rounded-md border border-[#D0D5DD] cursor-pointer items-center w-fit">

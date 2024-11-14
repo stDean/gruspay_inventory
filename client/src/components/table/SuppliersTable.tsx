@@ -43,7 +43,7 @@ export const SuppliersTable = () => {
 			}
 			setSuppliers(res?.data.suppliers);
 		});
-	}, [token]);
+	}, []);
 
 	useEffect(() => {
 		getAllSuppliers();

@@ -29,7 +29,7 @@ export const Customer = ({ id }: { id: string }) => {
 
 			setCustomer(res?.data.customer);
 		});
-	}, [token, id]);
+	}, [id]);
 
 	useEffect(() => {
 		getCustomerData();

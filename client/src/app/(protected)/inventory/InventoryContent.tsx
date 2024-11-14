@@ -1,7 +1,6 @@
 "use client";
 
 import { getInventoryStats, getProductsByStock } from "@/actions/inventory";
-import { getUser } from "@/actions/user";
 import { useAppDispatch } from "@/app/redux";
 import { AddButton } from "@/components/AddButton";
 import { Spinner } from "@/components/Spinners";
@@ -14,14 +13,15 @@ import useAddSingleProductModal from "@/hook/useAddSingleProductModal";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
 import { ProductStockProps } from "@/lib/types";
-import { setUser } from "@/state";
+import { fetchUser } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export const InventoryContent = () => {
+	const dispatch = useAppDispatch();
 	const [products, setProducts] = useState<Array<ProductStockProps>>([]);
-	const { token, companyDetails, user } = useReduxState();
+	const { token, companyDetails } = useReduxState();
 	const searchParam = useSearchParams();
 	const [isPending, startTransition] = useTransition();
 	const page = Number(searchParam.get("page"));
@@ -29,7 +29,6 @@ export const InventoryContent = () => {
 	const addSingleProductModal = useAddSingleProductModal();
 	const addMultipleProductModal = useAddMultipleProductModal();
 	const showProductModal = useShowProductModal();
-	const dispatch = useAppDispatch();
 
 	const [stats, setStats] = useState<{
 		allCategory: number;
@@ -52,17 +51,11 @@ export const InventoryContent = () => {
 			}
 			setProducts(res?.data);
 		});
-	}, [token, addSingleProductModal.isOpen, addMultipleProductModal.isOpen]);
+	}, [addSingleProductModal.isOpen, addMultipleProductModal.isOpen]);
 
 	const setUserState = useCallback(async () => {
-		const res = await getUser({ token });
-		if (res?.error) {
-			toast.error("Error", { description: res?.error });
-			return;
-		}
-
-		dispatch(setUser(res?.data.userInDb));
-	}, [token, user]);
+		await fetchUser(token, dispatch);
+	}, []);
 
 	const getInventoryStat = useCallback(async () => {
 		const res = await getInventoryStats({ token });
@@ -84,7 +77,7 @@ export const InventoryContent = () => {
 			totalPrice: res?.data.totalPrice,
 			topSeller: res?.data.topSoldProduct.product_name,
 		});
-	}, [token, showProductModal.isOpen]);
+	}, [showProductModal.isOpen]);
 
 	useEffect(() => {
 		getProducts();

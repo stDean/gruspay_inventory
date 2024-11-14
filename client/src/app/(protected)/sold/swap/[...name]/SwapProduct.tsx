@@ -36,7 +36,7 @@ export const SwapProduct = ({
 			}
 			setProducts(res?.data.swapProducts);
 		});
-	}, [token, name]);
+	}, []);
 
 	useEffect(() => {
 		getProducts();

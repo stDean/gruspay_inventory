@@ -48,7 +48,7 @@ export const CompletePayModal = () => {
 				completeModal.onClose();
 			});
 		},
-		[token, completeModal]
+		[completeModal]
 	);
 
 	const headerContent = (

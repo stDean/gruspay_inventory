@@ -40,9 +40,19 @@ router
 router
 	.route("/getInventoryStats")
 	.get([AuthMiddleware], InventoryCtrl.getInventoryStats);
+
 router
-	.route("/getDashboardStats")
-	.get([AuthMiddleware], InventoryCtrl.getDashboardStats);
+	.route("/getTopSeller")
+	.get([AuthMiddleware, AdminMiddleware], InventoryCtrl.getTopSeller);
+router
+	.route("/getBusSummaryNLss")
+	.get([AuthMiddleware, AdminMiddleware], InventoryCtrl.getBusSummaryNLss);
+router
+	.route("/getTotalSalesNPurchase")
+	.get([AuthMiddleware, AdminMiddleware], InventoryCtrl.getTotalSalesNPurchase);
+router
+	.route("/getTopSellingStocks")
+	.get([AuthMiddleware, AdminMiddleware], InventoryCtrl.getTopSellingStocks);
 router
 	.route("/getSoldProductsByCount")
 	.get([AuthMiddleware], InventoryCtrl.getCountOfSoldProducts);

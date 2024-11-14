@@ -32,7 +32,7 @@ export const SoldProduct = ({
 			}
 			setProducts(res?.data);
 		});
-	}, [token, name]);
+	}, []);
 
 	useEffect(() => {
 		getProducts();

@@ -38,7 +38,7 @@ export const SingleProductsByName = ({
 			}
 			setProducts(res?.data);
 		});
-	}, [token, name, showProductModal.isOpen]);
+	}, [showProductModal.isOpen]);
 
 	useEffect(() => {
 		getProducts();

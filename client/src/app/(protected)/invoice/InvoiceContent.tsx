@@ -55,7 +55,7 @@ export const InvoiceContent = () => {
 
 			setAllSoldInvoices(res?.data?.invoices);
 		});
-	}, [token]);
+	}, []);
 
 	useEffect(() => {
 		getAllSoldInvoices();

@@ -43,7 +43,7 @@ export const CustomersTable = () => {
 			}
 			setCustomers(res?.data.customers);
 		});
-	}, [token]);
+	}, []);
 
 	useEffect(() => {
 		getAllCustomers();

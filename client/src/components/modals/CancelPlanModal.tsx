@@ -1,25 +1,24 @@
 "use client";
 
-import useCancelPlanModal from "@/hook/useCancelPlanModal";
-import { Modal } from "./Modal";
+import { cancelCompanyPlan } from "@/actions/user";
 import { Button } from "@/components/ui/button";
-import { cancelCompanyPlan, getUser } from "@/actions/user";
+import useCancelPlanModal from "@/hook/useCancelPlanModal";
+import { useReduxState } from "@/hook/useRedux";
+import { fetchUser } from "@/lib/utils";
 import { useCallback, useTransition } from "react";
 import { toast } from "sonner";
-import { useReduxState } from "@/hook/useRedux";
-import { setUser } from "@/state";
+import { Modal } from "./Modal";
 import { useAppDispatch } from "@/app/redux";
 
 export const CancelPlanModal = () => {
 	const dispatch = useAppDispatch();
 	const cancelModal = useCancelPlanModal();
 	const [isPending, startTransition] = useTransition();
-	const { token, user } = useReduxState();
+	const { token } = useReduxState();
 
 	const setUserState = useCallback(async () => {
-		const { data } = await getUser({ token });
-		dispatch(setUser(data.userInDb));
-	}, [token, user]);
+		await fetchUser(token, dispatch);
+	}, []);
 
 	const handleCancelPlan = () => {
 		startTransition(async () => {

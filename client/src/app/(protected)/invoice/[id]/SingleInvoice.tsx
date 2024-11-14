@@ -88,7 +88,7 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 
 			setInvoice(res?.data?.invoice);
 		});
-	}, [token, id]);
+	}, [id]);
 
 	const ResendInvoice = useCallback(async () => {
 		setPending(true);
@@ -101,7 +101,7 @@ export const SingleInvoice = ({ id }: { id: string }) => {
 
 		toast.success("Success", { description: res?.data?.msg });
 		setPending(false);
-	}, [token, id]);
+	}, [id]);
 
 	useEffect(() => {
 		getInvoice();

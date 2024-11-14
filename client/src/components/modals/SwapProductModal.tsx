@@ -36,9 +36,6 @@ export const SwapProductModal = () => {
 	const [isPending, startTransition] = useTransition();
 	const { token } = useReduxState();
 
-  console.log({a: swapProductModal.items});
-  
-
 	const [search, setSearch] = useState<{ show: boolean; value: string }>({
 		show: false,
 		value: "",
@@ -159,7 +156,9 @@ export const SwapProductModal = () => {
 				return;
 			}
 
-			toast.success("Success", { description: "Product swapped successfully!" });
+			toast.success("Success", {
+				description: "Product swapped successfully!",
+			});
 			// Reset incoming product
 			setIncoming({
 				product_name: "",
@@ -324,7 +323,7 @@ export const SwapProductModal = () => {
 									className="text-red-500 cursor-pointer hover:text-red-400 h-4 w-4 self-start"
 									onClick={() => {
 										products.splice(products.indexOf(item), 1);
-                    setProducts([...products]);
+										setProducts([...products]);
 									}}
 								/>
 							</div>

@@ -368,6 +368,118 @@ export const getDashboardStats = async ({
 	}
 };
 
+export const getTopSellerStats = async ({
+	token,
+	sellerMonth,
+	sellerYear,
+}: {
+	token: string;
+	sellerMonth?: string;
+	sellerYear?: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getTopSeller?sellerMonth=${sellerMonth}&sellerYear=${sellerYear}`,
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Something went wrong..." };
+	}
+};
+
+export const getBusSummaryStats = async ({ token }: { token: string }) => {
+	try {
+		const { data } = await axios.get(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getBusSummaryNLss`,
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Something went wrong..." };
+	}
+};
+
+export const getTotalSalesNPurchaseStats = async ({
+	token,
+	soldYear,
+	soldMonth,
+}: {
+	token: string;
+	soldYear?: string;
+	soldMonth?: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getTotalSalesNPurchase?soldYear=${soldYear}&soldMonth=${soldMonth}`,
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Something went wrong..." };
+	}
+};
+
+export const getTopSellingStocks = async ({
+	token,
+	tssYear,
+	tssMonth,
+}: {
+	token: string;
+	tssYear?: string;
+	tssMonth?: string;
+}) => {
+	try {
+		const { data } = await axios.get(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/getTopSellingStocks?tssYear=${tssYear}&tssMonth=${tssMonth}`,
+			{
+				headers: { Authorization: `Bearer ${token}` },
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+		return { error: "Something went wrong..." };
+	}
+};
+
 export const getBarChartData = async ({
 	token,
 	barYear,
@@ -400,13 +512,13 @@ export const getBarChartData = async ({
 export const updateSoldProduct = async ({
 	token,
 	amount,
-  invoiceId,
+	invoiceId,
 	id,
 }: {
 	token: string;
 	amount: string;
 	id: string;
-  invoiceId: string
+	invoiceId: string;
 }) => {
 	try {
 		const { data } = await axios.patch(

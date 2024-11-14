@@ -37,11 +37,11 @@ export const Creditor = ({ id }: { id: string }) => {
 
 			setCreditor(res?.data.creditor);
 		});
-	}, [id, token, router]);
+	}, [id, router, completeModal.isOpen]);
 
 	useEffect(() => {
 		getCreditorData();
-	}, [completeModal.isOpen, getCreditorData]);
+	}, [getCreditorData]);
 
 	// Early redirect if the company is on the PERSONAL plan
 	if (companyDetails?.billingPlan !== "ENTERPRISE") {
@@ -55,10 +55,7 @@ export const Creditor = ({ id }: { id: string }) => {
 	// Render supplier details if available
 	return creditor ? (
 		<div className="-mt-4">
-			<ItemsHeader
-				routeTo="/users"
-				types={creditor?.creditor_name}
-			/>
+			<ItemsHeader routeTo="/users" types={creditor?.creditor_name} />
 
 			<CreditorTable products={creditor?.Products} page={page} />
 		</div>

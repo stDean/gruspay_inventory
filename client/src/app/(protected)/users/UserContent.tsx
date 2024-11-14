@@ -44,7 +44,7 @@ export const UserContent = () => {
 
 			setUsers(res?.data.users);
 		});
-	}, [token]);
+	}, []);
 
 	useEffect(() => {
 		if (user?.role === "ADMIN") {

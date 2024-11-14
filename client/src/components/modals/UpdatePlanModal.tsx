@@ -1,30 +1,24 @@
 "use client";
 
-import useUpdatePlanModal from "@/hook/useUpdatePlanModal";
+import { updateCompanyPlan } from "@/actions/user";
+import { useAppDispatch } from "@/app/redux";
 import { Modal } from "@/components/modals/Modal";
 import { Button } from "@/components/ui/button";
+import { useReduxState } from "@/hook/useRedux";
+import useUpdatePlanModal from "@/hook/useUpdatePlanModal";
+import { fetchUser } from "@/lib/utils";
 import { useCallback, useTransition } from "react";
 import { toast } from "sonner";
-import { getUser, updateCompanyPlan } from "@/actions/user";
-import { useReduxState } from "@/hook/useRedux";
-import { setUser } from "@/state";
-import { useAppDispatch } from "@/app/redux";
 
 export const UpdatePlanModal = () => {
-	const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 	const updateModal = useUpdatePlanModal();
 	const [isPending, startTransition] = useTransition();
-	const { token, user } = useReduxState();
+	const { token } = useReduxState();
 
 	const setUserState = useCallback(async () => {
-		const res = await getUser({ token });
-		if (res?.error) {
-			toast.error("Error", { description: res?.error });
-			return;
-		}
-    
-		dispatch(setUser(res?.data.userInDb));
-	}, [token, user]);
+		await fetchUser(token, dispatch);
+	}, []);
 
 	const handleUpdate = () => {
 		startTransition(async () => {

@@ -1,38 +1,78 @@
 "use client";
 
-import { getBarChartData, getDashboardStats } from "@/actions/inventory";
-import { Logout } from "@/actions/logout";
-import { getUser } from "@/actions/user";
+import {
+	getBarChartData,
+	getBusSummaryStats,
+	getTopSellerStats,
+	getTopSellingStocks,
+	getTotalSalesNPurchaseStats,
+} from "@/actions/inventory";
 import { useAppDispatch } from "@/app/redux";
 import { BarChartContent } from "@/components/BarChartContent";
 import { MonthsDropDown } from "@/components/MonthsDropDown";
-import { Spinner } from "@/components/Spinners";
+import { Skeleton } from "@/components/ui/skeleton";
 import { YearSelect } from "@/components/YearSelect";
 import { useReduxState } from "@/hook/useRedux";
-import { BarChartProps, DashboardProps } from "@/lib/types";
-import { formatCurrency, months } from "@/lib/utils";
-import { setUser } from "@/state";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { BarChartProps } from "@/lib/types";
+import { fetchUser, formatCurrency, months } from "@/lib/utils";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export const DashboardContent = () => {
-	const dispatch = useAppDispatch();
-	const { token, user } = useReduxState();
-	const [isPending, startTransition] = useTransition();
+interface TopSellerDetail {
+	first_name: string;
+	last_name: string;
+	count: number;
+	totalPrice: number;
+}
 
-	const [dashboardStat, setDashboardStat] = useState<DashboardProps>();
+interface BusinessSum {
+	businessSummary: {
+		stockCount: number;
+		totalUnsoldPrice: number;
+		suppliers: number;
+		customers: number;
+		creditors: number;
+	};
+	lowQuantityProducts: { product_name: string; count: number }[];
+}
+
+interface TopSellingProd {
+	topSellingWithDetails: {
+		product_name: string;
+		remaining_quantity: number;
+		total_sold: number;
+		total_sold_price: number;
+	}[];
+}
+
+interface TotalSalesNdPurchase {
+	totalPurchasePrice: number;
+	totalPurchasesCount: number;
+	totalSalesCount: number;
+	totalSoldPrice: number;
+}
+
+export const DashboardContent = () => {
+	const { token } = useReduxState();
+	const dispatch = useAppDispatch();
+
+	const [sellerPend, setSellerPend] = useState(false);
+	const [sumPend, setSumPend] = useState(false);
+	const [tspPend, setTspPend] = useState(false);
+	const [statsPend, setStatsPend] = useState(false);
+	const [topSeller, setTopSeller] = useState<TopSellerDetail>();
+	const [businessSummary, setBusinessSummary] = useState<BusinessSum>();
+	const [topSelling, setTopSelling] = useState<TopSellingProd>();
+	const [totalSalesNdPurchase, setTotalSalesNdPurchase] =
+		useState<TotalSalesNdPurchase>();
+
+	// Bar chart data
+	const [barPend, setBarPend] = useState(false);
 	const [data, setData] = useState<BarChartProps[]>();
 
 	const setUserState = useCallback(async () => {
-		const res = await getUser({ token });
-		if (res?.error) {
-      await Logout();
-			// toast.error("Error", { description: res?.error });
-			return;
-		}
-
-		dispatch(setUser(res?.data.userInDb));
-	}, [token, user]);
+		await fetchUser(token, dispatch);
+	}, []);
 
 	// filters
 	const [selectedYears, setSelectedYears] = useState<{
@@ -47,8 +87,6 @@ export const DashboardContent = () => {
 			...prevState,
 			[componentKey]: value, // Update the selected value for the specific component
 		}));
-
-		dashboardStats();
 	};
 
 	const [selectedMonths, setSelectedMonths] = useState<{
@@ -62,118 +100,223 @@ export const DashboardContent = () => {
 			...prevState,
 			[componentKey]: value, // Update the selected value for the specific component
 		}));
-
-		dashboardStats();
 	};
-
-	const dashboardStats = useCallback(async () => {
-		startTransition(async () => {
-			const res = await getDashboardStats({
-				token,
-				soldYear: selectedYears["dashYear"],
-				soldMonth:
-					selectedMonths["dashMonth"] !== ""
-						? String(months.indexOf(selectedMonths["dashMonth"]) + 1)
-						: "",
-				sellerYear: selectedYears["topSellerYear"],
-				sellerMonth:
-					selectedMonths["topSellerMonth"] !== ""
-						? String(months.indexOf(selectedMonths["topSellerMonth"]) + 1)
-						: "",
-				tssYear: selectedYears["stockYear"],
-				tssMonth:
-					selectedMonths["stockMonth"] !== ""
-						? String(months.indexOf(selectedMonths["stockMonth"]) + 1)
-						: "",
-			});
-
-			if (res?.error) {
-				toast.error("Error", { description: res?.error });
-				return;
-			}
-
-			setDashboardStat(res?.data);
-		});
-	}, [token, selectedYears, selectedMonths]);
 
 	// Bar data only fetched when needed, no need to trigger on filter change
 	const getBarData = useCallback(async () => {
-		startTransition(async () => {
-			const res = await getBarChartData({
-				token,
-				barYear: selectedYears["bar"],
-			});
-
-			if (res?.error) {
-				toast.error("Error", { description: res?.error });
-				return;
-			}
-
-			setData(res?.data.data);
+		setBarPend(true);
+		const res = await getBarChartData({
+			token,
+			barYear: selectedYears["bar"],
 		});
-	}, [token, selectedYears]);
 
-	// Update to avoid re-rendering the entire page
-	useEffect(() => {
-		setUserState(); // This only runs once when the component mounts
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			setBarPend(false);
+			return;
+		}
+
+		setData(res?.data.data);
+		setBarPend(false);
+	}, [selectedYears.bar]);
+
+	const getTopSeller = useCallback(async () => {
+		setSellerPend(true);
+		const res = await getTopSellerStats({
+			token,
+			sellerYear: selectedYears["topSellerYear"],
+			sellerMonth:
+				selectedMonths["topSellerMonth"] !== ""
+					? String(months.indexOf(selectedMonths["topSellerMonth"]) + 1)
+					: "",
+		});
+
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			setSellerPend(false);
+			return;
+		}
+
+		setTopSeller({
+			first_name: res?.data.topSellerDetail.first_name,
+			last_name: res?.data.topSellerDetail.last_name,
+			count: res?.data.topSellerDetail.count,
+			totalPrice: res?.data.topSellerDetail.totalPrice,
+		});
+		setSellerPend(false);
+	}, [selectedYears.topSellerYear, selectedMonths.topSellerMonth]);
+
+	const getBusinessSummary = useCallback(async () => {
+		setSumPend(true);
+		const res = await getBusSummaryStats({ token });
+
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			setSumPend(false);
+			return;
+		}
+
+		setBusinessSummary({
+			businessSummary: res?.data.businessSummary,
+			lowQuantityProducts: res?.data.lowQuantityProducts,
+		});
+		setSumPend(false);
 	}, []);
 
-	// Fetch dashboard stats only when filters change
-	useEffect(() => {
-		dashboardStats(); // Runs only when selectedMonths or selectedYears change
-	}, [dashboardStats]);
+	const getTotalStats = useCallback(async () => {
+		setStatsPend(true);
+		const res = await getTotalSalesNPurchaseStats({
+			token,
+			soldYear: selectedYears["dashYear"],
+			soldMonth:
+				selectedMonths["dashMonth"] !== ""
+					? String(months.indexOf(selectedMonths["dashMonth"]) + 1)
+					: "",
+		});
 
-	// Fetch bar chart data only when component mounts
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			setStatsPend(false);
+			return;
+		}
+
+		setTotalSalesNdPurchase({
+			totalPurchasePrice: res?.data.totalPurchasePrice,
+			totalPurchasesCount: res?.data.totalPurchasesCount,
+			totalSalesCount: res?.data.totalSalesCount,
+			totalSoldPrice: res?.data.totalSoldPrice,
+		});
+		setStatsPend(false);
+	}, [selectedYears.dashYear, selectedMonths.dashMonth]);
+
+	const getTopSellingStats = useCallback(async () => {
+		setTspPend(true);
+		const res = await getTopSellingStocks({
+			token,
+			tssYear: selectedYears["stockYear"],
+			tssMonth:
+				selectedMonths["stockMonth"] !== ""
+					? String(months.indexOf(selectedMonths["stockMonth"]) + 1)
+					: "",
+		});
+
+		if (res?.error) {
+			toast.error("Error", { description: res?.error });
+			setTspPend(false);
+			return;
+		}
+
+		setTopSelling({
+			topSellingWithDetails: res?.data.topSellingWithDetails,
+		});
+		setTspPend(false);
+	}, [selectedYears.stockYear, selectedMonths.stockMonth]);
+
 	useEffect(() => {
-		getBarData(); // This can run once on mount and not every time filters are updated
+		setUserState();
+	}, []);
+
+	useEffect(() => {
+		getTopSeller();
+	}, [getTopSeller]);
+
+	useEffect(() => {
+		getBusinessSummary();
+	}, [getBusinessSummary]);
+
+	useEffect(() => {
+		getTotalStats();
+	}, [getTotalStats]);
+
+	useEffect(() => {
+		getTopSellingStats();
+	}, [getTopSellingStats]);
+
+	useEffect(() => {
+		getBarData();
 	}, [getBarData]);
 
 	const index = new Date().getMonth();
 	const currentYear = new Date().getFullYear();
 
-	return isPending ? (
-		<Spinner />
-	) : (
+	return (
 		<div className="space-y-4 md:space-y-0 md:grid md:grid-cols-12 md:gap-10 md:mx-4">
 			<div className="col-span-7 flex flex-col gap-4">
-				<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between overflow-x-hidden">
-					<div className="space-y-2">
-						<p className="font-semibold text-base lg:text-lg">Total Sales</p>
-						<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
-							{formatCurrency(Number(dashboardStat?.totalSoldPrice || 0))}
-						</h1>
-						<p className="font-semibold md:text-lg">
-							{dashboardStat?.totalSalesCount} item(s)
-						</p>
-					</div>
+				{statsPend ? (
+					<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between overflow-x-hidden">
+						<div className="space-y-2">
+							<p className="font-semibold text-base lg:text-lg">Total Sales</p>
+							<Skeleton className="h-14 w-28" />
+							<Skeleton className="h-6 w-20" />
+						</div>
 
-					<div className="space-y-2">
-						<p className="font-semibold text-base lg:text-lg">
-							Total Purchases
-						</p>
-						<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
-							{formatCurrency(Number(dashboardStat?.totalPurchasePrice) || 0)}
-						</h1>
-						<p className="font-semibold md:text-lg">
-							{dashboardStat?.totalPurchasesCount} item(s)
-						</p>
-					</div>
+						<div className="space-y-2">
+							<p className="font-semibold text-base lg:text-lg">
+								Total Purchases
+							</p>
+							<Skeleton className="h-14 w-28" />
+							<Skeleton className="h-6 w-20" />
+						</div>
 
-					<div className="space-y-4">
-						<MonthsDropDown
-							initialMonth={selectedMonths["dashMonth"] || months[index]}
-							onMonthChange={handleMonthChange}
-							componentKey="dashMonth"
-						/>
-						<YearSelect
-							onYearChange={handleYearChange}
-							startYear={2024}
-							endYear={2034}
-							componentKey="dashYear"
-							initialYear={selectedYears["dashYear"] || String(currentYear)}
-						/>
+						<div className="space-y-4">
+							<MonthsDropDown
+								initialMonth={selectedMonths["dashMonth"] || months[index]}
+								onMonthChange={handleMonthChange}
+								componentKey="dashMonth"
+							/>
+							<YearSelect
+								onYearChange={handleYearChange}
+								startYear={2024}
+								endYear={2034}
+								componentKey="dashYear"
+								initialYear={selectedYears["dashYear"] || String(currentYear)}
+							/>
+						</div>
 					</div>
-				</div>
+				) : (
+					<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between overflow-x-hidden">
+						<div className="space-y-2">
+							<p className="font-semibold text-base lg:text-lg">Total Sales</p>
+							<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
+								{formatCurrency(
+									Number(totalSalesNdPurchase?.totalSoldPrice || 0)
+								)}
+							</h1>
+							<p className="font-semibold md:text-lg">
+								{totalSalesNdPurchase?.totalSalesCount || 0} item(s)
+							</p>
+						</div>
+
+						<div className="space-y-2">
+							<p className="font-semibold text-base lg:text-lg">
+								Total Purchases
+							</p>
+							<h1 className="font-semibold text-2xl lg:text-3xl xl:text-5xl">
+								{formatCurrency(
+									Number(totalSalesNdPurchase?.totalPurchasePrice) || 0
+								)}
+							</h1>
+							<p className="font-semibold md:text-lg">
+								{totalSalesNdPurchase?.totalPurchasesCount || 0} item(s)
+							</p>
+						</div>
+
+						<div className="space-y-4">
+							<MonthsDropDown
+								initialMonth={selectedMonths["dashMonth"] || months[index]}
+								onMonthChange={handleMonthChange}
+								componentKey="dashMonth"
+							/>
+							<YearSelect
+								onYearChange={handleYearChange}
+								startYear={2024}
+								endYear={2034}
+								componentKey="dashYear"
+								initialYear={selectedYears["dashYear"] || String(currentYear)}
+							/>
+						</div>
+					</div>
+				)}
 
 				<div className="border rounded-lg shadow-md p-6 pt-4 bg-white/70 ">
 					<div className="flex justify-end mb-2">
@@ -188,7 +331,11 @@ export const DashboardContent = () => {
 						/>
 					</div>
 
-					<BarChartContent data={data || []} />
+					{barPend ? (
+						<Skeleton className="h-[305px] w-full" />
+					) : (
+						<BarChartContent data={data || []} />
+					)}
 				</div>
 
 				<div className="border rounded-lg shadow-md p-6 bg-white/70 space-y-4">
@@ -218,23 +365,42 @@ export const DashboardContent = () => {
 							<p className="font-semibold">Remaining Quantity</p>
 							<p className="font-semibold">Value</p>
 						</div>
-						{dashboardStat?.topSellingWithDetails.map(product => (
-							<div
-								key={product.product_name}
-								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
-							>
-								<p className="flex-1">{product.product_name}</p>
-								<p className="flex-1 flex justify-center">
-									{product.total_sold}
-								</p>
-								<p className="flex-1 flex justify-center">
-									{product.remaining_quantity}
-								</p>
-								<p className="flex-1 flex justify-end">
-									{formatCurrency(Number(product.total_sold_price) || 0)}
-								</p>
-							</div>
-						))}
+
+						{tspPend ? (
+							<>
+								{[1, 2, 3, 4, 5].map((_, i) => (
+									<div
+										key={i}
+										className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
+									>
+										<Skeleton className="w-full h-6" />
+										<Skeleton className="w-full h-6" />
+										<Skeleton className="w-full h-6" />
+										<Skeleton className="w-full h-6" />
+									</div>
+								))}
+							</>
+						) : (
+							<>
+								{topSelling?.topSellingWithDetails.map(product => (
+									<div
+										key={product.product_name}
+										className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
+									>
+										<p className="flex-1">{product.product_name}</p>
+										<p className="flex-1 flex justify-center">
+											{product.total_sold}
+										</p>
+										<p className="flex-1 flex justify-center">
+											{product.remaining_quantity}
+										</p>
+										<p className="flex-1 flex justify-end">
+											{formatCurrency(Number(product.total_sold_price) || 0)}
+										</p>
+									</div>
+								))}
+							</>
+						)}
 					</div>
 				</div>
 			</div>
@@ -242,21 +408,30 @@ export const DashboardContent = () => {
 			{/* Left side */}
 			<div className="col-span-5 flex flex-col gap-4">
 				<div className="border rounded-lg shadow-md p-6 bg-white/70 flex justify-between">
-					<div className="space-y-3">
-						<p className="font-semibold text-lg">Top Seller</p>
-						<p className="font-semibold text-3xl">
-							{dashboardStat?.topSellerDetail.first_name || ""}{" "}
-							{dashboardStat?.topSellerDetail.last_name}
-						</p>
-						<p className="space-x-10 font-semibold text-lg md:flex md:flex-col md:space-x-0 lg:block lg:space-x-4 xl:space-x-10">
-							<span>
-								{formatCurrency(
-									Number(dashboardStat?.topSellerDetail.totalPrice) || 0
-								)}
-							</span>
-							<span>{dashboardStat?.topSellerDetail.count} item(s)</span>
-						</p>
-					</div>
+					{sellerPend ? (
+						<div className="space-y-3">
+							<p className="font-semibold text-lg">Top Seller</p>
+							<Skeleton className="h-10 w-44" />
+
+							<div className="flex gap-3">
+								<Skeleton className="h-6 w-20" />
+								<Skeleton className="h-6 w-20" />
+							</div>
+						</div>
+					) : (
+						<div className="space-y-3">
+							<p className="font-semibold text-lg">Top Seller</p>
+							<p className="font-semibold text-3xl">
+								{topSeller?.first_name || ""} {topSeller?.last_name}
+							</p>
+							<p className="space-x-10 font-semibold text-lg md:flex md:flex-col md:space-x-0 lg:block lg:space-x-4 xl:space-x-10">
+								<span>
+									{formatCurrency(Number(topSeller?.totalPrice) || 0)}
+								</span>
+								<span>{topSeller?.count || 0} item(s)</span>
+							</p>
+						</div>
+					)}
 
 					<div className="flex flex-col lg:flex-row gap-4">
 						<MonthsDropDown
@@ -282,37 +457,75 @@ export const DashboardContent = () => {
 
 					<hr />
 
-					<div className="space-y-2">
-						<p className="flex flex-col">
-							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.stockCount}
-							</span>
-							<span className="font-semibold">Stock Count</span>
-						</p>
+					{sumPend ? (
+						<div className="space-y-2">
+							<p className="flex flex-col">
+								<Skeleton className="h-10 w-20" />
+								<span className="font-semibold">Stock Count</span>
+							</p>
 
-						<p className="flex flex-col">
-							<span className="font-semibold text-2xl md:text-4xl">
-								{formatCurrency(
-									Number(dashboardStat?.businessSummary.totalUnsoldPrice) || 0
-								)}
-							</span>
-							<span className="font-semibold">Inventory Value</span>
-						</p>
+							<p className="flex flex-col">
+								<Skeleton className="h-10 w-20" />
+								<span className="font-semibold">Inventory Value</span>
+							</p>
 
-						<p className="flex flex-col">
-							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.suppliers}
-							</span>
-							<span className="font-semibold">Number of Suppliers</span>
-						</p>
+							<p className="flex flex-col">
+								<Skeleton className="h-10 w-20" />
+								<span className="font-semibold">Number of Suppliers</span>
+							</p>
 
-						<p className="flex flex-col">
-							<span className="font-semibold text-2xl md:text-4xl">
-								{dashboardStat?.businessSummary.customers}
-							</span>
-							<span className="font-semibold">Number of Customers</span>
-						</p>
-					</div>
+							<p className="flex flex-col">
+								<Skeleton className="h-10 w-20" />
+								<span className="font-semibold">Number of Customers</span>
+							</p>
+
+							<p className="flex flex-col">
+								<Skeleton className="h-10 w-20" />
+								<span className="font-semibold">Number of Debtors</span>
+							</p>
+						</div>
+					) : (
+						<div className="space-y-2">
+							<p className="flex flex-col">
+								<span className="font-semibold text-2xl md:text-4xl">
+									{businessSummary?.businessSummary?.stockCount || 0}
+								</span>
+								<span className="font-semibold">Stock Count</span>
+							</p>
+
+							<p className="flex flex-col">
+								<span className="font-semibold text-2xl md:text-4xl">
+									{formatCurrency(
+										Number(
+											businessSummary?.businessSummary?.totalUnsoldPrice
+										) || 0
+									)}
+								</span>
+								<span className="font-semibold">Inventory Value</span>
+							</p>
+
+							<p className="flex flex-col">
+								<span className="font-semibold text-2xl md:text-4xl">
+									{businessSummary?.businessSummary?.suppliers || 0}
+								</span>
+								<span className="font-semibold">Number of Suppliers</span>
+							</p>
+
+							<p className="flex flex-col">
+								<span className="font-semibold text-2xl md:text-4xl">
+									{businessSummary?.businessSummary?.customers || 0}
+								</span>
+								<span className="font-semibold">Number of Customers</span>
+							</p>
+
+							<p className="flex flex-col">
+								<span className="font-semibold text-2xl md:text-4xl">
+									{businessSummary?.businessSummary?.creditors || 0}
+								</span>
+								<span className="font-semibold">Number of Debtors</span>
+							</p>
+						</div>
+					)}
 				</div>
 
 				{/* Low Quantity Stock */}
@@ -324,15 +537,32 @@ export const DashboardContent = () => {
 							<p className="font-semibold">Product Name</p>
 							<p className="font-semibold mr-7">Remaining Quantity</p>
 						</div>
-						{dashboardStat?.lowQuantityProducts.map((product, idx) => (
-							<div
-								key={product.product_name || idx}
-								className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
-							>
-								<p>{product.product_name}</p>
-								<p className="mr-36">{product.count}</p>
-							</div>
-						))}
+
+						{sumPend ? (
+							<>
+								{[1, 2, 3, 4, 5].map((_, idx) => (
+									<div
+										key={idx}
+										className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
+									>
+										<Skeleton className="h-5 w-24" />
+										<Skeleton className="h-5 w-10 mr-36" />
+									</div>
+								))}
+							</>
+						) : (
+							<>
+								{businessSummary?.lowQuantityProducts.map((product, idx) => (
+									<div
+										key={product.product_name || idx}
+										className="flex justify-between border-t py-2 text-sm lg:text-base font-semibold"
+									>
+										<p>{product.product_name}</p>
+										<p className="mr-36">{product.count}</p>
+									</div>
+								))}
+							</>
+						)}
 					</div>
 				</div>
 			</div>

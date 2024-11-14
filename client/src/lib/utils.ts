@@ -1,9 +1,14 @@
+import { Logout } from "@/actions/logout";
+import { getUser } from "@/actions/user";
+import { AppDispatch } from "@/app/redux";
+import { setUser } from "@/state";
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import qs from "query-string";
-import { UrlQueryParams } from "./types";
-import { Metadata } from "next";
 import millify from "millify";
+import { Metadata } from "next";
+import qs from "query-string";
+import { toast } from "sonner";
+import { twMerge } from "tailwind-merge";
+import { UrlQueryParams } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -119,3 +124,14 @@ export const months = [
 	"November",
 	"December",
 ];
+
+export const fetchUser = async (token: string, dispatch: AppDispatch) => {
+	const res = await getUser({ token });
+	if (res?.error) {
+		toast.error("Error", { description: res?.error });
+		await Logout();
+		return;
+	}
+
+	dispatch(setUser(res?.data.userInDb));
+};
