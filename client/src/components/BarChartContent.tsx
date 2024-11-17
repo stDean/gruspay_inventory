@@ -14,7 +14,7 @@ import {
 
 export const BarChartContent = ({ data }: { data: BarChartProps[] }) => {
 	return (
-		<ResponsiveContainer width="100%" height={305}>
+		<ResponsiveContainer width="100%" height={310}>
 			<BarChart data={data}>
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="month" />

@@ -107,7 +107,7 @@ export const sendInvoice = async invoiceNo => {
 		invoice.customer?.buyer_name || invoice.creditor?.creditor_name;
 
 	const mailOptions = {
-		from: SENDERS_EMAIL,
+		from: invoice?.company?.company_email,
 		to: customer,
 		subject: `Customer Invoice - ${invoice.invoiceNo}`,
 		generateTextFromHTML: true,
