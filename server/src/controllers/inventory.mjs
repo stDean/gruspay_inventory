@@ -143,7 +143,10 @@ export const InventoryCtrl = {
 		});
 
 		// remove comma and space
-		const priceWithoutComma = price.replace(/^₦|,?\s*/g, "");
+		const priceWithoutComma = String(price).replace(/^[₦#]|,?\s*/g, "");
+		if (!Number(priceWithoutComma)) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid price" });
+		}
 
 		await prisma.products.create({
 			data: {
@@ -192,7 +195,14 @@ export const InventoryCtrl = {
 				});
 
 				// Remove commas and space from price
-				const priceWithoutComma = product.Price.replace(/^₦|,?\s*/g, "");
+				const priceWithoutComma = String(product.Price).replace(
+					/^[₦#]|,?\s*/g,
+					""
+				);
+
+        if (!Number(priceWithoutComma)) {
+          return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid price" });
+        }
 
 				// Now create the product with the connected supplier
 				const result = await prisma.products.create({

@@ -13,6 +13,7 @@ import { parse } from "papaparse";
 import { useCallback, useEffect, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { toast } from "sonner";
+import * as xlsx from "xlsx";
 
 enum STEPS {
 	UPLOAD = 0,
@@ -51,7 +52,7 @@ export const AddMultipleProductsModal = () => {
 		rejectedFiles.forEach(file => {
 			file.errors.forEach(error => {
 				if (error.code === "file-invalid-type") {
-					toast.error("Error", { description: "Invalid file type" });
+					toast.error("Invalid file type. Please upload a .csv or .xlsx file.");
 					return;
 				}
 
@@ -66,16 +67,63 @@ export const AddMultipleProductsModal = () => {
 	const extension = uploadedFile.name.split(".")[1];
 	const size = (uploadedFile.size / 1000000).toFixed(3);
 
+	// const handleDropAccepted = async (acceptedFiles: File[]) => {
+	// 	setUploadedFile({
+	// 		name: acceptedFiles[0].name,
+	// 		size: acceptedFiles[0].size,
+	// 	});
+
+	// 	// TODO:Let's try the xlsx file
+	// 	Array.from(acceptedFiles).map(async file => {
+	// 		if (
+	// 			file.type !== "application/vnd.ms-excel" &&
+	// 			file.type !==
+	// 				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	// 		) {
+
+	// 			return;
+	// 		}
+
+	// 		const data = await file.text();
+	// 		const parsedData = parse(data, { header: true });
+	// 		setData(parsedData.data);
+	// 	});
+	// };
+
 	const handleDropAccepted = async (acceptedFiles: File[]) => {
 		setUploadedFile({
 			name: acceptedFiles[0].name,
 			size: acceptedFiles[0].size,
 		});
 
-		Array.from(acceptedFiles).map(async file => {
-			const data = await file.text();
-			const parsedData = parse(data, { header: true });
-			setData(parsedData.data);
+		// Iterate over the accepted files
+		Array.from(acceptedFiles).forEach(async file => {
+			try {
+				let parsedData: any[] = [];
+				const arrayBuffer = await file.arrayBuffer();
+
+				if (file.type === "text/csv") {
+					// Convert CSV to JSON
+					const text = new TextDecoder("utf-8").decode(arrayBuffer);
+					parsedData = parse(text, { header: true }).data; // Use PapaParse for CSV parsing
+				} else {
+					// Handle .xlsx files
+					const workbook = xlsx.read(arrayBuffer, { type: "array" });
+					const sheetName = workbook.SheetNames[0]; // Read the first sheet
+					const worksheet = workbook.Sheets[sheetName];
+					const jsonData = xlsx.utils.sheet_to_json(worksheet);
+					// Convert parsed JSON data to plain objects
+					parsedData = JSON.parse(JSON.stringify(jsonData));
+				}
+
+				// Update the state with parsed data
+				setData(parsedData);
+			} catch (error) {
+				toast.error(
+					"Failed to process the file. Please check the file format."
+				);
+				console.error("File processing error:", error);
+			}
 		});
 	};
 
@@ -146,7 +194,12 @@ export const AddMultipleProductsModal = () => {
 
 			<div className="border-2 border-[#EAECF0] rounded-md py-5">
 				<DropzoneContainer
-					acceptedType={{ "text/csv": [] }}
+					acceptedType={{
+						"text/csv": [],
+						"application/vnd.ms-excel": [],
+						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+							[],
+					}}
 					handleDropAccepted={handleDropAccepted}
 					handleDropRejected={handleDropRejected}
 					notPend="CSV (max 5mb)"

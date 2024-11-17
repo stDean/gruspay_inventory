@@ -9,7 +9,7 @@ interface DropzoneContainerProps {
 	notPend?: string;
 	acceptedType: Accept;
 	maxSize: number;
-  isPending?:boolean
+	isPending?: boolean;
 }
 
 export const DropzoneContainer = ({
@@ -18,7 +18,7 @@ export const DropzoneContainer = ({
 	notPend,
 	acceptedType,
 	maxSize,
-  isPending = false
+	isPending = false,
 }: DropzoneContainerProps) => {
 	const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
