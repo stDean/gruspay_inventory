@@ -410,7 +410,7 @@ export const InventoryCtrl = {
 		});
 		const prev =
 			getPrevInvoice[0]?.invoiceNo ||
-			`${companyInitials}${yearLastTwo}-${month}0001`;
+			`${companyInitials}${yearLastTwo}-${month}0000`;
 		const invoiceNumber = generateInvoice(prev);
 
 		// Update each product and prepare invoice creation data
