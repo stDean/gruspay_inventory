@@ -3,7 +3,7 @@ import { prisma } from "../utils/db.mjs";
 import { StatusCodes } from "http-status-codes";
 import { generateVerificationToken } from "../utils/token.mjs";
 import { hashPassword, comparePassword, createJWT } from "../utils/helper.mjs";
-import { sendMail } from "../utils/sendMail.mjs";
+import { otpHtml, sendNodeMail } from "../utils/sendMail.mjs";
 import {
 	createSubscription,
 	initializeSubscription,
@@ -13,6 +13,18 @@ import {
 	refundInitialFee,
 } from "./paystack.c.mjs";
 import { my_plans } from "../utils/constants.mjs";
+
+// Function to send OTP email
+const sendOtpEmail = async (to, token) => {
+	const htmlContent = otpHtml(token); // Generates the OTP HTML template
+
+	try {
+		const info = await sendNodeMail(to, "Your OTP Code", "", htmlContent); // Send the email
+		console.log("OTP sent successfully:", info);
+	} catch (error) {
+		console.error("Failed to send OTP:", error);
+	}
+};
 
 const handleOtpForCompany = async email => {
 	const { token, expires } = await generateVerificationToken(email);
@@ -29,7 +41,7 @@ const handleOtpForCompany = async email => {
 		});
 	}
 
-	sendMail(email, token, "OTP Verification");
+	sendOtpEmail(email, token);
 };
 
 // Function to update the billing plan
@@ -371,7 +383,7 @@ export const AuthController = {
 			data: { otp: token, expiresAt: expires },
 		});
 
-		sendMail(existingToken.email, token, "Confirmation Code");
+		sendOtpEmail(existingToken.email, token);
 
 		res
 			.status(StatusCodes.OK)
@@ -438,7 +450,7 @@ export const AuthController = {
 		await prisma.otp.create({
 			data: { email, otp: token, expiresAt: expires },
 		});
-		sendMail(email, token, "Confirmation Code");
+		sendOtpEmail(email, token);
 		res
 			.status(StatusCodes.OK)
 			.json({ message: "OTP sent to your email", success: true, expires });

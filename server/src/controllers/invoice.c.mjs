@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../utils/db.mjs";
-import { sendInvoice } from "../utils/sendInvoice.mjs";
+import { sendNodeInvoice } from "../utils/sendMail.mjs";
 
 export const InvoiceCtrl = {
 	getAllInvoices: async (req, res) => {
@@ -30,7 +30,7 @@ export const InvoiceCtrl = {
 				customer: invoice.creditor
 					? invoice.creditor.creditor_name
 					: invoice.customer?.buyer_name || "Unknown",
-				date: invoice.createdAt.toLocaleDateString("en-GB"), // Format date as "dd-mm-yyyy"
+				date: invoice.createdAt.toLocaleDateString("en-US"), // Format date as "mm/dd/yyyy"
 				price: totalPrice, // Convert price to string with two decimal places
 				status:
 					invoice.status.charAt(0).toUpperCase() +
@@ -205,7 +205,8 @@ export const InvoiceCtrl = {
 				.json({ msg: "Invoice not found" });
 		}
 
-		await sendInvoice(invoice.invoiceNo);
+		// await sendInvoice(invoice.invoiceNo);
+		await sendNodeInvoice(invoice.invoiceNo);
 
 		return res
 			.status(StatusCodes.OK)
