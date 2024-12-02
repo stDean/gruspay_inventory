@@ -21,14 +21,18 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { SendOTP } from "@/actions/registration";
 import Link from "next/link";
+import { Checkbox } from "@/components/ui/checkbox";
+import useShowPolicyModal from "@/hook/useShowPolicyModal";
 
 const PAYMENT_PLANS = ["Personal", "Team", "Enterprise"];
 
 export const AuthForm = () => {
+	const showPolicy = useShowPolicyModal();
 	const dispatch = useAppDispatch();
 	const pathname = usePathname();
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
+	const [agree, setAgree] = useState<boolean>(false);
 	const [country, setCountry] = useState<CountrySelectValue>();
 	const [show, setShow] = useState<{ password: boolean; cfPassword: boolean }>({
 		password: false,
@@ -60,6 +64,14 @@ export const AuthForm = () => {
 					country: country?.label,
 					payment_plan: payment.plan.toUpperCase(),
 				};
+
+				if (!agree) {
+					toast.error("Error", {
+						description: "Agree to terms and conditions to continue.",
+					});
+
+					return;
+				}
 
 				if (values.password !== values.confirmPassword) {
 					toast.error("Error", {
@@ -119,11 +131,11 @@ export const AuthForm = () => {
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className="flex flex-col gap-4 w-[300px] md:w-[450px]">
+				<div className="flex flex-col gap-3 w-[300px] md:w-[450px]">
 					<img
 						src="/logo.png"
 						alt="logo"
-						className="w-44 md:w-52 lg:w-56 cursor-pointer mx-auto"
+						className="w-40 md:w-52 lg:w-52 cursor-pointer mx-auto"
 						onClick={() => router.push("/")}
 					/>
 
@@ -244,6 +256,29 @@ export const AuthForm = () => {
 								Reset
 							</Link>
 						</p>
+					)}
+
+					{pathname === "/register" && (
+						<div className="items-top flex space-x-2">
+							<Checkbox id="terms1" onClick={() => setAgree(!agree)} />
+							<div className="grid gap-1.5 leading-none">
+								<label
+									// htmlFor="terms1"
+									className="text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								>
+									Accept{" "}
+									<span
+										className="font-semibold text-blue-500 hover:text-blue-600 cursor-pointer hover:underline hover:underline-offset-2"
+										onClick={showPolicy.onOpen}
+									>
+										terms and conditions
+									</span>
+								</label>
+								<p className="text-xs md:text-sm text-muted-foreground">
+									You agree to our Terms of Service and Privacy Policy.
+								</p>
+							</div>
+						</div>
 					)}
 
 					{pathname === "/register" ? (

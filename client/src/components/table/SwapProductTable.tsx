@@ -100,7 +100,7 @@ export const SwapProductTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}
 					</TableCell>
-					<TableCell className="px-2 w-5 md:w-10 hidden md:block">
+					<TableCell className="px-2 w-full hidden md:block">
 						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>

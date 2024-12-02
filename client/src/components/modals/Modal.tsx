@@ -16,6 +16,7 @@ interface ModalProps {
 	footer?: boolean;
 	addStyle?: string;
 	lessPadd?: string;
+	addStyle2?: boolean;
 }
 
 export const Modal = ({
@@ -30,6 +31,7 @@ export const Modal = ({
 	footer,
 	addStyle,
 	lessPadd,
+	addStyle2,
 }: ModalProps) => {
 	const [showModal, setShowModal] = useState<boolean>(isOpen);
 
@@ -58,8 +60,10 @@ export const Modal = ({
 
 	return (
 		<>
-			<div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-neutral-800/70">
-				<div className="relative w-[350px] md:w-[550px] my-6 mx-auto h-fit lg:h-auto md:h-auto">
+			<div className="justify-center items-center flex overflow-x-hidden overflow-y-hidden fixed inset-0 z-50 outline-none focus:outline-none bg-neutral-800/70">
+				<div
+					className={`relative w-[350px] md:w-[550px] my-6 mx-auto h-fit lg:h-auto md:h-auto `}
+				>
 					<div
 						className={`translate duration-300 h-full ${
 							showModal ? "translate-y-0" : "translate-y-full"
@@ -67,11 +71,15 @@ export const Modal = ({
           `}
 					>
 						<div
-							className={`translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none ${addStyle}`}
+							className={`translate h-full lg:h-auto md:h-auto border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none ${addStyle} ${
+								addStyle2 && "overflow-y-scroll !h-[650px] scrollbar-thin"
+							}`}
 						>
 							{/* Header */}
 							<div
-								className={`flex items-center p-6 rounded-t relative border-b-[1px] ${lessPadd}`}
+								className={`flex items-center p-6 rounded-t relative border-b-[1px] ${lessPadd} ${
+									addStyle2 && "sticky top-0 bg-white z-10"
+								}`}
 							>
 								{headerContent}
 								<button
