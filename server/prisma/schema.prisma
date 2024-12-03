@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = []
@@ -12,6 +6,200 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model Company {
+  id            String        @id @default(uuid())
+  company_name  String
+  company_email String        @unique
+  password      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  verified      Boolean       @default(false)
+  country       String
+  paymentStatus PlanStatus    @default(INACTIVE)
+  cancelable    Boolean       @default(true)
+  billingPlan   Payment_Plan  @default(PERSONAL)
+  billingType   BillType      @default(MONTHLY)
+  expires       DateTime?
+  canUpdate     Boolean       @default(true)
+  customers     Buyer[]
+  creditors     Creditor[]
+  Invoice       Invoice[]
+  payStackAuth  PayStackAuth?
+  Products      Products[]
+  suppliers     Supplier[]
+  swaps         Swaps[]
+  Users         Users[]
+}
+
+model PayStackAuth {
+  id                 String   @id @default(uuid())
+  authorization_code String
+  card_type          String
+  last4              String
+  exp_year           String
+  bank               String
+  signature          String
+  reusable           Boolean
+  account_name       String?
+  companyId          String?  @unique
+  customerCode       String
+  transactionId      String
+  comany             Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([authorization_code, signature])
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  invoiceNo   String        @unique
+  companyId   String
+  customerId  String?
+  balance_due String?
+  creditorId  String?
+  status      InvoiceStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  creditor    Creditor?     @relation(fields: [creditorId], references: [id])
+  customer    Buyer?        @relation(fields: [customerId], references: [id])
+  product     Products[]
+
+  @@index([companyId], map: "Invoice_companyId_fkey")
+  @@index([creditorId], map: "Invoice_creditorId_fkey")
+  @@index([customerId], map: "Invoice_customerId_fkey")
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+}
+
+model Users {
+  id             String     @id @default(uuid())
+  first_name     String?
+  last_name      String?
+  email          String     @unique
+  password       String
+  role           Role       @default(EMPLOYEE)
+  companyId      String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  Added_Products Products[] @relation("product_added_by")
+  Sold_Products  Products[] @relation("product_sold_by")
+  Company        Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId], map: "Users_companyId_fkey")
+}
+
+model Products {
+  id               String          @id @default(uuid())
+  product_name     String
+  brand            String
+  description      String
+  type             String
+  price            String
+  companyId        String
+  added_by         String
+  createdAt        DateTime       
+  updatedAt        DateTime        @updatedAt
+  sold_by          String?
+  buyerId          String?
+  date_sold        DateTime?
+  sales_status     SaleStatus      @default(NOT_SOLD)
+  serial_no        String
+  supplierId       String
+  bought_for       String?
+  swapsInId        String?
+  swapsOutId       String?
+  balance_owed     String?
+  creditorId       String?
+  invoiceId        String?
+  status           Products_status
+  AddedByUser      Users           @relation("product_added_by", fields: [added_by], references: [id])
+  Customer         Buyer?          @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  Company          Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Creditor         Creditor?       @relation(fields: [creditorId], references: [id], onDelete: Cascade)
+  Invoice          Invoice?        @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  SoldByUser       Users?          @relation("product_sold_by", fields: [sold_by], references: [id])
+  Supplier         Supplier        @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  IncomingProducts Swaps?          @relation("Incoming", fields: [swapsInId], references: [id])
+  OutgoingProduct  Swaps?          @relation(fields: [swapsOutId], references: [id])
+
+  @@unique([serial_no, companyId])
+  @@index([added_by], map: "Products_added_by_fkey")
+  @@index([buyerId], map: "Products_buyerId_fkey")
+  @@index([companyId], map: "Products_companyId_fkey")
+  @@index([creditorId], map: "Products_creditorId_fkey")
+  @@index([invoiceId], map: "Products_invoiceId_fkey")
+  @@index([sold_by], map: "Products_sold_by_fkey")
+  @@index([supplierId], map: "Products_supplierId_fkey")
+  @@index([swapsInId], map: "Products_swapsInId_fkey")
+  @@index([swapsOutId], map: "Products_swapsOutId_fkey")
+}
+
+model Swaps {
+  id               String     @id @unique @default(uuid())
+  updatedAt        DateTime   @updatedAt
+  companyId        String?
+  swapDate         DateTime   @default(now())
+  incomingProducts Products[] @relation("Incoming")
+  outgoingProducts Products[]
+  Company          Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId], map: "Swaps_companyId_fkey")
+}
+
+model Supplier {
+  id                String     @id @default(uuid())
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  companyId         String?
+  supplier_email    String?
+  supplier_name     String
+  supplier_phone_no String
+  Products          Products[]
+  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([supplier_email, supplier_name, companyId])
+  @@index([companyId], map: "Supplier_companyId_fkey")
+}
+
+model Buyer {
+  id             String     @id @default(uuid())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  companyId      String?
+  buyer_name     String
+  buyer_phone_no String
+  buyer_email    String?
+  Company        Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Invoice        Invoice[]
+  Products       Products[]
+
+  @@unique([buyer_email, buyer_name, companyId])
+  @@index([companyId], map: "Buyer_companyId_fkey")
+}
+
+model Creditor {
+  id                String     @id @default(uuid())
+  creditor_name     String
+  creditor_email    String
+  creditor_phone_no String
+  companyId         String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Invoice           Invoice[]
+  Products          Products[]
+
+  @@unique([creditor_email, creditor_name, companyId])
+  @@index([companyId], map: "Creditor_companyId_fkey")
 }
 
 enum Payment_Plan {
@@ -48,175 +236,7 @@ enum InvoiceStatus {
   SWAP
 }
 
-model Company {
-  id            String        @id @default(uuid())
-  company_name  String
-  company_email String        @unique
-  password      String
-  country       String
-  Users         Users[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  verified      Boolean       @default(false)
-  cancelable    Boolean       @default(true)
-  canUpdate     Boolean       @default(true)
-  expires       DateTime?
-  billingPlan   Payment_Plan  @default(PERSONAL)
-  billingType   BillType      @default(MONTHLY)
-  paymentStatus PlanStatus    @default(INACTIVE)
-  Products      Products[]
-  suppliers     Supplier[]
-  customers     Buyer[]
-  swaps         Swaps[]
-  creditors     Creditor[]
-  payStackAuth  PayStackAuth?
-  Invoice       Invoice[]
-}
-
-model PayStackAuth {
-  id                 String   @id @default(uuid())
-  authorization_code String
-  card_type          String
-  last4              String
-  exp_year           String
-  bank               String
-  customerCode       String
-  signature          String
-  reusable           Boolean
-  account_name       String?
-  comany             Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId          String?  @unique
-  transactionId      String
-
-  @@unique([authorization_code, signature])
-}
-
-model Invoice {
-  id          String        @id @default(uuid())
-  invoiceNo   String        @unique
-  company     Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId   String
-  customer    Buyer?        @relation(fields: [customerId], references: [id])
-  customerId  String?
-  product     Products[]
-  creditor    Creditor?     @relation(fields: [creditorId], references: [id])
-  creditorId  String?
-  balance_due String?
-  status      InvoiceStatus @default(DRAFT)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-}
-
-model Otp {
-  id        String   @id @default(uuid())
-  email     String
-  otp       String
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-  verified  Boolean  @default(false)
-}
-
-model Users {
-  id             String     @id @default(uuid())
-  first_name     String?
-  last_name      String?
-  email          String     @unique
-  password       String
-  role           Role       @default(EMPLOYEE)
-  Company        Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId      String?
-  Added_Products Products[] @relation("product_added_by")
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  Sold_Products  Products[] @relation("product_sold_by")
-}
-
-model Products {
-  id               String     @id @default(uuid())
-  product_name     String
-  brand            String
-  description      String
-  type             String
-  price            String
-  serial_no        String
-  sales_status     SaleStatus @default(NOT_SOLD)
-  Company          Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId        String
-  AddedByUser      Users?     @relation("product_added_by", fields: [added_by], references: [id])
-  added_by         String
-  SoldByUser       Users?     @relation("product_sold_by", fields: [sold_by], references: [id])
-  sold_by          String?
-  Supplier         Supplier   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  supplierId       String
-  Customer         Buyer?     @relation(fields: [buyerId], references: [id], onDelete: Cascade)
-  date_sold        DateTime?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  buyerId          String?
-  bought_for       String?
-  IncomingProducts Swaps?     @relation("Incoming", fields: [swapsInId], references: [id])
-  swapsInId        String?
-  OutgoingProduct  Swaps?     @relation(fields: [swapsOutId], references: [id])
-  swapsOutId       String?
-  balance_owed     String?
-  Creditor         Creditor?  @relation(fields: [creditorId], references: [id], onDelete: Cascade)
-  creditorId       String?
-  Invoice          Invoice?   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  invoiceId        String?
-
-  @@unique([serial_no, companyId])
-}
-
-model Swaps {
-  id               String     @id @unique @default(uuid())
-  swapDate         DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  companyId        String?
-  Company          Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  incomingProducts Products[] @relation("Incoming")
-  outgoingProducts Products[]
-}
-
-model Supplier {
-  id                String     @id @default(uuid())
-  supplier_name     String
-  supplier_email    String?
-  supplier_phone_no String
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId         String?
-  Products          Products[]
-
-  @@unique([supplier_email, supplier_name, companyId])
-}
-
-model Buyer {
-  id             String     @id @default(uuid())
-  buyer_name     String
-  buyer_email    String?
-  buyer_phone_no String
-  Company        Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId      String?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  Products       Products[]
-  Invoice        Invoice[]
-
-  @@unique([buyer_email, buyer_name, companyId])
-}
-
-model Creditor {
-  id                String     @id @default(uuid())
-  creditor_name     String
-  creditor_email    String
-  creditor_phone_no String
-  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId         String?
-  Products          Products[]
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  Invoice           Invoice[]
-
-  @@unique([creditor_email, creditor_name, companyId])
+enum Products_status {
+  NEW
+  USED
 }

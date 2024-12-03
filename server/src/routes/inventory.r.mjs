@@ -76,7 +76,7 @@ router
 	.get([AuthMiddleware], InventoryCtrl.getMonthlySalesAndPurchases);
 
 router
-	.route("/updateProduct/:id")
+	.route("/updateProduct/:serialNo")
 	.patch(
 		[
 			AuthMiddleware,
@@ -105,5 +105,9 @@ router
 		[AuthMiddleware, checkSubscriptionStatus, inventoryChangeRateLimiter],
 		InventoryCtrl.swapProducts
 	);
+
+router
+	.route("/deleteProduct/:serialNo")
+	.delete([AuthMiddleware, AdminMiddleware], InventoryCtrl.deleteProduct);
 
 export default router;

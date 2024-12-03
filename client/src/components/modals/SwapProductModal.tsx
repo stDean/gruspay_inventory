@@ -28,6 +28,7 @@ interface IncomingProductProps {
 	serial_no: string;
 	description: string;
 	price: string;
+	status: string;
 }
 
 export const SwapProductModal = () => {
@@ -47,6 +48,7 @@ export const SwapProductModal = () => {
 		serial_no: "",
 		description: "",
 		price: "",
+    status: ""
 	});
 	const [products, setProducts] = useState<IncomingProductProps[]>([]);
 
@@ -99,6 +101,7 @@ export const SwapProductModal = () => {
 			serial_no: "",
 			description: "",
 			price: "",
+			status: "",
 		});
 	};
 
@@ -167,6 +170,7 @@ export const SwapProductModal = () => {
 				serial_no: "",
 				description: "",
 				price: "",
+				status: "",
 			});
 
 			setCustomerInfo({
@@ -212,6 +216,7 @@ export const SwapProductModal = () => {
 			serial_no: "",
 			description: "",
 			price: "",
+			status: "",
 		});
 		setProducts([]);
 		setShowOptions(false);
@@ -360,6 +365,12 @@ export const SwapProductModal = () => {
 							value={incoming.serial_no}
 							onChange={handleChange}
 							name="serial_no"
+						/>
+            <Input
+							placeholder="status e.g new/used"
+							value={incoming.status}
+							onChange={handleChange}
+							name="status"
 						/>
 					</div>
 

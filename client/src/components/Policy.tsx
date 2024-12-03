@@ -611,7 +611,7 @@ export const Policy = () => {
 				</p>
 				<p>
 					If you believe your account has been compromised, please contact us
-					immediately at
+					immediately at {" "}
 					<a
 						href="mailto:admin@cauntr.com"
 						className="cursor-pointer text-blue-500 hover:text-blue-600"
@@ -713,7 +713,7 @@ export const Policy = () => {
 					update your records or how to obtain a copy of any personally
 					identifiable information that we possess, please write to our Chief
 					Data Protection Officer, at The WCX Limited, 45 Osholake Street, Ebute
-					Metta, Lagos State, Nigeria or send an email to
+					Metta, Lagos State, Nigeria or send an email to {" "}
 					<a
 						href="mailto:admin@cauntr.com"
 						className="cursor-pointer text-blue-500 hover:text-blue-600"

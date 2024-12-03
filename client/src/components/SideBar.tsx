@@ -135,20 +135,22 @@ export const SideBar = () => {
 				/>
 
 				{user?.role === "ADMIN" && (
-					<SidebarLink
-						href="/sold"
-						icon={ClipboardCheck}
-						label="Sales History"
-						isCollapsed={isSidebarCollapsed}
-					/>
-				)}
+					<>
+						<SidebarLink
+							href="/sold"
+							icon={ClipboardCheck}
+							label="Sales History"
+							isCollapsed={isSidebarCollapsed}
+						/>
 
-				<SidebarLink
-					href="/users"
-					icon={Users}
-					label="Users"
-					isCollapsed={isSidebarCollapsed}
-				/>
+						<SidebarLink
+							href="/users"
+							icon={Users}
+							label="Users"
+							isCollapsed={isSidebarCollapsed}
+						/>
+					</>
+				)}
 
 				<SidebarLink
 					href="/invoice"

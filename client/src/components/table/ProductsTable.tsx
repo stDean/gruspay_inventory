@@ -3,14 +3,17 @@
 import { getProduct } from "@/actions/inventory";
 import { useAppDispatch } from "@/app/redux";
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
+import useConfirmDeleteModal from "@/hook/useConfirmDelete";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
 import { ProductProps } from "@/lib/types";
 import { setSingleData } from "@/state";
 import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { TableContainer } from "./Table";
-import { useState } from "react";
+import useUpdateItemModal from "@/hook/useUpdateItemModal";
 
 interface InventoryProps {
 	products: ProductProps[];
@@ -21,6 +24,8 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 	const showProductModal = useShowProductModal();
 	const { token, user } = useReduxState();
 	const dispatch = useAppDispatch();
+	const confirmDeleteModal = useConfirmDeleteModal();
+	const updateItem = useUpdateItemModal();
 
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
@@ -67,10 +72,14 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 				<TableHead className="px-2 border-r">Value(₦)</TableHead>
 			)}
 			<TableHead className="px-2 border-r">Added By</TableHead>
+			<TableHead className="px-2 border-r hidden md:flex items-center">
+				Status
+			</TableHead>
 			<TableHead className="px-2 border-r">Supplied By</TableHead>
-			<TableHead className="px-2 hidden md:flex items-center">
+			<TableHead className="px-2 hidden md:flex items-center border-r">
 				Date Added
 			</TableHead>
+			{user?.role === "ADMIN" && <TableHead className="px-2">Action</TableHead>}
 		</>
 	);
 
@@ -99,12 +108,31 @@ export const ProductsTable = ({ products, page }: InventoryProps) => {
 					<TableCell className="border-r">
 						{item.AddedByUser?.first_name}
 					</TableCell>
+					<TableCell className="border-r capitalize hidden md:block">
+						{item.status.toLowerCase()}
+					</TableCell>
 					<TableCell className="border-r">
 						{item.Supplier.supplier_name}
 					</TableCell>
-					<TableCell className="hidden md:block">
+					<TableCell className="hidden md:block border-r">
 						{format(new Date(item.createdAt), "PPP")}
 					</TableCell>
+					{user?.role === "ADMIN" && (
+						<TableCell className="">
+							<div className="flex items center gap-3 justify-center">
+								<Pencil
+									className="h-[17px] w-[17px] cursor-pointer hover:text-green-500 text-green-400"
+									onClick={() => updateItem.onOpen(item?.serial_no)}
+								/>
+								<Trash2
+									className="h-[17px] w-[17px] cursor-pointer hover:text-red-500 text-red-400"
+									onClick={() => {
+										confirmDeleteModal.onOpen(item.serial_no);
+									}}
+								/>
+							</div>
+						</TableCell>
+					)}
 				</TableRow>
 			))}
 		</>

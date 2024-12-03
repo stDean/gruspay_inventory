@@ -459,30 +459,30 @@ export const DashboardContent = () => {
 
 					{sumPend ? (
 						<div className="space-y-2">
-							<p className="flex flex-col">
+							<div className="flex flex-col">
 								<Skeleton className="h-10 w-20" />
 								<span className="font-semibold">Stock Count</span>
-							</p>
+							</div>
 
-							<p className="flex flex-col">
+							<div className="flex flex-col">
 								<Skeleton className="h-10 w-20" />
 								<span className="font-semibold">Inventory Value</span>
-							</p>
+							</div>
 
-							<p className="flex flex-col">
+							<div className="flex flex-col">
 								<Skeleton className="h-10 w-20" />
 								<span className="font-semibold">Number of Suppliers</span>
-							</p>
+							</div>
 
-							<p className="flex flex-col">
+							<div className="flex flex-col">
 								<Skeleton className="h-10 w-20" />
 								<span className="font-semibold">Number of Customers</span>
-							</p>
+							</div>
 
-							<p className="flex flex-col">
+							<div className="flex flex-col">
 								<Skeleton className="h-10 w-20" />
 								<span className="font-semibold">Number of Debtors</span>
-							</p>
+							</div>
 						</div>
 					) : (
 						<div className="space-y-2">

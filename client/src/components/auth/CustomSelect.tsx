@@ -17,6 +17,8 @@ export const CustomSelect = ({
 	width,
 	width2,
 	disabled,
+	placeHolder,
+	width3,
 }: {
 	items: ReactNode;
 	value: string;
@@ -25,6 +27,8 @@ export const CustomSelect = ({
 	width2?: boolean;
 	handleChange: (value: string, id?: number) => void;
 	disabled?: boolean;
+	placeHolder?: string;
+	width3?: boolean;
 }) => {
 	return (
 		<Select
@@ -36,9 +40,12 @@ export const CustomSelect = ({
 				className={cn("h-10", {
 					"w-[220px] md:w-full": width,
 					"w-[295px] md:w-[170px] text-xs": width2,
+					"w-[310px] md:w-[150px] text-xs": width3,
 				})}
 			>
-				<SelectValue placeholder="Select a fruit" />
+				<SelectValue
+					placeholder={placeHolder ? placeHolder : "Select a fruit"}
+				/>
 			</SelectTrigger>
 			<SelectContent>
 				<SelectGroup>

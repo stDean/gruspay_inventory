@@ -4,8 +4,10 @@ import { getProductsByName } from "@/actions/inventory";
 import { ItemsHeader } from "@/components/ItemsHeader";
 import { Spinner } from "@/components/Spinners";
 import { ProductsTable } from "@/components/table/ProductsTable";
+import useConfirmDeleteModal from "@/hook/useConfirmDelete";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
+import useUpdateItemModal from "@/hook/useUpdateItemModal";
 import { ProductProps } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
@@ -24,6 +26,8 @@ export const SingleProductsByName = ({
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
 	const showProductModal = useShowProductModal();
+	const confirmDeleteModal = useConfirmDeleteModal();
+	const updateItem = useUpdateItemModal();
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
@@ -42,7 +46,7 @@ export const SingleProductsByName = ({
 
 	useEffect(() => {
 		getProducts();
-	}, [getProducts]);
+	}, [getProducts, confirmDeleteModal.isOpen, updateItem.isOpen]);
 
 	const types = products
 		.map(p => p.type)

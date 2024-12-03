@@ -247,7 +247,7 @@ export const AuthForm = () => {
 					)}
 
 					{pathname === "/login" && (
-						<p className="-mt-3">
+						<p className="-mt-1">
 							Forgot password?{" "}
 							<Link
 								href="/reset"

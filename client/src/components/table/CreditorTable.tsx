@@ -4,7 +4,6 @@ import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
 import { useState } from "react";
 import { TableContainer } from "./Table";
-import { useReduxState } from "@/hook/useRedux";
 
 export const CreditorTable = ({
 	products,
@@ -13,7 +12,6 @@ export const CreditorTable = ({
 	products: Array<ProductProps>;
 	page: number;
 }) => {
-	const { user } = useReduxState();
 	const completeModal = useCompletePayModal();
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
@@ -37,9 +35,6 @@ export const CreditorTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
 			<TableHead className="px-2 border-r">Serial Number</TableHead>
-			{user?.role === "ADMIN" && (
-				<TableHead className="px-2 border-r">Price(₦)</TableHead>
-			)}
 			<TableHead className="px-2 border-r">Price Paid(₦)</TableHead>
 			<TableHead className="px-2 border-r">Balance Owed(₦)</TableHead>
 			<TableHead className="px-2">Purchase Date</TableHead>
@@ -62,11 +57,6 @@ export const CreditorTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.serial_no}
 					</TableCell>
-					{user?.role === "ADMIN" && (
-						<TableCell className="px-2 border-r w-5 md:w-10">
-							{product.price}
-						</TableCell>
-					)}
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}
 					</TableCell>

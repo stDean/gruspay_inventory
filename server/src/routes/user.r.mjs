@@ -28,7 +28,7 @@ router
 router.route("/getSuppliers").get(
 	[
 		AuthMiddleware,
-		// AdminMiddleware,
+		AdminMiddleware,
 		SupplierMiddleware,
 		checkSubscriptionStatus,
 		userRateLimiter,
@@ -38,7 +38,7 @@ router.route("/getSuppliers").get(
 router.route("/getSupplier/:id").get(
 	[
 		AuthMiddleware,
-		// AdminMiddleware,
+		AdminMiddleware,
 		SupplierMiddleware,
 		checkSubscriptionStatus,
 		userRateLimiter,
@@ -48,7 +48,7 @@ router.route("/getSupplier/:id").get(
 router.route("/getCustomers").get(
 	[
 		AuthMiddleware,
-		// AdminMiddleware,
+		AdminMiddleware,
 		CustomerAndCreditorMiddleware,
 		checkSubscriptionStatus,
 		userRateLimiter,
@@ -58,7 +58,7 @@ router.route("/getCustomers").get(
 router.route("/getCustomer/:id").get(
 	[
 		AuthMiddleware,
-		// AdminMiddleware,
+		AdminMiddleware,
 		CustomerAndCreditorMiddleware,
 		checkSubscriptionStatus,
 		userRateLimiter,
@@ -68,7 +68,7 @@ router.route("/getCustomer/:id").get(
 router.route("/getCreditors").get(
 	[
 		AuthMiddleware,
-		// AdminMiddleware,
+		AdminMiddleware,
 		CustomerAndCreditorMiddleware,
 		checkSubscriptionStatus,
 		userRateLimiter,
@@ -78,7 +78,7 @@ router.route("/getCreditors").get(
 router.route("/getCreditor/:id").get(
 	[
 		AuthMiddleware,
-		// AdminMiddleware,
+		AdminMiddleware,
 		CustomerAndCreditorMiddleware,
 		checkSubscriptionStatus,
 		userRateLimiter,

@@ -67,9 +67,11 @@ export const getProductsByName = async ({
 export const addSingleProduct = async ({
 	val,
 	token,
+	status,
 }: {
 	val: z.infer<typeof AddProductSchema>;
 	token: string;
+	status: string;
 }) => {
 	const validatedFields = AddProductSchema.safeParse(val);
 	if (!validatedFields.success) {
@@ -87,6 +89,7 @@ export const addSingleProduct = async ({
 			supplier_name,
 			supplier_phone_no,
 			supplier_email,
+			purchaseDate,
 		} = validatedFields.data;
 		const { data } = await axios.post(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/createProduct`,
@@ -100,6 +103,8 @@ export const addSingleProduct = async ({
 				supplier_name,
 				supplier_phone_no,
 				supplier_email,
+				status,
+				purchaseDate,
 			},
 			{
 				headers: {
@@ -540,6 +545,77 @@ export const updateSoldProduct = async ({
 		} else if (e.response?.status === 404) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again" };
+	}
+};
+
+export const deleteProduct = async ({
+	token,
+	serialNo,
+}: {
+	token: string;
+	serialNo: string;
+}) => {
+	try {
+		const { data } = await axios.delete(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/deleteProduct/${serialNo}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again" };
+	}
+};
+
+export const updateProduct = async ({
+	token,
+	price,
+	description,
+  serialNo
+}: {
+	token: string;
+	price: string;
+	description: string;
+  serialNo: string
+}) => {
+	try {
+		const { data } = await axios.patch(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/updateProduct/${serialNo}`,
+			{ price, description },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		}
 

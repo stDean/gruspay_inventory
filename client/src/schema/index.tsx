@@ -54,6 +54,7 @@ export const AddProductSchema = z.object({
 	supplier_name: z.string(),
 	supplier_phone_no: z.string(),
 	supplier_email: z.string().optional(),
+  purchaseDate: z.string(),
 });
 
 export const UpdateUserSchema = z.object({

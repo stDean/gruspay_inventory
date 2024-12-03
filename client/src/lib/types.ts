@@ -13,6 +13,7 @@ export interface ProductProps {
 	bought_for?: string;
 	sales_status?: string;
 	balance_owed?: string;
+	status: string;
 	AddedByUser?: { first_name: string; last_name: string; email: string };
 	SoldByUser?: { first_name: string; last_name: string; email: string };
 	Supplier: {

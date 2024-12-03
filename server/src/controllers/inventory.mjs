@@ -115,8 +115,16 @@ export const InventoryCtrl = {
 				supplier_name,
 				supplier_phone_no,
 				supplier_email,
+				status,
+				purchaseDate,
 			},
 		} = req;
+
+		if (!status) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Status must be provided." });
+		}
 
 		const product = await prisma.products.findUnique({
 			where: { serial_no_companyId: { serial_no, companyId: company_id } },
@@ -144,7 +152,7 @@ export const InventoryCtrl = {
 
 		// remove comma and space
 		const priceWithoutComma = String(price).replace(/^[₦#]|,?\s*/g, "");
-		if (!Number(priceWithoutComma)) {
+		if (!Number(priceWithoutComma) && user.role === "ADMIN") {
 			return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid price" });
 		}
 
@@ -156,6 +164,8 @@ export const InventoryCtrl = {
 				type,
 				price: priceWithoutComma,
 				serial_no,
+				status: status.toUpperCase(),
+				createdAt: new Date(purchaseDate),
 				Company: {
 					connect: { id: company.id },
 				},
@@ -200,9 +210,11 @@ export const InventoryCtrl = {
 					""
 				);
 
-        if (!Number(priceWithoutComma)) {
-          return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid price" });
-        }
+				if (!Number(priceWithoutComma) && user.role === "ADMIN") {
+					return res
+						.status(StatusCodes.BAD_REQUEST)
+						.json({ msg: "Invalid price" });
+				}
 
 				// Now create the product with the connected supplier
 				const result = await prisma.products.create({
@@ -213,6 +225,7 @@ export const InventoryCtrl = {
 						type: product["Item Type"],
 						price: priceWithoutComma,
 						serial_no: product["Serial Number"],
+						status: product["Status"].toUpperCase(),
 						Company: {
 							connect: { id: company.id },
 						},
@@ -222,6 +235,7 @@ export const InventoryCtrl = {
 						Supplier: {
 							connect: { id: supplier.id },
 						},
+						createdAt: new Date(product["Purchase Date"]),
 					},
 				});
 
@@ -340,10 +354,11 @@ export const InventoryCtrl = {
 		res.status(StatusCodes.OK).json(product);
 	},
 	updateProduct: async (req, res) => {
-		const { id } = req.params;
+		const { serialNo } = req.params;
+		const { company_id } = req.user;
 
 		const product = await prisma.products.findFirst({
-			where: { id, sales_status: "NOT_SOLD" },
+			where: { serial_no: serialNo, sales_status: "NOT_SOLD" },
 		});
 
 		if (!product) {
@@ -352,9 +367,20 @@ export const InventoryCtrl = {
 				.json({ msg: "Product not found", success: false });
 		}
 
+		const { description, price } = req.body;
+		const priceWithoutComma = String(price).replace(/^[₦#]|,?\s*/g, "");
+		if (!Number(priceWithoutComma)) {
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid price" });
+		}
+
 		const updatedProduct = await prisma.products.update({
-			where: { id },
-			data: req.body,
+			where: {
+				serial_no_companyId: {
+					companyId: company_id,
+					serial_no: serialNo,
+				},
+			},
+			data: { description, price: priceWithoutComma },
 		});
 
 		res.status(StatusCodes.OK).json({ msg: "updateProduct", updatedProduct });
@@ -664,6 +690,18 @@ export const InventoryCtrl = {
 				.json({ msg: "Customer information is required." });
 		}
 
+		// Parse customerInfo.amount_paid
+		const customerPaid = parseFloat(customerInfo.amount_paid || "0");
+
+		// Calculate the total price
+		const totalIncomingPrice = incoming.reduce(
+			(sum, product) => sum + parseFloat(product.price || "0"),
+			0
+		);
+
+		// Add customerPaid to totalIncomingPrice
+		const finalTotal = (totalIncomingPrice + customerPaid).toFixed(2);
+
 		const supplier = await getOrCreateSupplier({
 			supplier_name: customerInfo.buyer_name,
 			supplier_email: customerInfo.buyer_email || null,
@@ -681,6 +719,8 @@ export const InventoryCtrl = {
 			Company: { connect: { id: company.id } },
 			AddedByUser: { connect: { id: user.id } },
 			Supplier: { connect: { id: supplier.id } },
+			createdAt: new Date(),
+			status: product.status.toUpperCase(),
 		}));
 
 		const swap = await prisma.swaps.create({
@@ -696,7 +736,7 @@ export const InventoryCtrl = {
 				sales_status: "SWAP",
 				SoldByUser: { connect: { id: user.id } },
 				date_sold: new Date(),
-				bought_for: customerInfo.amount_paid,
+				bought_for: finalTotal,
 				balance_owed: "0",
 				Customer: {
 					connectOrCreate: {
@@ -1301,5 +1341,38 @@ export const InventoryCtrl = {
 		);
 
 		return res.status(StatusCodes.OK).json({ topSellingWithDetails });
+	},
+	deleteProduct: async (req, res) => {
+		const { serialNo } = req.params;
+		const { company_id } = req.user;
+
+		const product = await prisma.products.findUnique({
+			where: {
+				serial_no_companyId: { serial_no: serialNo, companyId: company_id },
+			},
+		});
+
+		if (!product) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Product not found", success: false });
+		}
+
+		const deletedProduct = await prisma.products.delete({
+			where: {
+				serial_no_companyId: { serial_no: serialNo, companyId: company_id },
+				sales_status: "NOT_SOLD",
+			},
+		});
+
+		if (!deletedProduct) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Cannot delete product.", success: false });
+		}
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Product deleted", success: true });
 	},
 };
