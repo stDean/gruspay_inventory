@@ -15,14 +15,18 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Textarea } from "@/components/ui/textarea";
 
 export const UserSettingsForm = () => {
 	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const { token, user } = useReduxState();
 
+	const initialBanks =
+		user?.UserBank?.map(bank => bank.bankName).join(", ") ?? "";
 	const [disabled, setDisabled] = useState(true);
 	const [isPending, startTransition] = useTransition();
+	const [banks, setBanks] = useState<string>(initialBanks);
 	const [show, setShow] = useState<{ password: boolean; cfPassword: boolean }>({
 		password: false,
 		cfPassword: false,
@@ -40,6 +44,7 @@ export const UserSettingsForm = () => {
 	});
 
 	const handleUpdateUser = (userData: z.infer<typeof UpdateUserSchema>) => {
+		const bankDetails = banks.split(/, |,/);
 		startTransition(async () => {
 			// If the password is provided, validate it along with confirmPassword
 			if (userData.password || userData.confirmPassword) {
@@ -71,7 +76,7 @@ export const UserSettingsForm = () => {
 			}
 
 			// Proceed with updating the user even if the password is not provided
-			const res = await updateUser({ token, userData });
+			const res = await updateUser({ token, userData, bankDetails });
 
 			if (res?.error) {
 				toast.error("Error", {
@@ -133,6 +138,16 @@ export const UserSettingsForm = () => {
 						placeholder="enter your email"
 						disabled={disabled}
 					/>
+
+					{user?.role === "ADMIN" && (
+						<Textarea
+							className="resize-none h-20"
+							placeholder="enter banks e.g UBA, GTBank, e.t.c"
+							value={banks}
+							onChange={e => setBanks(e.target.value)}
+							disabled={disabled}
+						/>
+					)}
 
 					<div className="flex gap-4 items-center">
 						<CustomInput

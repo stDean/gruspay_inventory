@@ -48,7 +48,7 @@ export const SwapProductModal = () => {
 		serial_no: "",
 		description: "",
 		price: "",
-    status: ""
+		status: "",
 	});
 	const [products, setProducts] = useState<IncomingProductProps[]>([]);
 
@@ -344,6 +344,7 @@ export const SwapProductModal = () => {
 					customerInfo={customerInfo}
 					handleChange={handleChangeCustomerInfo}
 					amount
+					swap
 				/>
 			</div>
 
@@ -366,7 +367,7 @@ export const SwapProductModal = () => {
 							onChange={handleChange}
 							name="serial_no"
 						/>
-            <Input
+						<Input
 							placeholder="status e.g new/used"
 							value={incoming.status}
 							onChange={handleChange}

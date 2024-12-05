@@ -92,9 +92,11 @@ export const getUsers = async ({ token }: { token: string }) => {
 export const updateUser = async ({
 	token,
 	userData,
+	bankDetails,
 }: {
 	token: string;
 	userData: z.infer<typeof UpdateUserSchema>;
+	bankDetails: string[];
 }) => {
 	const validateFields = UpdateUserSchema.safeParse(userData);
 	if (!validateFields.success) {
@@ -105,7 +107,7 @@ export const updateUser = async ({
 		const { email, password, first_name, last_name } = validateFields.data;
 		const { data } = await axios.patch(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/updateUser`,
-			{ email, password, first_name, last_name },
+			{ email, password, first_name, last_name, bankDetails },
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -213,7 +215,7 @@ export const deleteUser = async ({
 	token: string;
 	id: string;
 }) => {
-  try {
+	try {
 		const { data } = await axios.delete(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/deleteUser/${id}`,
 			{

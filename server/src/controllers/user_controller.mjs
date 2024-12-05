@@ -19,6 +19,9 @@ export const UserCtrl = {
 						canUpdate: true,
 					},
 				},
+				UserBank: {
+					select: { bankName: true },
+				},
 			},
 		});
 
@@ -38,6 +41,50 @@ export const UserCtrl = {
 
 		return res.status(StatusCodes.OK).json({ users });
 	},
+	// updateUser: async (req, res) => {
+	// 	const { user } = req;
+	// 	const userInDb = await prisma.users.findUnique({
+	// 		where: { email: user.email },
+	// 	});
+
+	// 	if (!userInDb) {
+	// 		return res
+	// 			.status(StatusCodes.NOT_FOUND)
+	// 			.json({ msg: "No user with that email" });
+	// 	}
+
+	// 	if (req.body.password !== "") {
+	// 		req.body.password = await hashPassword(req.body.password);
+	// 	} else {
+	// 		delete req.body.password;
+	// 	}
+
+	// 	const updatedUser = await prisma.$transaction(async prisma => {
+	// 		// Ensure `bankDetails` is an array of strings
+	// 		if (
+	// 			Array.isArray(req.body.bankDetails) &&
+	// 			req.body.bankDetails.length > 0
+	// 		) {
+	// 			await Promise.all(
+	// 				req.body.bankDetails.map(async (bankName) => {
+	// 					await prisma.userBank.create({
+	// 						data: { bankName, userId: userInDb.id },
+	// 					});
+	// 				})
+	// 			);
+	// 		}
+
+	// 		// Update the user
+	// 		return await prisma.users.update({
+	// 			where: { email: userInDb.email },
+	// 			data: { ...req.body },
+	// 		});
+	// 	});
+
+	// 	return res
+	// 		.status(StatusCodes.OK)
+	// 		.json({ msg: "profile updated successful", updatedUser });
+	// },
 	updateUser: async (req, res) => {
 		const { user } = req;
 		const userInDb = await prisma.users.findUnique({
@@ -50,20 +97,41 @@ export const UserCtrl = {
 				.json({ msg: "No user with that email" });
 		}
 
+		// Check if the password is being updated
 		if (req.body.password !== "") {
+			// Hash the new password
 			req.body.password = await hashPassword(req.body.password);
 		} else {
+			// Remove the password field from the request if it's empty
 			delete req.body.password;
 		}
 
-		const updatedUser = await prisma.users.update({
-			where: { email: userInDb.email },
-			data: { ...req.body },
+		const { bankDetails, ...updateData } = req.body;
+		// Perform a transaction to handle both `userBank` creation and user update atomically
+		const updatedUser = await prisma.$transaction(async prisma => {
+			// Ensure `bankDetails` exists and is an array of strings
+			if (Array.isArray(bankDetails) && bankDetails.length > 0) {
+				// Create multiple bank entries for the user
+				await Promise.all(
+					bankDetails.map(async bankName => {
+						await prisma.userBank.create({
+							data: { bankName, userId: userInDb.id },
+						});
+					})
+				);
+			}
+
+			// Update the user with the remaining fields from the request body
+			return await prisma.users.update({
+				where: { email: userInDb.email },
+				data: updateData,
+			});
 		});
 
+		// Respond with a success message and the updated user
 		return res
 			.status(StatusCodes.OK)
-			.json({ msg: "profile updated successful", updatedUser });
+			.json({ msg: "Profile updated successfully", updatedUser });
 	},
 	createUser: async (req, res) => {
 		const existingUser = await prisma.users.findUnique({
@@ -75,7 +143,6 @@ export const UserCtrl = {
 				.json({ msg: "User with this email already exists." });
 		}
 
-		// TODO:Not more than 2 admin for enterprise, and 1 admin for team and just admin in personal
 		const hashPass = await hashPassword(req.body.password);
 		await prisma.users.create({
 			data: { ...req.body, password: hashPass, companyId: req.user.company_id },

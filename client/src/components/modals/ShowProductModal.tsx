@@ -157,6 +157,7 @@ export const ShowProductModal = () => {
 			return;
 		}
 
+		dispatch(setSingleData(res?.data));
 		showProductModal.addProduct({
 			serial_no: res?.data.serial_no,
 			brand: res?.data.brand,
@@ -228,7 +229,7 @@ export const ShowProductModal = () => {
 						</div>
 
 						{search.value !== "" && (
-							<div className="bg-white border rounded-md w-full shadow-md absolute top-11 left-0">
+							<div className="bg-white border rounded-md w-full shadow-md absolute top-11 left-0 z-[999]">
 								{filteredOption.map((item: any) => (
 									<p
 										key={item.id}
@@ -314,7 +315,7 @@ export const ShowProductModal = () => {
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					onClick={handleSold}
-					disabled={isPending}
+					disabled={isPending || showProductModal?.products?.length === 0}
 				>
 					{sold ? "Confirm Sale" : "Mark as Sold"}
 				</Button>
@@ -329,6 +330,7 @@ export const ShowProductModal = () => {
 								brand: singleData?.brand as string,
 							})
 						}
+						disabled={showProductModal?.products?.length === 0}
 					>
 						Swap
 					</Button>

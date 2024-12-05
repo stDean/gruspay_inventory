@@ -85,6 +85,7 @@ export interface UserProps {
 		paymentStatus: string;
 		canUpdate: boolean;
 	};
+	UserBank?: { bankName: string }[];
 }
 
 export interface CustomerProps {

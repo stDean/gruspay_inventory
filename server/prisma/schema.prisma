@@ -80,6 +80,13 @@ model Otp {
   verified  Boolean  @default(false)
 }
 
+model UserBank {
+  id       String @id @default(uuid())
+  user     Users?  @relation(fields: [userId], references: [id])
+  userId   String
+  bankName String
+}
+
 model Users {
   id             String     @id @default(uuid())
   first_name     String?
@@ -93,6 +100,7 @@ model Users {
   Added_Products Products[] @relation("product_added_by")
   Sold_Products  Products[] @relation("product_sold_by")
   Company        Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  UserBank       UserBank[]
 
   @@index([companyId], map: "Users_companyId_fkey")
 }
@@ -106,7 +114,7 @@ model Products {
   price            String
   companyId        String
   added_by         String
-  createdAt        DateTime       
+  createdAt        DateTime
   updatedAt        DateTime        @updatedAt
   sold_by          String?
   buyerId          String?

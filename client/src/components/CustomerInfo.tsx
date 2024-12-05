@@ -1,12 +1,100 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { useReduxState } from "@/hook/useRedux";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChangeEvent, useState } from "react";
+
+const NestedDrop = () => {
+	const { user } = useReduxState(); // Assuming you have a way to access user data
+	const [selectedMode, setSelectedMode] = useState("");
+	const [selectedBank, setSelectedBank] = useState("");
+	const [drop, setDrop] = useState<boolean>(false);
+	const [showBanks, setShowBanks] = useState<boolean>(false);
+
+	const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedMode(event.target.value);
+		setSelectedBank(""); // Reset bank selection if mode changes
+	};
+
+	const handleBankChange = (bankName: string) => {
+		setSelectedBank(bankName);
+		setShowBanks(false); // Close bank options after selecting
+		setDrop(false); // Close the main dropdown
+	};
+
+	const bankOptions = user?.UserBank?.map(bank => ({
+		value: bank.bankName,
+		label: bank.bankName,
+	}));
+
+	return (
+		<div className="relative">
+			{/* Main Dropdown Trigger */}
+			<div
+				className="h-9 w-full border shadow-sm border-gray-200 rounded-lg p-2 text-gray-800 flex justify-between items-center hover:cursor-pointer relative"
+				onClick={() => setDrop(drop => !drop)}
+			>
+				{selectedMode === "Transfer"
+					? selectedBank
+					: selectedMode || "Select mode of payment"}
+				<ChevronDown className="h-4 w-4 text-black" />
+			</div>
+
+			{/* Main Dropdown Content */}
+			{drop && (
+				<div className="bg-white rounded-lg border p-3 z-[9999] font-semibold absolute w-full top-10 space-y-3">
+					{/* Cash Option */}
+					<p
+						className="hover:cursor-pointer"
+						onClick={() => {
+							setSelectedMode("Cash");
+							setSelectedBank("");
+							setDrop(false);
+						}}
+					>
+						Cash
+					</p>
+					<hr />
+					{/* Transfer Option */}
+					<div className="flex justify-between items-center hover:cursor-pointer relative">
+						<p
+							onClick={() => {
+								setSelectedMode("Transfer");
+								setShowBanks(true);
+							}}
+							className="flex-grow"
+						>
+							Transfer
+						</p>
+						<ChevronRight className="h-4 w-4 text-black" />
+						{/* Bank Options */}
+						{showBanks && (
+							<div className="absolute bg-white rounded-lg border p-3 z-[9999] -right-40 w-40 space-y-2">
+								{bankOptions?.map(bank => (
+									<span
+										key={bank.value}
+										className="block hover:bg-gray-100 p-2 rounded-md hover:cursor-pointer"
+										onClick={() => handleBankChange(bank.label)}
+									>
+										{bank.label}
+									</span>
+								))}
+							</div>
+						)}
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
 
 export const CustomerInfo = ({
 	customerInfo,
 	handleChange,
 	balance_owed,
-  amount
+	amount,
+	swap,
 }: {
 	customerInfo: {
 		buyer_name: string;
@@ -17,7 +105,8 @@ export const CustomerInfo = ({
 	};
 	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	balance_owed?: boolean;
-  amount?:boolean
+	amount?: boolean;
+	swap?: boolean;
 }) => {
 	return (
 		<>
@@ -79,6 +168,17 @@ export const CustomerInfo = ({
 						</div>
 					)}
 
+					{swap && (
+						<div className="flex flex-col gap-1 flex-1">
+							<p className="text-xs text-gray-500 font-semibold">
+								Mode Of Payment
+							</p>
+							<NestedDrop />
+						</div>
+					)}
+				</div>
+
+				<div className="flex items-center gap-4">
 					{balance_owed && (
 						<div className="flex flex-col gap-1 flex-1">
 							<p className="text-xs text-gray-500 font-semibold">
@@ -93,6 +193,13 @@ export const CustomerInfo = ({
 							/>
 						</div>
 					)}
+
+					<div className="flex flex-col gap-1 flex-1">
+						<p className="text-xs text-gray-500 font-semibold">
+							Mode Of Payment
+						</p>
+						<NestedDrop />
+					</div>
 				</div>
 			</div>
 		</>
