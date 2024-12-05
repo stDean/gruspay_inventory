@@ -3,23 +3,31 @@
 import { Input } from "@/components/ui/input";
 import { useReduxState } from "@/hook/useRedux";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 
-const NestedDrop = () => {
+const NestedDrop = ({
+	onModeChange,
+	onBankChange,
+}: {
+	onModeChange: (mode: string) => void;
+	onBankChange: (bank: string) => void;
+}) => {
 	const { user } = useReduxState(); // Assuming you have a way to access user data
 	const [selectedMode, setSelectedMode] = useState("");
 	const [selectedBank, setSelectedBank] = useState("");
 	const [drop, setDrop] = useState<boolean>(false);
 	const [showBanks, setShowBanks] = useState<boolean>(false);
 
-	const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedMode(event.target.value);
-		setSelectedBank(""); // Reset bank selection if mode changes
+	const handleModeChange = (mode: string) => {
+		setSelectedMode(mode);
+		setSelectedBank(""); // Reset bank when mode changes
+		onModeChange(mode); // Notify parent
 	};
 
 	const handleBankChange = (bankName: string) => {
 		setSelectedBank(bankName);
-		setShowBanks(false); // Close bank options after selecting
+		onBankChange(bankName); // Notify parent
+		setShowBanks(false); // Close bank options
 		setDrop(false); // Close the main dropdown
 	};
 
@@ -32,11 +40,14 @@ const NestedDrop = () => {
 		<div className="relative">
 			{/* Main Dropdown Trigger */}
 			<div
-				className="h-9 w-full border shadow-sm border-gray-200 rounded-lg p-2 text-gray-800 flex justify-between items-center hover:cursor-pointer relative"
-				onClick={() => setDrop(drop => !drop)}
+				className="h-9 w-full border shadow-sm border-gray-200 rounded-lg p-2 text-gray-800 flex justify-between items-center hover:cursor-pointer relative text-xs"
+				onClick={() => {
+					setDrop(drop => !drop);
+					setShowBanks(false);
+				}}
 			>
 				{selectedMode === "Transfer"
-					? selectedBank
+					? `${selectedMode} (${selectedBank})`
 					: selectedMode || "Select mode of payment"}
 				<ChevronDown className="h-4 w-4 text-black" />
 			</div>
@@ -48,8 +59,7 @@ const NestedDrop = () => {
 					<p
 						className="hover:cursor-pointer"
 						onClick={() => {
-							setSelectedMode("Cash");
-							setSelectedBank("");
+							handleModeChange("Cash");
 							setDrop(false);
 						}}
 					>
@@ -60,7 +70,7 @@ const NestedDrop = () => {
 					<div className="flex justify-between items-center hover:cursor-pointer relative">
 						<p
 							onClick={() => {
-								setSelectedMode("Transfer");
+								handleModeChange("Transfer");
 								setShowBanks(true);
 							}}
 							className="flex-grow"
@@ -70,7 +80,7 @@ const NestedDrop = () => {
 						<ChevronRight className="h-4 w-4 text-black" />
 						{/* Bank Options */}
 						{showBanks && (
-							<div className="absolute bg-white rounded-lg border p-3 z-[9999] -right-40 w-40 space-y-2">
+							<div className="absolute bg-white rounded-lg border p-3 z-[9999] -right-44 top-100 w-40 space-y-2">
 								{bankOptions?.map(bank => (
 									<span
 										key={bank.value}
@@ -95,6 +105,8 @@ export const CustomerInfo = ({
 	balance_owed,
 	amount,
 	swap,
+	handleModeChange,
+	handleBankChange,
 }: {
 	customerInfo: {
 		buyer_name: string;
@@ -107,7 +119,11 @@ export const CustomerInfo = ({
 	balance_owed?: boolean;
 	amount?: boolean;
 	swap?: boolean;
+	handleModeChange: (mode: string) => void;
+	handleBankChange: (bank: string) => void;
 }) => {
+
+
 	return (
 		<>
 			<p className="font-semibold text-base mt-3">Customers Information</p>
@@ -173,7 +189,11 @@ export const CustomerInfo = ({
 							<p className="text-xs text-gray-500 font-semibold">
 								Mode Of Payment
 							</p>
-							<NestedDrop />
+
+							<NestedDrop
+								onModeChange={handleModeChange}
+								onBankChange={handleBankChange}
+							/>
 						</div>
 					)}
 				</div>
@@ -198,7 +218,11 @@ export const CustomerInfo = ({
 						<p className="text-xs text-gray-500 font-semibold">
 							Mode Of Payment
 						</p>
-						<NestedDrop />
+
+						<NestedDrop
+							onModeChange={handleModeChange}
+							onBankChange={handleBankChange}
+						/>
 					</div>
 				</div>
 			</div>

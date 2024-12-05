@@ -44,7 +44,14 @@ export const UserSettingsForm = () => {
 	});
 
 	const handleUpdateUser = (userData: z.infer<typeof UpdateUserSchema>) => {
-		const bankDetails = banks.split(/, |,/);
+		const bankDetails = Array.from(
+			new Set(
+				banks
+					.split(/, |,/) // Split by commas or comma-space
+					.map(bank => bank.trim().toLowerCase()) // Normalize to lowercase and trim spaces
+			)
+		);
+
 		startTransition(async () => {
 			// If the password is provided, validate it along with confirmPassword
 			if (userData.password || userData.confirmPassword) {

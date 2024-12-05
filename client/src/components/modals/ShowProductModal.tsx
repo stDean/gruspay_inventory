@@ -39,6 +39,18 @@ export const ShowProductModal = () => {
 		balance_owed: "",
 	});
 
+	// Mode of payment
+	const [selectedMode, setSelectedMode] = useState("");
+	const [selectedBank, setSelectedBank] = useState("");
+
+	const handleModeChange = (mode: string) => {
+		setSelectedMode(mode);
+	};
+
+	const handleBankChange = (bank: string) => {
+		setSelectedBank(bank);
+	};
+
 	const [search, setSearch] = useState<{ show: boolean; value: string }>({
 		show: false,
 		value: "",
@@ -68,6 +80,11 @@ export const ShowProductModal = () => {
 	>([]);
 
 	const handleSold = () => {
+		const modeOfPayment =
+			selectedMode === "Transfer"
+				? `${selectedMode} (${selectedBank})`
+				: selectedMode;
+
 		if (sold) {
 			startTransition(async () => {
 				// Validation
@@ -112,6 +129,7 @@ export const ShowProductModal = () => {
 					token,
 					products: updatedProducts,
 					customerInfo,
+          modeOfPayment,
 				});
 
 				// Handle response
@@ -304,6 +322,8 @@ export const ShowProductModal = () => {
 							handleChange={handleChange}
 							balance_owed={(showProductModal?.products ?? []).length <= 1}
 							amount={(showProductModal?.products ?? []).length <= 1}
+							handleModeChange={handleModeChange}
+							handleBankChange={handleBankChange}
 						/>
 					</div>
 

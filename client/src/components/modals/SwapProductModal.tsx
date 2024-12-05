@@ -64,6 +64,20 @@ export const SwapProductModal = () => {
 		amount_paid: "",
 	});
 
+	// Mode of payment
+	const [selectedMode, setSelectedMode] = useState("");
+	const [selectedBank, setSelectedBank] = useState("");
+
+	const handleModeChange = (mode: string) => {
+		setSelectedMode(mode);
+	};
+
+	const handleBankChange = (bank: string) => {
+		setSelectedBank(bank);
+	};
+
+	console.log({ selectedMode, selectedBank });
+
 	const handleChangeCustomerInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setCustomerInfo(prev => ({ ...prev, [name]: value }));
@@ -127,6 +141,11 @@ export const SwapProductModal = () => {
 	}, [search.value]);
 
 	const handleConfirmSwap = useCallback(async () => {
+		const modeOfPayment =
+			selectedMode === "Transfer"
+				? `${selectedMode} (${selectedBank})`
+				: selectedMode;
+
 		startTransition(async () => {
 			const isDuplicate = products.some(
 				product => product.serial_no === incoming.serial_no
@@ -153,7 +172,7 @@ export const SwapProductModal = () => {
 			};
 
 			// Submit to backend (separate async from state setter)
-			const res = await swapProducts({ token, ...dataToDb });
+			const res = await swapProducts({ token, modeOfPayment, ...dataToDb });
 			if (res?.error) {
 				toast.error("Error", { description: res?.error });
 				return;
@@ -345,6 +364,8 @@ export const SwapProductModal = () => {
 					handleChange={handleChangeCustomerInfo}
 					amount
 					swap
+					handleModeChange={handleModeChange}
+					handleBankChange={handleBankChange}
 				/>
 			</div>
 

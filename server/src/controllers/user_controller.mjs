@@ -41,50 +41,6 @@ export const UserCtrl = {
 
 		return res.status(StatusCodes.OK).json({ users });
 	},
-	// updateUser: async (req, res) => {
-	// 	const { user } = req;
-	// 	const userInDb = await prisma.users.findUnique({
-	// 		where: { email: user.email },
-	// 	});
-
-	// 	if (!userInDb) {
-	// 		return res
-	// 			.status(StatusCodes.NOT_FOUND)
-	// 			.json({ msg: "No user with that email" });
-	// 	}
-
-	// 	if (req.body.password !== "") {
-	// 		req.body.password = await hashPassword(req.body.password);
-	// 	} else {
-	// 		delete req.body.password;
-	// 	}
-
-	// 	const updatedUser = await prisma.$transaction(async prisma => {
-	// 		// Ensure `bankDetails` is an array of strings
-	// 		if (
-	// 			Array.isArray(req.body.bankDetails) &&
-	// 			req.body.bankDetails.length > 0
-	// 		) {
-	// 			await Promise.all(
-	// 				req.body.bankDetails.map(async (bankName) => {
-	// 					await prisma.userBank.create({
-	// 						data: { bankName, userId: userInDb.id },
-	// 					});
-	// 				})
-	// 			);
-	// 		}
-
-	// 		// Update the user
-	// 		return await prisma.users.update({
-	// 			where: { email: userInDb.email },
-	// 			data: { ...req.body },
-	// 		});
-	// 	});
-
-	// 	return res
-	// 		.status(StatusCodes.OK)
-	// 		.json({ msg: "profile updated successful", updatedUser });
-	// },
 	updateUser: async (req, res) => {
 		const { user } = req;
 		const userInDb = await prisma.users.findUnique({

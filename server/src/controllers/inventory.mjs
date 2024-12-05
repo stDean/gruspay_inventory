@@ -386,8 +386,14 @@ export const InventoryCtrl = {
 		res.status(StatusCodes.OK).json({ msg: "updateProduct", updatedProduct });
 	},
 	sellProductsBulk: async (req, res) => {
-		let { products, buyer_name, buyer_email, buyer_phone_no, balance_owed } =
-			req.body;
+		let {
+			products,
+			buyer_name,
+			buyer_email,
+			buyer_phone_no,
+			balance_owed,
+			modeOfPayment,
+		} = req.body;
 		const { company_id, email } = req.user;
 
 		// Ensure products is always an array
@@ -454,6 +460,7 @@ export const InventoryCtrl = {
 				date_sold: new Date(),
 				bought_for: amount_paid || product.price,
 				balance_owed: balance_owed || "0",
+				modeOfPay: modeOfPayment,
 			};
 
 			if (balance_owed) {
@@ -648,7 +655,7 @@ export const InventoryCtrl = {
 	swapProducts: async (req, res) => {
 		const {
 			user: { company_id, email },
-			body: { outgoing, customerInfo, incoming },
+			body: { outgoing, customerInfo, incoming, modeOfPayment },
 		} = req;
 
 		const { company, user } = await useUserAndCompany({ company_id, email });
@@ -756,6 +763,7 @@ export const InventoryCtrl = {
 					},
 				},
 				OutgoingProduct: { connect: { id: swap.id } },
+				modeOfPay: modeOfPayment,
 			},
 		});
 

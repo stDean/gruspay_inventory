@@ -195,6 +195,7 @@ export const sellProduct = async ({
 	token,
 	products,
 	customerInfo,
+	modeOfPayment,
 }: {
 	token: string;
 	products: { amount_paid: string; serialNo: string }[];
@@ -203,11 +204,17 @@ export const sellProduct = async ({
 		buyer_email?: string;
 		phone_no: string;
 	};
+	modeOfPayment: string;
 }) => {
 	try {
 		const { data } = await axios.patch(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/sellProduct`,
-			{ ...customerInfo, buyer_phone_no: customerInfo.phone_no, products },
+			{
+				...customerInfo,
+				buyer_phone_no: customerInfo.phone_no,
+				products,
+				modeOfPayment,
+			},
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -270,6 +277,7 @@ interface SwapProductsProps {
 		serial_no: string;
 		description: string;
 	}[];
+	modeOfPayment: string;
 }
 
 export const swapProducts = async ({
@@ -277,6 +285,7 @@ export const swapProducts = async ({
 	incoming,
 	outgoing,
 	customerInfo,
+	modeOfPayment,
 }: SwapProductsProps) => {
 	try {
 		const { data } = await axios.patch(
@@ -288,6 +297,7 @@ export const swapProducts = async ({
 					...customerInfo,
 					buyer_phone_no: customerInfo.phone_no,
 				},
+				modeOfPayment,
 			},
 			{
 				headers: {
@@ -589,12 +599,12 @@ export const updateProduct = async ({
 	token,
 	price,
 	description,
-  serialNo
+	serialNo,
 }: {
 	token: string;
 	price: string;
 	description: string;
-  serialNo: string
+	serialNo: string;
 }) => {
 	try {
 		const { data } = await axios.patch(

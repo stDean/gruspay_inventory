@@ -35,9 +35,7 @@ export const CustomerTable = ({
 			<TableHead className="px-2 border-r w-5 md:w-10">S/N</TableHead>
 			<TableHead className={`px-2 border-r`}>Product Name</TableHead>
 			<TableHead className="px-2 border-r">Serial Number</TableHead>
-			{user?.role === "ADMIN" && (
-				<TableHead className="px-2 border-r">Price(₦)</TableHead>
-			)}
+			<TableHead className="px-2 border-r">Payment Mode</TableHead>
 			<TableHead className="px-2 border-r">Price Paid(₦)</TableHead>
 			<TableHead className="px-2 border-r">Balance Owed(₦)</TableHead>
 			<TableHead className="px-2">Purchase Date</TableHead>
@@ -55,11 +53,9 @@ export const CustomerTable = ({
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.serial_no}
 					</TableCell>
-					{user?.role === "ADMIN" && (
-						<TableCell className="px-2 border-r w-5 md:w-10">
-							{product.price}
-						</TableCell>
-					)}
+					<TableCell className="px-2 border-r w-5 md:w-10">
+						{product?.modeOfPay}
+					</TableCell>
 					<TableCell className="px-2 border-r w-5 md:w-10">
 						{product.bought_for}
 					</TableCell>
