@@ -87,10 +87,10 @@ export const sendNodeInvoice = async invoiceNo => {
 	const customerName =
 		invoice.customer?.buyer_name || invoice.creditor?.creditor_name;
 
-	let productGroups = {};
+	let products = [];
+	let outgoingProducts = [];
+	let incomingProducts = [];
 	let grandTotal = 0;
-	let outgoingProducts = {};
-	let incomingProducts = {};
 
 	// Process products based on invoice type
 	if (invoice.status === "SWAP") {
@@ -99,17 +99,23 @@ export const sendNodeInvoice = async invoiceNo => {
 			include: { incomingProducts: true, outgoingProducts: true },
 		});
 		if (swap) {
-			outgoingProducts = processProducts(swap.outgoingProducts, "bought_for");
-			incomingProducts = processProducts(swap.incomingProducts, "price");
+			outgoingProducts = processIndividualProducts(
+				swap.outgoingProducts,
+				"bought_for"
+			);
+			incomingProducts = processIndividualProducts(
+				swap.incomingProducts,
+				"price"
+			);
 		}
 	} else {
-		productGroups = processProducts(invoice.product, "bought_for");
-		grandTotal = calculateGrandTotal(productGroups);
+		products = processIndividualProducts(invoice.product, "bought_for");
+		grandTotal = calculateGrandTotal(products);
 	}
 
 	const emailHtml = generateEmailHtml(
 		invoice,
-		productGroups,
+		products,
 		grandTotal,
 		outgoingProducts,
 		incomingProducts,
@@ -132,45 +138,37 @@ export const sendNodeInvoice = async invoiceNo => {
 };
 
 /**
- * Process products into grouped data
+ * Process products into individual data
  * @param {Array} products - List of products
  * @param {string} priceField - Field for price lookup
  */
-const processProducts = (products, priceField) =>
-	products.reduce((acc, product) => {
-		const { product_name } = product;
-		const price = parseFloat(product[priceField]) || 0;
-		if (!acc[product_name]) {
-			acc[product_name] = { qty: 1, unitPrice: price, totalPrice: price };
-		} else {
-			acc[product_name].qty += 1;
-			acc[product_name].totalPrice += price;
-		}
-		return acc;
-	}, {});
+const processIndividualProducts = (products, priceField) =>
+	products.map(product => ({
+		name: product.product_name,
+		description: product.description,
+		serialNo: product.serial_no,
+		price: parseFloat(product[priceField]) || 0,
+	}));
 
 /**
- * Calculate grand total from product groups
- * @param {Object} productGroup - Grouped product data
+ * Calculate grand total from individual products
+ * @param {Array} products - List of individual product data
  */
-const calculateGrandTotal = productGroup =>
-	Object.values(productGroup).reduce(
-		(sum, { totalPrice }) => sum + totalPrice,
-		0
-	);
+const calculateGrandTotal = products =>
+	products.reduce((sum, { price }) => sum + price, 0);
 
 /**
  * Generate invoice email HTML
  * @param {Object} invoice - Invoice data
- * @param {Object} productGroups - Grouped products
+ * @param {Array} products - List of products
  * @param {number} grandTotal - Grand total for products
- * @param {Object} outgoingProducts - Outgoing products for swaps
- * @param {Object} incomingProducts - Incoming products for swaps
+ * @param {Array} outgoingProducts - Outgoing products for swaps
+ * @param {Array} incomingProducts - Incoming products for swaps
  * @param {string} customerName - Customer's name
  */
 const generateEmailHtml = (
 	invoice,
-	productGroups,
+	products,
 	grandTotal,
 	outgoingProducts,
 	incomingProducts,
@@ -193,7 +191,7 @@ const generateEmailHtml = (
         `
 				: `
           <h3>Products:</h3>
-          ${createProductTable(productGroups)}
+          ${createProductTable(products)}
           <p style="text-align: right; font-weight: bold;">Grand Total: ₦${grandTotal}</p>
         `
 		}
@@ -208,27 +206,27 @@ const generateEmailHtml = (
 
 /**
  * Create product table HTML
- * @param {Object} productGroup - Grouped product data
+ * @param {Array} products - List of individual product data
  */
-const createProductTable = productGroup => `
+const createProductTable = products => `
   <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
     <thead>
       <tr style="background-color: #f5f5f5;">
         <th style="padding: 10px; text-align: left;">Product</th>
-        <th style="padding: 10px; text-align: center;">Quantity</th>
-        <th style="padding: 10px; text-align: right;">Unit Price (₦)</th>
-        <th style="padding: 10px; text-align: right;">Total Price (₦)</th>
+        <th style="padding: 10px; text-align: center;">Serial No</th>
+        <th style="padding: 10px; text-align: left;">Description</th>
+        <th style="padding: 10px; text-align: right;">Price (₦)</th>
       </tr>
     </thead>
     <tbody>
-      ${Object.entries(productGroup)
+      ${products
 				.map(
-					([name, { qty, unitPrice, totalPrice }]) => `
+					({ name, serialNo, description, price }) => `
           <tr>
             <td style="padding: 10px;">${name}</td>
-            <td style="padding: 10px; text-align: center;">${qty}</td>
-            <td style="padding: 10px; text-align: right;">₦${unitPrice}</td>
-            <td style="padding: 10px; text-align: right;">₦${totalPrice}</td>
+            <td style="padding: 10px; text-align: center;">${serialNo}</td>
+            <td style="padding: 10px; text-align: left;">${description}</td>
+            <td style="padding: 10px; text-align: right;">₦${price}</td>
           </tr>
         `
 				)

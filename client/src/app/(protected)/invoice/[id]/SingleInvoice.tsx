@@ -20,9 +20,9 @@ import { Spinner } from "@/components/Spinners";
 
 interface ItemsProps {
 	name: string;
-	qty: number;
+	desc: string;
+	serialNo: string;
 	price: number;
-	totalPrice: number;
 }
 
 interface InvoiceProps {
@@ -51,21 +51,21 @@ const InvoiceTable = ({ itemsPurchased }: { itemsPurchased: ItemsProps[] }) => (
 		<TableHeader>
 			<TableRow className="border-b border-gray-200 pb-4 text-sm md:text-base font-semibold">
 				<TableHead className="w-1/5">Product Name</TableHead>
-				<TableHead className="w-1/5">Qty</TableHead>
-				<TableHead className="w-1/5">Price(₦)</TableHead>
+				<TableHead className="w-1/5">Serial No</TableHead>
+				<TableHead className="w-1/5">Description</TableHead>
 				<TableHead className="w-1/5">Total(₦)</TableHead>
 			</TableRow>
 		</TableHeader>
 		<TableBody>
 			{itemsPurchased.map(item => (
 				<TableRow
-					key={`${item.name} ${item.qty}`}
+					key={`${item.name} ${item.serialNo}`}
 					className="border-b border-gray-200 py-4"
 				>
 					<TableCell className="w-1/5 font-semibold">{item.name}</TableCell>
-					<TableCell className="w-1/5">{item.qty}</TableCell>
+					<TableCell className="w-1/5">{item.serialNo}</TableCell>
+					<TableCell className="w-1/5">{item.desc}</TableCell>
 					<TableCell className="w-1/5">{item.price}</TableCell>
-					<TableCell className="w-1/5">{item.totalPrice}</TableCell>
 				</TableRow>
 			))}
 		</TableBody>

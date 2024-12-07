@@ -122,8 +122,6 @@ export const CustomerInfo = ({
 	handleModeChange: (mode: string) => void;
 	handleBankChange: (bank: string) => void;
 }) => {
-
-
 	return (
 		<>
 			<p className="font-semibold text-base mt-3">Customers Information</p>
@@ -214,16 +212,18 @@ export const CustomerInfo = ({
 						</div>
 					)}
 
-					<div className="flex flex-col gap-1 flex-1">
-						<p className="text-xs text-gray-500 font-semibold">
-							Mode Of Payment
-						</p>
+					{!swap && (
+						<div className="flex flex-col gap-1 flex-1">
+							<p className="text-xs text-gray-500 font-semibold">
+								Mode Of Payment
+							</p>
 
-						<NestedDrop
-							onModeChange={handleModeChange}
-							onBankChange={handleBankChange}
-						/>
-					</div>
+							<NestedDrop
+								onModeChange={handleModeChange}
+								onBankChange={handleBankChange}
+							/>
+						</div>
+					)}
 				</div>
 			</div>
 		</>
