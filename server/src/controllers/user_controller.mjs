@@ -194,6 +194,7 @@ export const UserCtrl = {
 						invoiceId: true,
 					},
 				},
+				subPayDates: { select: { date: true } },
 			},
 		});
 

@@ -57,7 +57,11 @@ export const Creditor = ({ id }: { id: string }) => {
 		<div className="-mt-4">
 			<ItemsHeader routeTo="/users" types={creditor?.creditor_name} />
 
-			<CreditorTable products={creditor?.Products} page={page} />
+			<CreditorTable
+				products={creditor?.Products}
+				page={page}
+				dates={creditor.subPayDates}
+			/>
 		</div>
 	) : (
 		<div>No creditor data available.</div> // Handle case where creditor is null

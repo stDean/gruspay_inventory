@@ -14,7 +14,7 @@ export interface ProductProps {
 	sales_status?: string;
 	balance_owed?: string;
 	status: string;
-  modeOfPay?:string
+	modeOfPay?: string;
 	AddedByUser?: { first_name: string; last_name: string; email: string };
 	SoldByUser?: { first_name: string; last_name: string; email: string };
 	Supplier: {
@@ -111,6 +111,7 @@ export interface CreditorProps {
 	id: string;
 	updatedAt: string;
 	creditor: boolean;
+	subPayDates: { date: string }[];
 }
 
 export interface SupplierProps {

@@ -195,17 +195,26 @@ model Buyer {
   @@index([companyId], map: "Buyer_companyId_fkey")
 }
 
+model SubPaymentDate {
+  id         String   @id @default(uuid())
+  date       DateTime
+  creditorId String
+  productId  String
+  Creditor   Creditor @relation(fields: [creditorId], references: [id], onDelete: Cascade)
+}
+
 model Creditor {
-  id                String     @id @default(uuid())
+  id                String           @id @default(uuid())
   creditor_name     String
   creditor_email    String
   creditor_phone_no String
   companyId         String?
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  Company           Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   Invoice           Invoice[]
   Products          Products[]
+  subPayDates       SubPaymentDate[]
 
   @@unique([creditor_email, creditor_name, companyId])
   @@index([companyId], map: "Creditor_companyId_fkey")

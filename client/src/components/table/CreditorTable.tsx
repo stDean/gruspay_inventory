@@ -8,9 +8,11 @@ import { TableContainer } from "./Table";
 export const CreditorTable = ({
 	products,
 	page,
+	dates,
 }: {
 	products: Array<ProductProps>;
 	page: number;
+	dates: { date: string }[];
 }) => {
 	const completeModal = useCompletePayModal();
 	const rowsPerPage = 20;
@@ -50,7 +52,7 @@ export const CreditorTable = ({
 					<TableCell
 						className="px-2 border-r w-5 md:w-10 text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer capitalize"
 						onClick={() => {
-							completeModal.onOpen(product);
+							completeModal.onOpen(product, dates);
 						}}
 					>
 						{product.product_name}
@@ -68,7 +70,7 @@ export const CreditorTable = ({
 						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 					<TableCell className="px-2 w-5 md:w-10">
-						{format(product.date_sold as string, "PPP")}
+						{format(dates[0].date as string, "PPP")}
 					</TableCell>
 				</TableRow>
 			))}

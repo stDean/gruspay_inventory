@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useCompletePayModal from "@/hook/useCompletePayModal";
 import { useReduxState } from "@/hook/useRedux";
+import { format } from "date-fns";
 import { useCallback, useState, useTransition, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -102,6 +103,15 @@ export const CompletePayModal = () => {
 						label="Customer Number"
 						value={completeModal.product?.Creditor?.creditor_phone_no as string}
 					/>
+				</div>
+
+				<div className="flex items-center gap-3 flex-wrap">
+					{completeModal?.dates?.reverse()?.map((date, idx) => (
+						<MyInput
+							label={`Payment Date ${idx + 1}`}
+							value={format(date.date as string, "PPP")}
+						/>
+					))}
 				</div>
 			</div>
 

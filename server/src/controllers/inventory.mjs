@@ -402,6 +402,12 @@ export const InventoryCtrl = {
 		}
 
 		const user = await prisma.users.findUnique({ where: { email } });
+		if (!user) {
+			return res
+				.status(StatusCodes.UNAUTHORIZED)
+				.json({ msg: "User not found." });
+		}
+
 		const results = { success: [], failed: [] };
 		const serialNumbers = products.map(product => product.serialNo);
 
@@ -428,6 +434,12 @@ export const InventoryCtrl = {
 		const company = await prisma.company.findUnique({
 			where: { id: company_id },
 		});
+		if (!company) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Company not found." });
+		}
+
 		const companyInitials = company.company_name
 			.split(" ")
 			.map(name => name[0])
@@ -464,19 +476,35 @@ export const InventoryCtrl = {
 			};
 
 			if (balance_owed) {
-				updateData["Creditor"] = {
-					connectOrCreate: {
-						where: {
-							creditor_email_creditor_name_companyId: {
-								creditor_name: buyer_name,
-								creditor_email: buyer_email,
-								companyId: company_id,
+				await prisma.subPaymentDate.create({
+					data: {
+						date: new Date(),
+						productId: product.id,
+						Creditor: {
+							connectOrCreate: {
+								where: {
+									creditor_email_creditor_name_companyId: {
+										creditor_name: buyer_name,
+										creditor_email: buyer_email,
+										companyId: company_id,
+									},
+								},
+								create: {
+									creditor_name: buyer_name,
+									creditor_email: buyer_email,
+									creditor_phone_no: buyer_phone_no,
+									companyId: company_id,
+								},
 							},
 						},
-						create: {
+					},
+				});
+
+				updateData["Creditor"] = {
+					connect: {
+						creditor_email_creditor_name_companyId: {
 							creditor_name: buyer_name,
 							creditor_email: buyer_email,
-							creditor_phone_no: buyer_phone_no,
 							companyId: company_id,
 						},
 					},
@@ -495,7 +523,6 @@ export const InventoryCtrl = {
 							buyer_name,
 							buyer_email: buyer_email || null,
 							buyer_phone_no,
-							companyId: company_id,
 						},
 					},
 				};
@@ -1011,10 +1038,9 @@ export const InventoryCtrl = {
 				sales_status: "SOLD",
 				balance_owed: { not: "0" },
 			},
-			include: { Creditor: { include: { Products: true } } },
+			include: { Creditor: true },
 		});
 
-		// If product not found, return error
 		if (!product) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
@@ -1031,39 +1057,61 @@ export const InventoryCtrl = {
 				.json({ msg: "Cannot pay more than balance owed", success: false });
 		}
 
-		// Update product when there's still balance owed
+		// Update product balance and subPayDates
 		const updatedData = {
 			balance_owed: String(balance),
-			date_sold: new Date(),
+			date_sold: product.date_sold,
 			bought_for: String(Number(amount) + Number(product.bought_for)),
 		};
 
-		// When balance is fully paid, update customer information
-		if (balance === 0) {
-			updatedData["Customer"] = {
-				connectOrCreate: {
-					where: {
-						buyer_email_buyer_name_companyId: {
-							buyer_email: product.Creditor.creditor_email,
-							buyer_name: product.Creditor.creditor_name,
-							companyId: product.companyId,
-						},
-					},
-					create: {
-						buyer_email: product.Creditor.creditor_email,
-						buyer_name: product.Creditor.creditor_name,
-						buyer_phone_no: product.Creditor.creditor_phone_no,
-						companyId: product.companyId,
-					},
-				},
-			};
-		}
-
-		// Update product with the new balance and customer info
+		// Update the product
 		const updatedProduct = await prisma.products.update({
 			where: { id: product.id },
 			data: updatedData,
 		});
+
+		await prisma.subPaymentDate.create({
+			data: {
+				date: new Date(),
+				productId: product.id,
+				Creditor: {
+					connect: {
+						creditor_email_creditor_name_companyId: {
+							creditor_email: product.Creditor.creditor_email,
+							creditor_name: product.Creditor.creditor_name,
+							companyId: product.companyId,
+						},
+					},
+				},
+			},
+		});
+
+		// When balance is fully paid, update customer information
+		// if (balance === 0) {
+		// 	updatedData["Customer"] = {
+		// 		connectOrCreate: {
+		// 			where: {
+		// 				buyer_email_buyer_name_companyId: {
+		// 					buyer_email: product.Creditor.creditor_email,
+		// 					buyer_name: product.Creditor.creditor_name,
+		// 					companyId: product.companyId,
+		// 				},
+		// 			},
+		// 			create: {
+		// 				buyer_email: product.Creditor.creditor_email,
+		// 				buyer_name: product.Creditor.creditor_name,
+		// 				buyer_phone_no: product.Creditor.creditor_phone_no,
+		// 				companyId: product.companyId,
+		// 			},
+		// 		},
+		// 	};
+		// }
+
+		// // Update product with the new balance and customer info
+		// const updatedProduct = await prisma.products.update({
+		// 	where: { id: product.id },
+		// 	data: updatedData,
+		// });
 
 		// Find the invoice associated with this product
 		const invoice = await prisma.invoice.findUnique({

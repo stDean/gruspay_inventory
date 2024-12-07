@@ -12,7 +12,7 @@ export default function page() {
 				</div>
 
 				<Button
-					className="bg-blue-500 hover:bg-blue-400 md:py-6 md:px-10 md:text-lg"
+					className="bg-blue-500 hover:bg-blue-400 md:py-6 md:px-10 md:text-lg cursor-pointer"
 					asChild
 				>
 					<Link href="/login">Login</Link>
@@ -27,7 +27,7 @@ export default function page() {
 							Manage your inventory more efficiently.
 						</h1>
 
-						<Button className="md:py-7 md:px-10 md:text-lg" asChild>
+						<Button className="md:py-7 md:px-10 md:text-lg cursor-pointer" asChild>
 							<Link href="#plan">Get Started</Link>
 						</Button>
 					</div>

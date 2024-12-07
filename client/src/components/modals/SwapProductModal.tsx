@@ -76,8 +76,6 @@ export const SwapProductModal = () => {
 		setSelectedBank(bank);
 	};
 
-	console.log({ selectedMode, selectedBank });
-
 	const handleChangeCustomerInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setCustomerInfo(prev => ({ ...prev, [name]: value }));
