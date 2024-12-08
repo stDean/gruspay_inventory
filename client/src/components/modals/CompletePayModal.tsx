@@ -106,7 +106,7 @@ export const CompletePayModal = () => {
 				</div>
 
 				<div className="flex items-center gap-3 flex-wrap">
-					{completeModal?.dates?.reverse()?.map((date, idx) => (
+					{[...(completeModal?.dates ?? [])]?.reverse()?.map((date, idx) => (
 						<MyInput
 							label={`Payment Date ${idx + 1}`}
 							value={format(date.date as string, "PPP")}

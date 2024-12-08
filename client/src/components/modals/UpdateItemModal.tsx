@@ -132,7 +132,7 @@ export const UpdateItemModal = () => {
 
 			<hr />
 
-			<div className="p-4">
+			<div className="p-4 flex justify-end">
 				<Button onClick={handleUpdate} disabled={disable}>
 					Confirm Update
 				</Button>
