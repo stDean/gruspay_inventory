@@ -1,9 +1,8 @@
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { ProductProps } from "@/lib/types";
 import { format } from "date-fns";
-import { TableContainer } from "./Table";
 import { useState } from "react";
-import { useReduxState } from "@/hook/useRedux";
+import { TableContainer } from "./Table";
 
 export const CustomerTable = ({
 	products,
@@ -12,7 +11,6 @@ export const CustomerTable = ({
 	products: Array<ProductProps>;
 	page: number;
 }) => {
-	const { user } = useReduxState();
 	const rowsPerPage = 20;
 	const totalPages = Math.ceil(products.length / rowsPerPage);
 	const currentPage = page || 1;
