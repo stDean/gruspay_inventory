@@ -111,10 +111,10 @@ model Products {
   brand            String
   description      String
   type             String
-  price            String
+  price            String?
   companyId        String
   added_by         String
-  createdAt        DateTime
+  createdAt        DateTime?
   updatedAt        DateTime        @updatedAt
   sold_by          String?
   buyerId          String?

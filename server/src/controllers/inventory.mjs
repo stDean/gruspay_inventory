@@ -162,10 +162,10 @@ export const InventoryCtrl = {
 				brand,
 				description,
 				type,
-				price: priceWithoutComma,
+				price: user?.role === "ADMIN" ? priceWithoutComma : "0",
 				serial_no,
 				status: status.toUpperCase(),
-				createdAt: new Date(purchaseDate),
+				createdAt: user?.role === "ADMIN" ? new Date(purchaseDate) : null,
 				Company: {
 					connect: { id: company.id },
 				},
@@ -223,7 +223,7 @@ export const InventoryCtrl = {
 						brand: product.Brand,
 						description: product.Description,
 						type: product["Item Type"],
-						price: priceWithoutComma,
+						price: user?.role === "ADMIN" ? priceWithoutComma : "0",
 						serial_no: product["Serial Number"],
 						status: product["Status"].toUpperCase(),
 						Company: {
@@ -235,7 +235,10 @@ export const InventoryCtrl = {
 						Supplier: {
 							connect: { id: supplier.id },
 						},
-						createdAt: new Date(product["Purchase Date"]),
+						createdAt:
+							user?.role === "ADMIN"
+								? new Date(product["Purchase Date"])
+								: null,
 					},
 				});
 
