@@ -165,7 +165,7 @@ export const InventoryCtrl = {
 				price: user?.role === "ADMIN" ? priceWithoutComma : "0",
 				serial_no,
 				status: status.toUpperCase(),
-				purchase_date: user?.role === "ADMIN" ? new Date(purchaseDate) : null,
+				purchase_date: new Date(purchaseDate),
 				Company: {
 					connect: { id: company.id },
 				},
@@ -235,10 +235,7 @@ export const InventoryCtrl = {
 						Supplier: {
 							connect: { id: supplier.id },
 						},
-						purchase_date:
-							user?.role === "ADMIN"
-								? new Date(product["Purchase Date"])
-								: null,
+						purchase_date: new Date(product["Purchase Date"]),
 					},
 				});
 
