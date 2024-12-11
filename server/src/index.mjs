@@ -115,6 +115,29 @@ app.post("/webhook", async (req, res) => {
 	}
 });
 
+// Send Daily Emails
+app.get("/api/send-daily-emails", async (req, res) => {
+	try {
+		const company = await prisma.company.findMany({
+			where: { paymentStatus: "ACTIVE", verified: true },
+			select: { company_email: true, id: true },
+		});
+		const productNotSoldToday = await prisma.products.findMany({
+			where: {
+				createdAt: {
+					gte: new Date(new Date().setHours(0, 0, 0, 0)),
+					lte: new Date(new Date().setHours(23, 59, 59, 999)),
+				},
+				sales_status: "NOT_SOLD",
+				companyId: { in: company.map(c => c.id) },
+			},
+		});
+		return res.status(200).json({ company, productNotSoldToday });
+	} catch (error) {
+		console.log("Error sending daily emails:", error);
+	}
+});
+
 const PORT = 5001 | process.env.PORT;
 const start = async () => {
 	try {

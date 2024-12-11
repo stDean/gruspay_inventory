@@ -114,7 +114,8 @@ model Products {
   price            String?
   companyId        String
   added_by         String
-  createdAt        DateTime?
+  purchase_date    DateTime?
+  createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   sold_by          String?
   buyerId          String?
