@@ -9,7 +9,6 @@ import crypto from "crypto";
 import { prisma } from "./utils/db.mjs";
 import nodemailer from "nodemailer";
 import { scheduleJob } from "node-schedule";
-import { send } from "process";
 
 /* CONFIGURATIONS */
 dotenv.config();
