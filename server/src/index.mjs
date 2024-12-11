@@ -260,83 +260,95 @@ const sendDailyEmails = async () => {
 			const emailContent = `
        <h1>Daily Summary for ${c.company_name}</h1>
        <h2>Products Added Today:</h2>
-       <table border="1" cellspacing="0" cellpadding="5">
-         <thead>
-           <tr>
-             <th>Serial Number</th>
-             <th>Product Name</th>
-             <th>Price</th>
-             <th>Purchase Date</th>
-             <th>Added By</th>
-             <th>Supplier Name</th>
-             <th>Supplier Email</th>
-             <th>Supplier Phone</th>
-           </tr>
-         </thead>
-         <tbody>
-           ${notSold
+       ${
+					notSold.length === 0
+						? `<p style="color: green; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">No product added today.</p>`
+						: `
+        <table border="1" cellspacing="0" cellpadding="5">
+          <thead>
+            <tr>
+              <th>Serial Number</th>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Purchase Date</th>
+              <th>Added By</th>
+              <th>Supplier Name</th>
+              <th>Supplier Email</th>
+              <th>Supplier Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${notSold
 							.map(
 								product => `
-               <tr>
-                 <td>${product.serial_no}</td>
-                 <td>${product.product_name}</td>
-                 <td>$${product.price}</td>
-                 <td>${product.purchase_date}</td>
-                 <td>${product.addedBy}</td>
-                 <td>${product.supplier_name}</td>
-                 <td>${product.supplier_email}</td>
-                 <td>${product.supplier_phone_no}</td>
-               </tr>`
+                <tr>
+                  <td>${product.serial_no}</td>
+                  <td>${product.product_name}</td>
+                  <td>$${product.price}</td>
+                  <td>${product.purchase_date}</td>
+                  <td>${product.addedBy}</td>
+                  <td>${product.supplier_name}</td>
+                  <td>${product.supplier_email}</td>
+                  <td>${product.supplier_phone_no}</td>
+                </tr>`
 							)
 							.join("")}
-         </tbody>
-       </table>
-
-       ${notSold
+          </tbody>
+        </table>
+ 
+        ${notSold
 					.map(
 						product => `
-            ${
-							product.price === "0" &&
-							`<p style="color: blue; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">Some products price need to be updated.</p>`
-						}
-            `
+             ${
+								product.price === "0" &&
+								`<p style="color: blue; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">Some products price need to be updated.</p>`
+							}
+             `
 					)
 					.join("")}
+        `
+				}
 
        <h2>Sold and Swapped Products Today:</h2>
-       <table border="1" cellspacing="0" cellpadding="5">
-         <thead>
-           <tr>
-             <th>Serial Number</th>
-             <th>Product Name</th>
-             <th>Price</th>
-             <th>Sold By</th>
-             <th>Bought For</th>
-             <th>Balance</th>
-             <th>Customer Name</th>
-             <th>Customer Email</th>
-             <th>Customer Phone</th>
-             <th>Sales Status</th>
-           </tr>
-         </thead>
-         <tbody>
-           ${soldAndSwapped
-							.map(
-								product => `
-               <tr>
-                 <td>${product.serial_no}</td>
-                 <td>${product.product_name}</td>
-                 <td>$${product.price}</td>
-                 <td>${product.sold_by}</td>
-                 <td>$${product.bought_for}</td>
-                 <td>$${product.balance}</td>
-                 <td>${product.customerName}</td>
-                 <td>${product.customerEmail}</td>
-                 <td>${product.customerPhone}</td>
-                 <td>${product.sales_status}</td>
-               </tr>`
-							)
-							.join("")}
+       ${
+					soldAndSwapped.length === 0
+						? `<p style="color: green; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">No products sold or swapped today.</p>`
+						: `
+            <table border="1" cellspacing="0" cellpadding="5">
+              <thead>
+                <tr>
+                  <th>Serial Number</th>
+                  <th>Product Name</th>
+                  <th>Price</th>
+                  <th>Sold By</th>
+                  <th>Bought For</th>
+                  <th>Balance</th>
+                  <th>Customer Name</th>
+                  <th>Customer Email</th>
+                  <th>Customer Phone</th>
+                  <th>Sales Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${soldAndSwapped
+									.map(
+										product => `
+                    <tr>
+                      <td>${product.serial_no}</td>
+                      <td>${product.product_name}</td>
+                      <td>$${product.price}</td>
+                      <td>${product.sold_by}</td>
+                      <td>$${product.bought_for}</td>
+                      <td>$${product.balance}</td>
+                      <td>${product.customerName}</td>
+                      <td>${product.customerEmail}</td>
+                      <td>${product.customerPhone}</td>
+                      <td>${product.sales_status}</td>
+                    </tr>`
+									)
+									.join("")}
+            `
+				}
          </tbody>
        </table>
    `;
@@ -358,8 +370,8 @@ const sendDailyEmails = async () => {
 
 // Schedule the job to run at 11:00 PM every day
 scheduleJob("* 23 * * *", () => {
-  console.log("Daily email sending schedule...");
-  sendDailyEmails();
+	console.log("Daily email sending schedule...");
+	sendDailyEmails();
 });
 
 const PORT = 5001 | process.env.PORT;
