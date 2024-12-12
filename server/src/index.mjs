@@ -368,8 +368,8 @@ const sendDailyEmails = async () => {
 	}
 };
 
-// Schedule the job to run at 11:00 PM every day
-scheduleJob("* 23 * * *", () => {
+// Schedule the job to run at 10:00 PM every day
+scheduleJob("59 21 * * *", () => {
 	console.log("Daily email sending schedule...");
 	sendDailyEmails();
 });
