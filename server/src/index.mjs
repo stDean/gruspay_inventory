@@ -369,10 +369,10 @@ const sendDailyEmails = async () => {
 };
 
 // Schedule the job to run at 10:00 PM every day
-scheduleJob("59 21 * * *", () => {
-	console.log("Daily email sending schedule...");
-	sendDailyEmails();
-});
+// scheduleJob("59 21 * * *", () => {
+// 	console.log("Daily email sending schedule...");
+// 	sendDailyEmails();
+// });
 
 const PORT = 5001 | process.env.PORT;
 const start = async () => {
