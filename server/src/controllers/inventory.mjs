@@ -120,10 +120,19 @@ export const InventoryCtrl = {
 			},
 		} = req;
 
-		if (!status) {
+		if (
+			!product_name?.trim() ||
+			!brand?.trim() ||
+			!type?.trim() ||
+			!description?.trim() ||
+			!serial_no?.trim() ||
+			!supplier_name?.trim() ||
+			!supplier_phone_no?.trim() ||
+			!status?.trim()
+		) {
 			return res
 				.status(StatusCodes.BAD_REQUEST)
-				.json({ msg: "Status must be provided." });
+				.json({ msg: "Missing required fields for product creation" });
 		}
 
 		const product = await prisma.products.findUnique({
@@ -197,6 +206,23 @@ export const InventoryCtrl = {
 
 		for (const product of req.body) {
 			try {
+				// Check if the product object or required fields are empty
+				if (
+					!product["Product Name"]?.trim() ||
+					!product.Brand?.trim() ||
+					!product["Item Type"]?.trim() ||
+					!product["Serial Number"]?.trim() ||
+					!product["Supplier Name"]?.trim() ||
+					!product["Supplier Phone Number"]?.trim() ||
+					!product["Status"]?.trim()
+				) {
+					errors.push({
+						product: product?.["Serial Number"] || "Unknown",
+						error: "Missing required fields for product creation",
+					});
+					continue; // Skip this iteration
+				}
+
 				const supplier = await getOrCreateSupplier({
 					supplier_email: product["Supplier Email"],
 					supplier_name: product["Supplier Name"],
@@ -243,8 +269,8 @@ export const InventoryCtrl = {
 			} catch (error) {
 				console.log({ error });
 				errors.push({
-					product: product.serial_no,
-					error: `Error creating product with serial number ${product.serial_no}: ${error.message}`,
+					product: product?.["Serial Number"] || "Unknown",
+					error: `Error creating product with serial number ${product?.["Serial Number"]}: ${error.message}`,
 				});
 			}
 		}
