@@ -47,10 +47,10 @@ export const AddProductForm = () => {
 			});
 			if (res?.status === 400 && res?.error) {
 				toast.error("Error", { description: res?.error });
-				setTimeout(() => {
-					addSingleProductModal.onClose();
-					form.reset();
-				}, 300);
+				// setTimeout(() => {
+				// 	addSingleProductModal.onClose();
+				// 	form.reset();
+				// }, 300);
 				return;
 			}
 

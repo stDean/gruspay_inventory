@@ -191,67 +191,85 @@ export const InventoryCtrl = {
 		const {
 			user: { company_id, email },
 		} = req;
+
+		// Fetch the company and user details based on the provided credentials
 		const { company, user } = await useUserAndCompany({ company_id, email });
 
-		const errors = [];
-		const results = [];
+		const errors = []; // Collect errors during product creation
+		const results = []; // Collect successful product creation results
 
-		// Check the product length synchronously (handle errors via return)
-		// const productLengthCheck = checkProductLength(company, req.body.length);
-		// if (productLengthCheck.error) {
-		// 	return res.status(StatusCodes.BAD_REQUEST).json({
-		// 		msg: productLengthCheck.msg,
-		// 	});
-		// }
+		// Validate input data in bulk before processing
+		const validationErrors = req.body
+			.map((product, index) => {
+				const missingFields = [];
 
+				// Check for missing required fields and collect their names
+				if (!product["Product Name"]?.trim())
+					missingFields.push("Product Name");
+				if (!product.Brand?.trim()) missingFields.push("Brand");
+				if (!product["Item Type"]?.trim()) missingFields.push("Item Type");
+				if (!product["Serial Number"]?.trim())
+					missingFields.push("Serial Number");
+				if (!product["Supplier Name"]?.trim())
+					missingFields.push("Supplier Name");
+				if (!product["Supplier Phone Number"]?.trim())
+					missingFields.push("Supplier Phone Number");
+				if (!product["Status"]?.trim()) missingFields.push("Status");
+
+				// Return errors for products with missing fields
+				return missingFields.length > 0 ? { index, missingFields } : null;
+			})
+			.filter(Boolean);
+
+		// If there are validation errors, return them as a response
+		if (validationErrors.length > 0) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				msg: "Validation errors in input data",
+				errors: validationErrors,
+			});
+		}
+
+		// Process each product in the request body
 		for (const product of req.body) {
 			try {
-				// Check if the product object or required fields are empty
-				if (
-					!product["Product Name"]?.trim() ||
-					!product.Brand?.trim() ||
-					!product["Item Type"]?.trim() ||
-					!product["Serial Number"]?.trim() ||
-					!product["Supplier Name"]?.trim() ||
-					!product["Supplier Phone Number"]?.trim() ||
-					!product["Status"]?.trim()
-				) {
-					errors.push({
-						product: product?.["Serial Number"] || "Unknown",
-						error: "Missing required fields for product creation",
-					});
-					continue; // Skip this iteration
+				// Sanitize input data by trimming whitespace from all string fields
+				for (const key in product) {
+					if (typeof product[key] === "string") {
+						product[key] = product[key].trim();
+					}
 				}
 
+				// Get or create the supplier for the product
 				const supplier = await getOrCreateSupplier({
-					supplier_email: product["Supplier Email"],
+					supplier_email: product["Supplier Email"]?.trim(),
 					supplier_name: product["Supplier Name"],
 					supplier_phone_no: product["Supplier Phone Number"],
 					companyId: company.id,
 				});
 
-				// Remove commas and space from price
+				// Remove commas and spaces from the price and validate it
 				const priceWithoutComma = String(product.Price).replace(
 					/^[₦#]|,?\s*/g,
 					""
 				);
 
+				// If the price is invalid and the user is an admin, return an error
 				if (!Number(priceWithoutComma) && user.role === "ADMIN") {
 					return res
 						.status(StatusCodes.BAD_REQUEST)
 						.json({ msg: "Invalid price" });
 				}
 
-				// Now create the product with the connected supplier
+				// Create the product and associate it with the connected supplier
 				const result = await prisma.products.create({
 					data: {
 						product_name: product["Product Name"],
-						brand: product.Brand,
-						description: product.Description,
-						type: product["Item Type"],
-						price: user?.role === "ADMIN" ? priceWithoutComma : "0",
+						brand: product.Brand || "Unknown", // Default if missing
+						description: product.Description || "No description provided", // Default
+						type: product["Item Type"] || "Miscellaneous", // Default
+						price: user?.role === "ADMIN" ? priceWithoutComma : "0", // Set to "0" if not admin
 						serial_no: product["Serial Number"],
-						status: product["Status"].toUpperCase(),
+						status: product["Status"].toUpperCase() || "AVAILABLE", // Default to "AVAILABLE"
 						Company: {
 							connect: { id: company.id },
 						},
@@ -261,13 +279,17 @@ export const InventoryCtrl = {
 						Supplier: {
 							connect: { id: supplier.id },
 						},
-						purchase_date: new Date(product["Purchase Date"]),
+						purchase_date: product["Purchase Date"]
+							? new Date(product["Purchase Date"])
+							: null, // Default to current date if not provided
 					},
 				});
 
-				results.push(result); // Collect the successful result
+				results.push(result); // Collect successful results
 			} catch (error) {
-				console.log({ error });
+				console.error(error); // Log errors for debugging
+
+				// Collect error details for failed product creation
 				errors.push({
 					product: product?.["Serial Number"] || "Unknown",
 					error: `Error creating product with serial number ${product?.["Serial Number"]}: ${error.message}`,
@@ -275,7 +297,7 @@ export const InventoryCtrl = {
 			}
 		}
 
-		// Handle errors if any
+		// If there were any errors during processing, return them
 		if (errors.length > 0) {
 			const serialNo = errors.map(error => error.product);
 			const errorMsg =
@@ -287,7 +309,8 @@ export const InventoryCtrl = {
 			return res.status(StatusCodes.BAD_REQUEST).json({ msg: errorMsg });
 		}
 
-		res.status(StatusCodes.OK).json({ msg: "Products created!" });
+		// Return a success response with the created products
+		res.status(StatusCodes.OK).json({ msg: "Products created!", results });
 	},
 	getAllProductNotSold: async (req, res) => {
 		const products = await prisma.products.findMany({
