@@ -135,6 +135,8 @@ export const InventoryCtrl = {
 				.json({ msg: "Missing required fields for product creation" });
 		}
 
+		// TODO:desc character limit
+
 		const product = await prisma.products.findUnique({
 			where: { serial_no_companyId: { serial_no, companyId: company_id } },
 		});
@@ -967,13 +969,12 @@ export const InventoryCtrl = {
 		const { barYear } = req.query;
 
 		const selectedYear = barYear ? Number(barYear) : new Date().getFullYear();
-
 		// Fetch sold products grouped by month
 		const soldProducts = await prisma.products.findMany({
 			where: {
 				companyId: company_id,
 				sales_status: { not: "NOT_SOLD" },
-				createdAt: {
+				date_sold: {
 					gte: new Date(`${selectedYear}-01-01T00:00:00.000Z`), // Start of the year
 					lt: new Date(`${Number(selectedYear) + 1}-01-01T00:00:00.000Z`), // Start of the next year
 				},
@@ -995,7 +996,7 @@ export const InventoryCtrl = {
 			},
 			select: {
 				price: true,
-				createdAt: true, // Assuming the purchase date is the createdAt field
+				createdAt: true,
 			},
 		});
 

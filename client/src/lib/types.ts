@@ -119,7 +119,7 @@ export interface SupplierProps {
 	companyId: string;
 	createdAt: string;
 	id: string;
-	supplier_email: string;
+	supplier_email?: string;
 	supplier_name: string;
 	supplier_phone_no: string;
 	updatedAt: string;

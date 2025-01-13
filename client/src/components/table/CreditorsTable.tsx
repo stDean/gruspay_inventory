@@ -99,6 +99,6 @@ export const CreditorsTable = () => {
       searchInput
 		/>
 	) : (
-		<p>No Creditors yet</p>
+		<p>No Debtors yet</p>
 	);
 };

@@ -64,6 +64,6 @@ export const Creditor = ({ id }: { id: string }) => {
 			/>
 		</div>
 	) : (
-		<div>No creditor data available.</div> // Handle case where creditor is null
+		<div>No debtors data available.</div> // Handle case where creditor is null
 	);
 };

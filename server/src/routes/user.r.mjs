@@ -25,66 +25,77 @@ router
 		[AuthMiddleware, AdminMiddleware, userRateLimiter],
 		UserCtrl.getUserById
 	);
-router.route("/getSuppliers").get(
-	[
-		AuthMiddleware,
-		AdminMiddleware,
-		SupplierMiddleware,
-		checkSubscriptionStatus,
-		userRateLimiter,
-	],
-	UserCtrl.getSuppliers
-);
-router.route("/getSupplier/:id").get(
-	[
-		AuthMiddleware,
-		AdminMiddleware,
-		SupplierMiddleware,
-		checkSubscriptionStatus,
-		userRateLimiter,
-	],
-	UserCtrl.getSupplier
-);
-router.route("/getCustomers").get(
-	[
-		AuthMiddleware,
-		AdminMiddleware,
-		CustomerAndCreditorMiddleware,
-		checkSubscriptionStatus,
-		userRateLimiter,
-	],
-	UserCtrl.getCustomers
-);
-router.route("/getCustomer/:id").get(
-	[
-		AuthMiddleware,
-		AdminMiddleware,
-		CustomerAndCreditorMiddleware,
-		checkSubscriptionStatus,
-		userRateLimiter,
-	],
-	UserCtrl.getCustomer
-);
-router.route("/getCreditors").get(
-	[
-		AuthMiddleware,
-		AdminMiddleware,
-		CustomerAndCreditorMiddleware,
-		checkSubscriptionStatus,
-		userRateLimiter,
-	],
-	UserCtrl.getCreditors
-);
-router.route("/getCreditor/:id").get(
-	[
-		AuthMiddleware,
-		AdminMiddleware,
-		CustomerAndCreditorMiddleware,
-		checkSubscriptionStatus,
-		userRateLimiter,
-	],
-	UserCtrl.getCreditor
-);
+router
+	.route("/getSuppliers")
+	.get(
+		[
+			AuthMiddleware,
+			SupplierMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
+		UserCtrl.getSuppliers
+	);
+router
+	.route("/getSupplier/:id")
+	.get(
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			SupplierMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
+		UserCtrl.getSupplier
+	);
+router
+	.route("/getCustomers")
+	.get(
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
+		UserCtrl.getCustomers
+	);
+router
+	.route("/getCustomer/:id")
+	.get(
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
+		UserCtrl.getCustomer
+	);
+router
+	.route("/getCreditors")
+	.get(
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
+		UserCtrl.getCreditors
+	);
+router
+	.route("/getCreditor/:id")
+	.get(
+		[
+			AuthMiddleware,
+			AdminMiddleware,
+			CustomerAndCreditorMiddleware,
+			checkSubscriptionStatus,
+			userRateLimiter,
+		],
+		UserCtrl.getCreditor
+	);
 
 router
 	.route("/updateUser")

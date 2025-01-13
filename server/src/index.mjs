@@ -58,6 +58,7 @@ app.post("/webhook", async (req, res) => {
 				where: { id: getCompany.id, company_email: getCompany.company_email },
 				data: {
 					paymentStatus: "ACTIVE",
+					expires: payload.data.next_payment_date,
 					payStackAuth: {
 						connectOrCreate: {
 							where: {
