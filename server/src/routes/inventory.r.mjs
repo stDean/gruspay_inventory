@@ -86,6 +86,13 @@ router
 	);
 
 router
+	.route("/updateBoughtPrice/:serialNo")
+	.patch(
+		[AuthMiddleware, AdminMiddleware, checkSubscriptionStatus],
+		InventoryCtrl.updateBoughtPrice
+	);
+
+router
 	.route("/swapProducts")
 	.patch([AuthMiddleware, checkSubscriptionStatus], InventoryCtrl.swapProducts);
 

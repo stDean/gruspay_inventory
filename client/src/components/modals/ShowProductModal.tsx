@@ -188,8 +188,6 @@ export const ShowProductModal = () => {
 			return [true];
 		});
 
-	console.log({ filteredOption });
-
 	// Handle adding another item to the sale
 	const handleAddAnotherItem = async (serial_no: string) => {
 		if (!serial_no) return;

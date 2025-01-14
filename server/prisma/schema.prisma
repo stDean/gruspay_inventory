@@ -109,7 +109,7 @@ model Products {
   id               String          @id @default(uuid())
   product_name     String
   brand            String
-  description      String
+  description      String          @db.VarChar(200)
   type             String
   price            String?
   companyId        String

@@ -610,6 +610,42 @@ export const updateSoldProduct = async ({
 	}
 };
 
+export const updateBoughtPrice = async ({
+	token,
+	bought_for,
+	serialNo,
+}: {
+	token: string;
+	bought_for: string;
+	serialNo: string;
+}) => {
+	try {
+		const { data } = await axios.patch(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/updateBoughtPrice/${serialNo}`,
+			{ bought_for },
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again" };
+	}
+};
+
 export const deleteProduct = async ({
 	token,
 	serialNo,

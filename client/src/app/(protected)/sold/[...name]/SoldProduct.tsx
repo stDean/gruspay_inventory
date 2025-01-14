@@ -5,6 +5,7 @@ import { ItemsHeader } from "@/components/ItemsHeader";
 import { Spinner } from "@/components/Spinners";
 import { SoldProductsTable } from "@/components/table/SoldProductsTable";
 import { useReduxState } from "@/hook/useRedux";
+import useShowSoldInfoModal from "@/hook/useShowSoldDetails";
 import { ProductProps } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
@@ -22,6 +23,7 @@ export const SoldProduct = ({
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page"));
 	const [isPending, startTransition] = useTransition();
+	const productDetails = useShowSoldInfoModal();
 
 	const getProducts = useCallback(() => {
 		startTransition(async () => {
@@ -32,7 +34,7 @@ export const SoldProduct = ({
 			}
 			setProducts(res?.data);
 		});
-	}, []);
+	}, [productDetails.isOpen]);
 
 	useEffect(() => {
 		getProducts();

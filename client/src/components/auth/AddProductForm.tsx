@@ -24,6 +24,7 @@ export const AddProductForm = () => {
 	const addSingleProductModal = useAddSingleProductModal();
 	const { token, user } = useReduxState();
 	const [suppliers, setSuppliers] = useState<Array<SupplierProps>>([]);
+	const [characterCounter, setCharacterCounter] = useState(0);
 
 	const getAllSuppliers = useCallback(() => {
 		startTransition(async () => {
@@ -132,6 +133,10 @@ export const AddProductForm = () => {
 		}
 	}, [filterSupplier]);
 
+	useEffect(() => {
+		setCharacterCounter(form.getValues("description").length);
+	}, [form.watch("description")]);
+
 	return (
 		<>
 			<Form {...form}>
@@ -204,12 +209,28 @@ export const AddProductForm = () => {
 							</div>
 						</div>
 
-						<CustomTextArea
-							name="description"
-							label="Description"
-							control={form.control}
-							placeholder="Item Description"
-						/>
+						<div className="flex flex-col w-full">
+							<CustomTextArea
+								name="description"
+								label="Description"
+								control={form.control}
+								placeholder="Item Description not more than 200 characters"
+								characterCounter={characterCounter}
+								characterLimit={200}
+							/>
+							<p
+								className={`text-xs pt-1 ${
+									characterCounter >= 191 &&
+									"text-red-500"
+								} ${
+									characterCounter >= 150 &&
+									characterCounter <= 190 &&
+									"text-yellow-500"
+								} `}
+							>
+								{characterCounter}/200
+							</p>
+						</div>
 
 						<hr />
 

@@ -733,7 +733,7 @@ export const InventoryCtrl = {
 							buyer_name,
 							buyer_email: buyer_email || null,
 							buyer_phone_no,
-              companyId: company_id,
+							companyId: company_id,
 						},
 					},
 				},
@@ -1611,5 +1611,32 @@ export const InventoryCtrl = {
 		return res
 			.status(StatusCodes.OK)
 			.json({ msg: "Product deleted", success: true });
+	},
+	updateBoughtPrice: async (req, res) => {
+		const { serialNo } = req.params;
+		const { company_id } = req.user;
+
+		const product = await prisma.products.findFirst({
+			where: {
+				serial_no: serialNo,
+				sales_status: { not: "NOT_SOLD" },
+				companyId: company_id,
+			},
+		});
+
+		if (!product) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "No product found." });
+		}
+
+		const updatedPrice = await prisma.products.update({
+			where: { id: product.id, serial_no: serialNo, companyId: company_id },
+			data: { bought_for: req.body.bought_for },
+		});
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Price successfully updated.", updatedPrice });
 	},
 };
