@@ -156,6 +156,8 @@ export const CustomerInfo = ({
 		getAllCustomers();
 	}, []);
 
+	console.log({ isPending });
+
 	useEffect(() => {
 		if (customerInfo.buyer_name) {
 			const filtered = customers.filter(cus =>
