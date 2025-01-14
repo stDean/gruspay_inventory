@@ -22,8 +22,8 @@ const getOrCreateSupplier = async supplierData => {
 
 	const existingSupplier = await prisma.supplier.findUnique({
 		where: {
-			supplier_email_supplier_name_companyId: {
-				supplier_email: supplier_email || null,
+			supplier_phone_no_supplier_name_companyId: {
+				supplier_phone_no: supplier_phone_no || null,
 				supplier_name,
 				companyId,
 			},
@@ -47,6 +47,41 @@ function generateInvoice(previousInvoice = "INV-0001") {
 	// Generate the next invoice number based on the previous one
 	const newInvoiceNumber = InvoiceNumber.next(previousInvoice);
 	return newInvoiceNumber;
+}
+
+function excelDateToJSDate(serial) {
+	const excelEpoch = new Date(1900, 0, 1); // Excel's epoch starts on January 1, 1900
+	const jsDate = new Date(excelEpoch.getTime() + (serial - 1) * 86400000); // Subtract 1 to adjust and multiply by ms per day
+	return jsDate;
+}
+
+function formatDateToYYYYMMDD(date) {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${year}/${month}/${day}`;
+}
+
+async function generateInvoiceNo(company_name, company_id) {
+	const companyInitials = company_name
+		.split(" ")
+		.map(name => name[0])
+		.join("");
+	const getYearAndDate = new Date();
+	const yearLastTwo = getYearAndDate.getFullYear().toString().substr(-2);
+	const month = (getYearAndDate.getMonth() + 1).toString().padStart(2, "0");
+	const getPrevInvoice = await prisma.invoice.findMany({
+		where: { companyId: company_id },
+		orderBy: { invoiceNo: "desc" },
+		take: 1,
+	});
+	const prevInvoiceWithoutFirstFour = getPrevInvoice[0]?.invoiceNo.slice(5);
+
+	const prev = getPrevInvoice[0]?.invoiceNo
+		? `${companyInitials}${yearLastTwo}-${prevInvoiceWithoutFirstFour}`
+		: `${companyInitials}${yearLastTwo}-${month}0000`;
+	const invoiceNumber = generateInvoice(prev);
+	return invoiceNumber;
 }
 
 // Helper function for generating date filters
@@ -210,11 +245,11 @@ export const InventoryCtrl = {
 					missingFields.push("Product Name");
 				if (!product.Brand?.trim()) missingFields.push("Brand");
 				if (!product["Item Type"]?.trim()) missingFields.push("Item Type");
-				if (!product["Serial Number"]?.trim())
+				if (!String(product["Serial Number"])?.trim())
 					missingFields.push("Serial Number");
 				if (!product["Supplier Name"]?.trim())
 					missingFields.push("Supplier Name");
-				if (!product["Supplier Phone Number"]?.trim())
+				if (!String(product["Supplier Phone Number"])?.trim())
 					missingFields.push("Supplier Phone Number");
 				if (!product["Status"]?.trim()) missingFields.push("Status");
 
@@ -245,7 +280,7 @@ export const InventoryCtrl = {
 				const supplier = await getOrCreateSupplier({
 					supplier_email: product["Supplier Email"]?.trim(),
 					supplier_name: product["Supplier Name"],
-					supplier_phone_no: product["Supplier Phone Number"],
+					supplier_phone_no: product["Supplier Phone Number"].toString(),
 					companyId: company.id,
 				});
 
@@ -254,6 +289,9 @@ export const InventoryCtrl = {
 					/^[₦#]|,?\s*/g,
 					""
 				);
+
+				const jsDate = excelDateToJSDate(product["Purchase Date"]);
+				const purchaseDateFormat = formatDateToYYYYMMDD(jsDate);
 
 				// If the price is invalid and the user is an admin, return an error
 				if (!Number(priceWithoutComma) && user.role === "ADMIN") {
@@ -270,7 +308,7 @@ export const InventoryCtrl = {
 						description: product.Description || "No description provided", // Default
 						type: product["Item Type"] || "Miscellaneous", // Default
 						price: user?.role === "ADMIN" ? priceWithoutComma : "0", // Set to "0" if not admin
-						serial_no: product["Serial Number"],
+						serial_no: product["Serial Number"].toString(),
 						status: product["Status"].toUpperCase() || "AVAILABLE", // Default to "AVAILABLE"
 						Company: {
 							connect: { id: company.id },
@@ -282,7 +320,7 @@ export const InventoryCtrl = {
 							connect: { id: supplier.id },
 						},
 						purchase_date: product["Purchase Date"]
-							? new Date(product["Purchase Date"])
+							? new Date(purchaseDateFormat)
 							: null, // Default to current date if not provided
 					},
 				});
@@ -436,9 +474,10 @@ export const InventoryCtrl = {
 
 		res.status(StatusCodes.OK).json({ msg: "updateProduct", updatedProduct });
 	},
-	sellProductsBulk: async (req, res) => {
-		let {
-			products,
+	sellSingleProduct: async (req, res) => {
+		const {
+			serialNo,
+			amount_paid,
 			buyer_name,
 			buyer_email,
 			buyer_phone_no,
@@ -446,11 +485,7 @@ export const InventoryCtrl = {
 			modeOfPayment,
 		} = req.body;
 		const { company_id, email } = req.user;
-
-		// Ensure products is always an array
-		if (!Array.isArray(products)) {
-			products = [products];
-		}
+		// return res.status(200).json({ ...req.body });
 
 		const user = await prisma.users.findUnique({ where: { email } });
 		if (!user) {
@@ -459,29 +494,21 @@ export const InventoryCtrl = {
 				.json({ msg: "User not found." });
 		}
 
-		const results = { success: [], failed: [] };
-		const serialNumbers = products.map(product => product.serialNo);
-
-		// Step 1: Batch retrieve products for sale processing
-		const retrievedProducts = await prisma.products.findMany({
+		const retrievedProduct = await prisma.products.findFirst({
 			where: {
-				serial_no: { in: serialNumbers },
+				serial_no: serialNo,
 				companyId: company_id,
 				sales_status: "NOT_SOLD",
 			},
 		});
 
-		if (retrievedProducts.length === 0) {
+		if (!retrievedProduct) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
-				.json({ msg: "Products not found.", success: false });
+				.json({ msg: "Product not found or already sold." });
 		}
 
-		const productMap = new Map(
-			retrievedProducts.map(product => [product.serial_no, product])
-		);
-
-		// Generate a single invoice number for the transaction
+		// Generate invoice number
 		const company = await prisma.company.findUnique({
 			where: { id: company_id },
 		});
@@ -491,114 +518,89 @@ export const InventoryCtrl = {
 				.json({ msg: "Company not found." });
 		}
 
-		const companyInitials = company.company_name
-			.split(" ")
-			.map(name => name[0])
-			.join("");
-		const getYearAndDate = new Date();
-		const yearLastTwo = getYearAndDate.getFullYear().toString().substr(-2);
-		const month = (getYearAndDate.getMonth() + 1).toString().padStart(2, "0");
-		const getPrevInvoice = await prisma.invoice.findMany({
-			where: { companyId: company_id },
-			orderBy: { invoiceNo: "desc" },
-			take: 1,
-		});
-		const prev =
-			getPrevInvoice[0]?.invoiceNo ||
-			`${companyInitials}${yearLastTwo}-${month}0000`;
-		const invoiceNumber = generateInvoice(prev);
+		const invoiceNumber = await generateInvoiceNo(
+			company.company_name,
+			company_id
+		);
 
-		// Update each product and prepare invoice creation data
-		for (let { serialNo, amount_paid } of products) {
-			const product = productMap.get(serialNo);
-			if (!product) {
-				results.failed.push({ serialNo, reason: "Not found or already sold" });
-				continue;
-			}
+		// Update product
+		const updateData = {
+			sales_status: "SOLD",
+			SoldByUser: { connect: { id: user.id } },
+			date_sold: new Date(),
+			bought_for: amount_paid || product.price,
+			balance_owed: balance_owed || "0",
+			modeOfPay: modeOfPayment,
+		};
 
-			// Prepare product update data
-			const updateData = {
-				sales_status: "SOLD",
-				SoldByUser: { connect: { id: user.id } },
-				date_sold: new Date(),
-				bought_for: amount_paid || product.price,
-				balance_owed: balance_owed || "0",
-				modeOfPay: modeOfPayment,
-			};
-
-			if (balance_owed) {
-				await prisma.subPaymentDate.create({
-					data: {
-						date: new Date(),
-						productId: product.id,
-						Creditor: {
-							connectOrCreate: {
-								where: {
-									creditor_email_creditor_name_companyId: {
-										creditor_name: buyer_name,
-										creditor_email: buyer_email,
-										companyId: company_id,
-									},
-								},
-								create: {
+		if (balance_owed !== "0") {
+			await prisma.subPaymentDate.create({
+				data: {
+					date: new Date(),
+					productId: retrievedProduct.id,
+					Creditor: {
+						connectOrCreate: {
+							where: {
+								creditor_email_creditor_name_companyId: {
 									creditor_name: buyer_name,
 									creditor_email: buyer_email,
-									creditor_phone_no: buyer_phone_no,
 									companyId: company_id,
 								},
 							},
-						},
-					},
-				});
-
-				updateData["Creditor"] = {
-					connect: {
-						creditor_email_creditor_name_companyId: {
-							creditor_name: buyer_name,
-							creditor_email: buyer_email,
-							companyId: company_id,
-						},
-					},
-				};
-			} else {
-				updateData["Customer"] = {
-					connectOrCreate: {
-						where: {
-							buyer_email_buyer_name_companyId: {
-								buyer_email,
-								buyer_name,
+							create: {
+								creditor_name: buyer_name,
+								creditor_email: buyer_email,
+								creditor_phone_no: buyer_phone_no,
 								companyId: company_id,
 							},
 						},
-						create: {
-							buyer_name,
-							buyer_email: buyer_email || null,
-							buyer_phone_no,
-						},
 					},
-				};
-			}
-
-			await prisma.products.update({
-				where: { id: product.id },
-				data: updateData,
+				},
 			});
 
-			results.success.push({ serialNo, updatedProduct: product });
+			updateData["Creditor"] = {
+				connect: {
+					creditor_email_creditor_name_companyId: {
+						creditor_name: buyer_name,
+						creditor_email: buyer_email,
+						companyId: company_id,
+					},
+				},
+			};
+		} else {
+			updateData["Customer"] = {
+				connectOrCreate: {
+					where: {
+						buyer_email_buyer_name_companyId: {
+							buyer_email,
+							buyer_name,
+							companyId: company_id,
+						},
+					},
+					create: {
+						buyer_name,
+						buyer_email: buyer_email || null,
+						buyer_phone_no,
+						companyId: company_id,
+					},
+				},
+			};
 		}
 
-		// Step 2: Create the invoice with all products connected
+		await prisma.products.update({
+			where: { id: retrievedProduct.id },
+			data: updateData,
+		});
+
 		const baseInvoiceData = {
 			company: { connect: { id: company_id } },
 			invoiceNo: invoiceNumber,
-			product: {
-				connect: retrievedProducts.map(product => ({ id: product.id })),
-			},
-			status: balance_owed ? "OUTSTANDING" : "PAID",
+			product: { connect: { id: retrievedProduct.id } },
+			status: balance_owed === "0" ? "OUTSTANDING" : "PAID",
 			balance_due: balance_owed ? String(balance_owed) : "0",
 		};
 
-		if (balance_owed) {
+		if (balance_owed !== "0") {
 			baseInvoiceData.creditor = {
 				connectOrCreate: {
 					where: {
@@ -640,6 +642,143 @@ export const InventoryCtrl = {
 			data: baseInvoiceData,
 		});
 
+		// Send invoice
+		if (buyer_email) {
+			await sendNodeInvoice(createdInvoice.invoiceNo);
+		}
+
+		return res.status(StatusCodes.OK).json({ msg: "Product sale completed." });
+	},
+	sellProductsBulk: async (req, res) => {
+		let {
+			products,
+			buyer_name,
+			buyer_email,
+			buyer_phone_no,
+			balance_owed,
+			modeOfPayment,
+		} = req.body;
+		const { company_id, email } = req.user;
+
+		const user = await prisma.users.findUnique({ where: { email } });
+		if (!user) {
+			return res
+				.status(StatusCodes.UNAUTHORIZED)
+				.json({ msg: "User not found." });
+		}
+
+		const results = { success: [], failed: [] };
+		const serialNumbers = products.map(product => product.serialNo);
+
+		// Step 1: Batch retrieve products for sale processing
+		const retrievedProducts = await prisma.products.findMany({
+			where: {
+				serial_no: { in: serialNumbers },
+				companyId: company_id,
+				sales_status: "NOT_SOLD",
+			},
+		});
+
+		if (retrievedProducts.length === 0) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Products not found.", success: false });
+		}
+
+		const productMap = new Map(
+			retrievedProducts.map(product => [product.serial_no, product])
+		);
+
+		// Generate a single invoice number for the transaction
+		const company = await prisma.company.findUnique({
+			where: { id: company_id },
+		});
+		if (!company) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ msg: "Company not found." });
+		}
+
+		const invoiceNumber = await generateInvoiceNo(
+			company.company_name,
+			company_id
+		);
+
+		// Update each product and prepare invoice creation data
+		for (let { serialNo, amount_paid } of products) {
+			const product = productMap.get(serialNo);
+			if (!product) {
+				results.failed.push({ serialNo, reason: "Not found or already sold" });
+				continue;
+			}
+
+			// Prepare product update data
+			const updateData = {
+				sales_status: "SOLD",
+				SoldByUser: { connect: { id: user.id } },
+				date_sold: new Date(),
+				bought_for: amount_paid || product.price,
+				balance_owed: balance_owed || "0",
+				modeOfPay: modeOfPayment,
+				Customer: {
+					connectOrCreate: {
+						where: {
+							buyer_email_buyer_name_companyId: {
+								buyer_email,
+								buyer_name,
+								companyId: company_id,
+							},
+						},
+						create: {
+							buyer_name,
+							buyer_email: buyer_email || null,
+							buyer_phone_no,
+              companyId: company_id,
+						},
+					},
+				},
+			};
+
+			await prisma.products.update({
+				where: { id: product.id },
+				data: updateData,
+			});
+
+			results.success.push({ serialNo, updatedProduct: product });
+		}
+
+		// Step 2: Create the invoice with all products connected
+		const baseInvoiceData = {
+			company: { connect: { id: company_id } },
+			invoiceNo: invoiceNumber,
+			product: {
+				connect: retrievedProducts.map(product => ({ id: product.id })),
+			},
+			status: balance_owed ? "OUTSTANDING" : "PAID",
+			balance_due: balance_owed ? String(balance_owed) : "0",
+			customer: {
+				connectOrCreate: {
+					where: {
+						buyer_email_buyer_name_companyId: {
+							buyer_email,
+							buyer_name,
+							companyId: company_id,
+						},
+					},
+					create: {
+						buyer_name,
+						buyer_email: buyer_email || null,
+						buyer_phone_no,
+						companyId: company_id,
+					},
+				},
+			},
+		};
+
+		const createdInvoice = await prisma.invoice.create({
+			data: baseInvoiceData,
+		});
+
 		// Step 3: Link products to the created invoice
 		await Promise.all(
 			retrievedProducts.map(product =>
@@ -651,7 +790,20 @@ export const InventoryCtrl = {
 		);
 
 		// Step 4: Send invoice to the buyer
-		await sendNodeInvoice(createdInvoice.invoiceNo);
+		if (buyer_email) {
+			await sendNodeInvoice(createdInvoice.invoiceNo);
+		}
+
+		if (results.failed.length > 0) {
+			const serialNo = results.failed.map(product => product.serialNo);
+			const errorMsg =
+				serialNo.length > 5
+					? "Some of the products does not exist or already sold."
+					: `Products with serial numbers ${serialNo.join(
+							", "
+					  )} does not exist or already sold.`;
+			return res.status(StatusCodes.BAD_REQUEST).json({ msg: errorMsg });
+		}
 
 		return res.status(StatusCodes.OK).json({
 			msg: "Product(s) sale completed.",
@@ -1136,33 +1288,6 @@ export const InventoryCtrl = {
 			},
 		});
 
-		// When balance is fully paid, update customer information
-		// if (balance === 0) {
-		// 	updatedData["Customer"] = {
-		// 		connectOrCreate: {
-		// 			where: {
-		// 				buyer_email_buyer_name_companyId: {
-		// 					buyer_email: product.Creditor.creditor_email,
-		// 					buyer_name: product.Creditor.creditor_name,
-		// 					companyId: product.companyId,
-		// 				},
-		// 			},
-		// 			create: {
-		// 				buyer_email: product.Creditor.creditor_email,
-		// 				buyer_name: product.Creditor.creditor_name,
-		// 				buyer_phone_no: product.Creditor.creditor_phone_no,
-		// 				companyId: product.companyId,
-		// 			},
-		// 		},
-		// 	};
-		// }
-
-		// // Update product with the new balance and customer info
-		// const updatedProduct = await prisma.products.update({
-		// 	where: { id: product.id },
-		// 	data: updatedData,
-		// });
-
 		// Find the invoice associated with this product
 		const invoice = await prisma.invoice.findUnique({
 			where: { companyId: company_id, id: invoiceId },
@@ -1206,7 +1331,13 @@ export const InventoryCtrl = {
 			}
 		}
 
-		await sendNodeInvoice(invoice.invoiceNo);
+		const creditor = await prisma.creditor.findUnique({
+			where: { id: product.Creditor.id },
+		});
+
+		if (creditor.creditor_email) {
+			await sendNodeInvoice(invoice.invoiceNo);
+		}
 
 		// Return success message
 		return res

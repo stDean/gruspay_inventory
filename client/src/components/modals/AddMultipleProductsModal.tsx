@@ -67,29 +67,6 @@ export const AddMultipleProductsModal = () => {
 	const extension = uploadedFile.name.split(".")[1];
 	const size = (uploadedFile.size / 1000000).toFixed(3);
 
-	// const handleDropAccepted = async (acceptedFiles: File[]) => {
-	// 	setUploadedFile({
-	// 		name: acceptedFiles[0].name,
-	// 		size: acceptedFiles[0].size,
-	// 	});
-
-	// 	// TODO:Let's try the xlsx file
-	// 	Array.from(acceptedFiles).map(async file => {
-	// 		if (
-	// 			file.type !== "application/vnd.ms-excel" &&
-	// 			file.type !==
-	// 				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-	// 		) {
-
-	// 			return;
-	// 		}
-
-	// 		const data = await file.text();
-	// 		const parsedData = parse(data, { header: true });
-	// 		setData(parsedData.data);
-	// 	});
-	// };
-
 	const handleDropAccepted = async (acceptedFiles: File[]) => {
 		setUploadedFile({
 			name: acceptedFiles[0].name,

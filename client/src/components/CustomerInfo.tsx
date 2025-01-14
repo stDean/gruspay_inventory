@@ -3,7 +3,10 @@
 import { Input } from "@/components/ui/input";
 import { useReduxState } from "@/hook/useRedux";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { getCustomers } from "@/actions/user";
+import { toast } from "sonner";
+import { CustomerProps } from "@/lib/types";
 
 const NestedDrop = ({
 	onModeChange,
@@ -122,22 +125,120 @@ export const CustomerInfo = ({
 	handleModeChange: (mode: string) => void;
 	handleBankChange: (bank: string) => void;
 }) => {
+	const { token } = useReduxState();
+	const [isPending, startTransition] = useTransition();
+	const [customers, setCustomers] = useState<Array<CustomerProps>>([]);
+	const [filterCustomers, setFilterCustomers] = useState<Array<CustomerProps>>(
+		[]
+	);
+	const [selectCustomer, setSelectCustomer] = useState<{
+		name: string;
+		email: string;
+		phone: string;
+	}>({
+		name: "",
+		email: "",
+		phone: "",
+	});
+
+	const getAllCustomers = useCallback(() => {
+		startTransition(async () => {
+			const res = await getCustomers({ token });
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+			setCustomers(res?.data.customers);
+		});
+	}, []);
+
+	useEffect(() => {
+		getAllCustomers();
+	}, []);
+
+	useEffect(() => {
+		if (customerInfo.buyer_name) {
+			const filtered = customers.filter(cus =>
+				cus.buyer_name
+					.toLowerCase()
+					.includes(customerInfo.buyer_name.toLowerCase())
+			);
+			setFilterCustomers(filtered);
+		} else {
+			setFilterCustomers([]);
+		}
+	}, [customers, customerInfo.buyer_name]);
+
 	return (
 		<>
 			<p className="font-semibold text-base mt-3">Customers Information</p>
 			<div className="space-y-3">
 				<div className="flex items-center gap-4">
-					<div className="flex flex-col gap-1 flex-1">
+					<div className="flex flex-col gap-1 flex-1 relative">
 						<p className="text-sm text-gray-500 font-semibold">
 							Customers Name
 						</p>
 						<Input
-							value={customerInfo?.buyer_name}
-							className=""
-							onChange={handleChange}
+							value={selectCustomer.name || customerInfo?.buyer_name}
+							onChange={e => {
+								handleChange(e);
+								setSelectCustomer(prev => ({
+									...prev,
+									name: e.target.value,
+								}));
+							}}
 							name="buyer_name"
-							placeholder="Customers Full Name"
+							placeholder="Customer Full Name"
 						/>
+
+						{filterCustomers.length > 0 && (
+							<div className="absolute border-2 rounded-md border-grey-500 bg-white z-50 w-full top-[60px] left-0">
+								<div
+									className={`${
+										filterCustomers.length > 3
+											? "max-h-40 overflow-y-auto scrollbar-thin"
+											: ""
+									}`}
+								>
+									{filterCustomers.map(
+										({ buyer_name, buyer_phone_no, buyer_email }, idx) => (
+											<div
+												key={`${buyer_name}-${buyer_phone_no}`}
+												className={`flex flex-col ${
+													idx !== filterCustomers.length - 1 && "border-b"
+												} cursor-pointer p-2 pl-4 hover:bg-zinc-100`}
+												onClick={() => {
+													setSelectCustomer({
+														name: buyer_name,
+														phone: buyer_phone_no,
+														email: buyer_email || "",
+													});
+													handleChange({
+														target: { name: "buyer_name", value: buyer_name },
+													} as any);
+													handleChange({
+														target: {
+															name: "buyer_email",
+															value: buyer_email || "",
+														},
+													} as any);
+													handleChange({
+														target: { name: "phone_no", value: buyer_phone_no },
+													} as any);
+													setFilterCustomers([]);
+												}}
+											>
+												<p className="text-sm font-semibold">{buyer_name}</p>
+												<p className="text-xs">
+													{buyer_phone_no} -{" "}
+													{buyer_email || "No email provided"}
+												</p>
+											</div>
+										)
+									)}
+								</div>
+							</div>
+						)}
 					</div>
 
 					<div className="flex flex-col gap-1 flex-1">
@@ -145,10 +246,15 @@ export const CustomerInfo = ({
 							Customers Email
 						</p>
 						<Input
-							value={customerInfo?.buyer_email}
-							className=""
+							value={selectCustomer.email || customerInfo?.buyer_email}
 							name="buyer_email"
-							onChange={handleChange}
+							onChange={e => {
+								handleChange(e);
+								setSelectCustomer(prev => ({
+									...prev,
+									email: e.target.value,
+								}));
+							}}
 							placeholder="Customers Email"
 							type="email"
 						/>
@@ -161,9 +267,15 @@ export const CustomerInfo = ({
 							Customers Phone Number
 						</p>
 						<Input
-							value={customerInfo?.phone_no}
+							value={selectCustomer.phone || customerInfo?.phone_no}
 							className=""
-							onChange={handleChange}
+							onChange={e => {
+								handleChange(e);
+								setSelectCustomer(prev => ({
+									...prev,
+									phone: e.target.value,
+								}));
+							}}
 							name="phone_no"
 							placeholder="Customers Phone Number"
 						/>

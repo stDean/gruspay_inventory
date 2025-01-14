@@ -73,6 +73,12 @@ router
 		InventoryCtrl.updateSoldProduct
 	);
 router
+	.route("/sellSingleProduct")
+	.patch(
+		[AuthMiddleware, checkSubscriptionStatus],
+		InventoryCtrl.sellSingleProduct
+	);
+router
 	.route("/sellProduct")
 	.patch(
 		[AuthMiddleware, checkSubscriptionStatus],

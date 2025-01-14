@@ -73,8 +73,6 @@ export const AddProductForm = () => {
 			purchaseDate: new Date(date).toISOString(),
 		};
 
-		console.log({ products });
-		return;
 		startTransition(async () => {
 			const res = await addSingleProduct({
 				val: { ...products, price: user?.role === "ADMIN" ? data.price : "0" },
@@ -112,8 +110,8 @@ export const AddProductForm = () => {
 
 	const handleSupplierSelection = (
 		supplier_name: string,
-		supplier_email?: string,
-		supplier_phone_no: string
+		supplier_phone_no: string,
+		supplier_email?: string
 	) => {
 		// Set the selected supplier's details in the form
 		form.setValue("supplier_name", supplier_name); // Populate the name
@@ -133,8 +131,6 @@ export const AddProductForm = () => {
 			setIsDropdownVisible(false);
 		}
 	}, [filterSupplier]);
-
-	console.log({ isDropdownVisible, filterSupplier });
 
 	return (
 		<>
@@ -217,7 +213,6 @@ export const AddProductForm = () => {
 
 						<hr />
 
-						{/* TODO:search optimization to auto complete supplier */}
 						<div className="relative">
 							<CustomInput
 								name="supplier_name"
@@ -248,8 +243,8 @@ export const AddProductForm = () => {
 													onClick={() =>
 														handleSupplierSelection(
 															supplier_name,
-															supplier_email,
-															supplier_phone_no
+															supplier_phone_no,
+															supplier_email
 														)
 													}
 												>

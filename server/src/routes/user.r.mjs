@@ -53,7 +53,6 @@ router
 	.get(
 		[
 			AuthMiddleware,
-			AdminMiddleware,
 			CustomerAndCreditorMiddleware,
 			checkSubscriptionStatus,
 			userRateLimiter,

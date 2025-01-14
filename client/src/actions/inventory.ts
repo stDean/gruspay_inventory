@@ -236,6 +236,54 @@ export const sellProduct = async ({
 	}
 };
 
+export const sellSingleProduct = async ({
+	token,
+	product,
+	customerInfo,
+	modeOfPayment,
+}: {
+	token: string;
+	product: { amount_paid: string; serialNo: string; balance_owed?: string };
+	customerInfo: {
+		buyer_name: string;
+		buyer_email?: string;
+		phone_no: string;
+	};
+	modeOfPayment: string;
+}) => {
+	try {
+		const { data } = await axios.patch(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/inventory/sellSingleProduct`,
+			{
+				serialNo: product.serialNo,
+				amount_paid: product.amount_paid,
+				buyer_name: customerInfo.buyer_name,
+				buyer_email: customerInfo.buyer_email,
+				buyer_phone_no: customerInfo.phone_no,
+				balance_owed: product.balance_owed,
+				modeOfPayment: modeOfPayment,
+			},
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again" };
+	}
+};
+
 export const getAllProductsNotSold = async ({ token }: { token: string }) => {
 	try {
 		const { data } = await axios.get(

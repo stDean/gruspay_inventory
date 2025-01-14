@@ -142,7 +142,11 @@ export const UserCtrl = {
 		const { user } = req;
 		const customers = await prisma.buyer.findMany({
 			where: { companyId: user.company_id },
-			include: { Products: { where: { balance_owed: "0" } } },
+			include: {
+				Products: {
+					where: { balance_owed: "0", sales_status: { not: "NOT_SOLD" } },
+				},
+			},
 		});
 
 		return res.status(StatusCodes.OK).json({ customers });

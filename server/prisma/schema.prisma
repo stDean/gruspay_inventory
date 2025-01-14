@@ -176,7 +176,7 @@ model Supplier {
   Products          Products[]
   Company           Company?   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([supplier_email, supplier_name, companyId])
+  @@unique([supplier_phone_no, supplier_name, companyId])
   @@index([companyId], map: "Supplier_companyId_fkey")
 }
 
@@ -207,7 +207,7 @@ model SubPaymentDate {
 model Creditor {
   id                String           @id @default(uuid())
   creditor_name     String
-  creditor_email    String
+  creditor_email    String?
   creditor_phone_no String
   companyId         String?
   createdAt         DateTime         @default(now())

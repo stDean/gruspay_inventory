@@ -1,6 +1,10 @@
 "use client";
 
-import { getProduct, sellProduct } from "@/actions/inventory";
+import {
+	getProduct,
+	sellProduct,
+	sellSingleProduct,
+} from "@/actions/inventory";
 import { useAppDispatch } from "@/app/redux";
 import { CustomerInfo } from "@/components/CustomerInfo";
 import { Modal } from "@/components/modals/Modal";
@@ -14,6 +18,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, PlusCircle, X } from "lucide-react";
 import { useProductsNotSold } from "@/hook/useAllProductsNotSold";
+import { ProductProps } from "@/lib/types";
 
 export const ShowProductModal = () => {
 	const showProductModal = useShowProductModal();
@@ -88,7 +93,11 @@ export const ShowProductModal = () => {
 		if (sold) {
 			startTransition(async () => {
 				// Validation
-				if (customerInfo.buyer_name === "" || customerInfo.phone_no === "") {
+				if (
+					customerInfo.buyer_name === "" ||
+					customerInfo.phone_no === "" ||
+					modeOfPayment === ""
+				) {
 					toast.error("Error", { description: "Please fill all the fields!" });
 					return;
 				}
@@ -101,36 +110,46 @@ export const ShowProductModal = () => {
 					return;
 				}
 
-				let updatedProducts;
+				let res;
 
 				// Single sale logic
 				if (showProductModal?.products?.length === 1) {
-					updatedProducts = [
-						{
-							serialNo: showProductModal?.products[0].serial_no,
+					if (customerInfo.amount_paid === "") {
+						toast.error("Error", {
+							description: "Please fill the amount paid!",
+						});
+						return;
+					}
+					res = await sellSingleProduct({
+						token,
+						product: {
 							amount_paid: customerInfo.amount_paid, // Single product uses customer amount
+							serialNo: showProductModal?.products[0].serial_no,
+							balance_owed: customerInfo.balance_owed || "0",
 						},
-					];
+						customerInfo,
+						modeOfPayment,
+					});
 				}
 				// Bulk sale logic
 				else {
-					updatedProducts = showProductModal?.products?.map(
+					const updatedProducts = showProductModal?.products?.map(
 						(product, index) => ({
 							serialNo: product.serial_no,
 							amount_paid: products[index]?.amount_paid || "", // Gets individual amount from input
 						})
 					);
+
+					setProducts(updatedProducts);
+
+					// Send request to sell product(s)
+					res = await sellProduct({
+						token,
+						products: updatedProducts,
+						customerInfo,
+						modeOfPayment,
+					});
 				}
-
-				setProducts(updatedProducts);
-
-				// Send request to sell product(s)
-				const res = await sellProduct({
-					token,
-					products: updatedProducts,
-					customerInfo,
-          modeOfPayment,
-				});
 
 				// Handle response
 				if (res?.error) {
@@ -155,15 +174,21 @@ export const ShowProductModal = () => {
 	const { allProducts } = useProductsNotSold({ token });
 
 	// Filter products based on search input
-	const filteredOption = allProducts?.filter((product: any) => {
-		if (search.value !== "") {
-			return product.serial_no
-				.toLowerCase()
-				.includes(search.value.toLowerCase());
-		} else {
-			return [];
-		}
-	});
+	const filteredOption = allProducts
+		?.filter(
+			(product: ProductProps) =>
+				product.sales_status !== "SOLD" && product.sales_status !== "SWAP"
+		)
+		?.filter((product: any) => {
+			if (search.value !== "") {
+				return product.serial_no
+					.toLowerCase()
+					.includes(search.value.toLowerCase());
+			}
+			return [true];
+		});
+
+	console.log({ filteredOption });
 
 	// Handle adding another item to the sale
 	const handleAddAnotherItem = async (serial_no: string) => {
@@ -247,7 +272,10 @@ export const ShowProductModal = () => {
 						</div>
 
 						{search.value !== "" && (
-							<div className="bg-white border rounded-md w-full shadow-md absolute top-11 left-0 z-[999]">
+							<div
+								className="bg-white border rounded-md w-full shadow-md absolute top-11 left-0 z-[999] overflow-y-auto scrollbar-thin"
+								style={{ maxHeight: "300px" }}
+							>
 								{filteredOption.map((item: any) => (
 									<p
 										key={item.id}
