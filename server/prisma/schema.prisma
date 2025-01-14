@@ -201,6 +201,7 @@ model SubPaymentDate {
   date       DateTime
   creditorId String
   productId  String
+  pricePaid  String
   Creditor   Creditor @relation(fields: [creditorId], references: [id], onDelete: Cascade)
 }
 

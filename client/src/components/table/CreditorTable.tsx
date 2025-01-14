@@ -12,7 +12,7 @@ export const CreditorTable = ({
 }: {
 	products: Array<ProductProps>;
 	page: number;
-	dates: { date: string }[];
+	dates: { date: string; pricePaid: string }[];
 }) => {
 	const completeModal = useCompletePayModal();
 	const rowsPerPage = 20;

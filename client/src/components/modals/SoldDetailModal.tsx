@@ -36,8 +36,6 @@ export const SoldDetailModal = () => {
 	const [isPending, startTransition] = useTransition();
 	const [price, setPrice] = useState("");
 
-	console.log({ a: productDetails.product, price });
-
 	const handleUpdatePrice = (serialNo: string, bought_for: string) => {
 		startTransition(async () => {
 			const res = await updateBoughtPrice({ token, serialNo, bought_for });
@@ -92,7 +90,11 @@ export const SoldDetailModal = () => {
 					/>
 					<MyInput
 						label="Bought For"
-						value={canUpdate ? price as string : productDetails.product?.bought_for as string}
+						value={
+							canUpdate
+								? (price as string)
+								: (productDetails.product?.bought_for as string)
+						}
 						disabled={!canUpdate}
 						onChange={e => setPrice(e.target.value)}
 					/>

@@ -60,7 +60,7 @@ export const CompletePayModal = () => {
 
 	const bodyContent = (
 		<>
-			<div className="p-4 px-6 w-full space-y-3">
+			<div className="p-3 px-4 w-full space-y-3">
 				<h1 className="text-sm font-semibold">Product Information</h1>
 
 				<div className="flex items-center gap-4">
@@ -91,7 +91,7 @@ export const CompletePayModal = () => {
 
 			<hr />
 
-			<div className="p-4 px-6 w-full space-y-3 mb-2">
+			<div className="p-3 px-4 w-full space-y-3 mb-2">
 				<h1 className="text-sm font-semibold">Customer Information</h1>
 
 				<div className="flex items-center gap-4 ">
@@ -105,13 +105,18 @@ export const CompletePayModal = () => {
 					/>
 				</div>
 
-				<div className="flex items-center gap-3 flex-wrap">
+				<div className="w-full space-y-2">
 					{[...(completeModal?.dates ?? [])]?.reverse()?.map((date, idx) => (
-						<MyInput
-							key={`${date} ${idx}`}
-							label={`Payment Date ${idx + 1}`}
-							value={format(date.date as string, "PPP")}
-						/>
+						<div key={`${date} ${idx}`} className="flex items-center gap-3">
+							<MyInput
+								label={`Payment Date ${idx + 1}`}
+								value={format(date.date as string, "PPP")}
+							/>
+							<MyInput
+								label={`Amount ${idx + 1}`}
+								value={date.pricePaid as string}
+							/>
+						</div>
 					))}
 				</div>
 			</div>
@@ -134,7 +139,7 @@ export const CompletePayModal = () => {
 
 			<hr />
 
-			<div className="flex items-center p-6 gap-6">
+			<div className="flex items-center p-4 gap-6">
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					disabled={isPending}

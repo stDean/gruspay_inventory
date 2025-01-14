@@ -111,7 +111,7 @@ export interface CreditorProps {
 	id: string;
 	updatedAt: string;
 	creditor: boolean;
-	subPayDates: { date: string }[];
+	subPayDates: { date: string; pricePaid: string }[];
 }
 
 export interface SupplierProps {

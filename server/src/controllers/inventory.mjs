@@ -170,8 +170,6 @@ export const InventoryCtrl = {
 				.json({ msg: "Missing required fields for product creation" });
 		}
 
-		// TODO:desc character limit
-
 		const product = await prisma.products.findUnique({
 			where: { serial_no_companyId: { serial_no, companyId: company_id } },
 		});
@@ -538,6 +536,7 @@ export const InventoryCtrl = {
 				data: {
 					date: new Date(),
 					productId: retrievedProduct.id,
+					pricePaid: amount_paid,
 					Creditor: {
 						connectOrCreate: {
 							where: {
@@ -1276,6 +1275,7 @@ export const InventoryCtrl = {
 			data: {
 				date: new Date(),
 				productId: product.id,
+				pricePaid: amount,
 				Creditor: {
 					connect: {
 						creditor_email_creditor_name_companyId: {
@@ -1288,30 +1288,32 @@ export const InventoryCtrl = {
 			},
 		});
 
-		// Find the invoice associated with this product
-		const invoice = await prisma.invoice.findUnique({
-			where: { companyId: company_id, id: invoiceId },
-		});
-
-		if (invoice) {
-			// Update the invoice balance
-			const updatedInvoiceData = { balance_due: String(balance) };
-
-			// If balance is zero, mark the invoice as paid in full
-			if (balance === 0) {
-				updatedInvoiceData["status"] = "PAID";
-				updatedInvoiceData["customerId"] = updatedProduct.buyerId || null;
-			}
-
-			// Update the invoice in the database
-			await prisma.invoice.update({
-				where: { id: invoice.id },
-				data: updatedInvoiceData,
-			});
-		}
-
 		// If balance is zero, disconnect the product from the creditor
 		if (balance === 0) {
+			await prisma.products.update({
+				where: { id: product.id },
+				data: {
+					Customer: {
+						connectOrCreate: {
+							where: {
+								buyer_email_buyer_name_companyId: {
+									buyer_email: product.Creditor.creditor_email,
+									buyer_name: product.Creditor.creditor_name,
+									companyId: product.companyId,
+								},
+							},
+							create: {
+								buyer_email: product.Creditor.creditor_email,
+								buyer_name: product.Creditor.creditor_name,
+								companyId: product.companyId,
+								buyer_phone_no: product.Creditor.creditor_phone_no,
+							},
+						},
+					},
+				},
+			});
+
+			// Disconnect the product from the creditor
 			await prisma.creditor.update({
 				where: { id: product.Creditor.id },
 				data: {
@@ -1331,13 +1333,36 @@ export const InventoryCtrl = {
 			}
 		}
 
-		const creditor = await prisma.creditor.findUnique({
-			where: { id: product.Creditor.id },
+		// Find the invoice associated with this product
+		const invoice = await prisma.invoice.findUnique({
+			where: { companyId: company_id, id: invoiceId },
 		});
 
-		if (creditor.creditor_email) {
-			await sendNodeInvoice(invoice.invoiceNo);
+		if (invoice) {
+			// Update the invoice balance
+			const updatedInvoiceData = { balance_due: String(balance) };
+
+			// If balance is zero, mark the invoice as paid in full
+			if (balance === 0) {
+				const product = await prisma.products.findUnique({
+					where: { id: updatedProduct.id },
+					include: { Customer: { select: { id: true } } },
+				});
+				updatedInvoiceData["status"] = "PAID";
+				updatedInvoiceData["customerId"] = product?.Customer?.id || null;
+			}
+			// TODO:error in the buyer id ish
+
+			console.log({ updatedInvoiceData });
+
+			// Update the invoice in the database
+			await prisma.invoice.update({
+				where: { id: invoice.id },
+				data: updatedInvoiceData,
+			});
 		}
+
+		await sendNodeInvoice(invoice.invoiceNo);
 
 		// Return success message
 		return res
