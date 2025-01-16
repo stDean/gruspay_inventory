@@ -1,24 +1,23 @@
 "use client";
 
 import {
-	getProduct,
-	sellProduct,
-	sellSingleProduct,
+  getProduct,
+  sellProduct,
+  sellSingleProduct,
 } from "@/actions/inventory";
 import { useAppDispatch } from "@/app/redux";
 import { CustomerInfo } from "@/components/CustomerInfo";
 import { Modal } from "@/components/modals/Modal";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useProductsNotSold } from "@/hook/useAllProductsNotSold";
 import { useReduxState } from "@/hook/useRedux";
 import useShowProductModal from "@/hook/useShowProduct";
 import useSwapProductModal, { ItemProps } from "@/hook/useSwapModal";
 import { setSingleData } from "@/state";
+import { ArrowRight, PlusCircle, X } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, PlusCircle, X } from "lucide-react";
-import { useProductsNotSold } from "@/hook/useAllProductsNotSold";
-import { ProductProps } from "@/lib/types";
 
 export const ShowProductModal = () => {
 	const showProductModal = useShowProductModal();

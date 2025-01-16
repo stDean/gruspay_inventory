@@ -12,15 +12,14 @@ import useSwapProductModal from "@/hook/useSwapModal";
 import { ArrowRight, PlusCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
-	ChangeEvent,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-	useTransition,
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
 } from "react";
 import { toast } from "sonner";
-import { ProductProps } from "@/lib/types";
 
 interface IncomingProductProps {
 	product_name: string;
