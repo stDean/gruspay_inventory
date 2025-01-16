@@ -214,21 +214,21 @@ export const AddProductForm = () => {
 								name="description"
 								label="Description"
 								control={form.control}
-								placeholder="Item Description not more than 200 characters"
+								placeholder="Item Description not more than 250 characters"
 								characterCounter={characterCounter}
-								characterLimit={200}
+								characterLimit={250}
 							/>
 							<p
 								className={`text-xs pt-1 ${
-									characterCounter >= 191 &&
+									characterCounter >= 201 &&
 									"text-red-500"
 								} ${
 									characterCounter >= 150 &&
-									characterCounter <= 190 &&
+									characterCounter <= 200 &&
 									"text-yellow-500"
 								} `}
 							>
-								{characterCounter}/200
+								{characterCounter}/250
 							</p>
 						</div>
 

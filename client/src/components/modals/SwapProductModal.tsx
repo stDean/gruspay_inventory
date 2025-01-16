@@ -20,6 +20,7 @@ import {
 	useTransition,
 } from "react";
 import { toast } from "sonner";
+import { ProductProps } from "@/lib/types";
 
 interface IncomingProductProps {
 	product_name: string;
@@ -37,6 +38,7 @@ export const SwapProductModal = () => {
 	const [isPending, startTransition] = useTransition();
 	const { token } = useReduxState();
 
+	const [characterCounter, setCharacterCounter] = useState(0);
 	const [search, setSearch] = useState<{ show: boolean; value: string }>({
 		show: false,
 		value: "",
@@ -88,6 +90,17 @@ export const SwapProductModal = () => {
 
 	const handleChange = (e: ChangeEvent<any>) => {
 		const { name, value } = e.target;
+		const characterLimit = 250;
+
+		if (name === "description") {
+			setCharacterCounter(value.length);
+
+			// Prevent typing beyond the character limit
+			if (value.length >= characterLimit) {
+				return;
+			}
+		}
+
 		setIncoming(prev => ({ ...prev, [name]: value }));
 	};
 
@@ -241,7 +254,7 @@ export const SwapProductModal = () => {
 
 	const bodyContent = (
 		<>
-			<div className="p-3 px-4 space-y-2">
+			<div className="p-3 space-y-2">
 				<div className="flex justify-between items-center gap-4">
 					<p className="text-xs md:text-sm font-semibold md:w-44">
 						Outgoing Item
@@ -323,7 +336,7 @@ export const SwapProductModal = () => {
 			<hr />
 
 			{products.length !== 0 && (
-				<div className="space-y-1 p-3 px-4">
+				<div className="space-y-1 p-3">
 					<p className="text-xs md:text-sm font-semibold md:w-44">
 						Incoming Item(s)
 					</p>
@@ -356,7 +369,7 @@ export const SwapProductModal = () => {
 
 			<hr />
 
-			<div className="p-3 px-4 pt-0 space-y-2">
+			<div className="p-3 pt-0 space-y-2">
 				<CustomerInfo
 					customerInfo={customerInfo}
 					handleChange={handleChangeCustomerInfo}
@@ -369,7 +382,7 @@ export const SwapProductModal = () => {
 
 			<hr />
 
-			<div className="p-3 px-4 space-y-3">
+			<div className="p-3 space-y-2">
 				<p className="font-semibold text-sm">Incoming Item(s)</p>
 
 				<div className="flex flex-col gap-4">
@@ -414,13 +427,34 @@ export const SwapProductModal = () => {
 							name="brand"
 						/>
 					</div>
-					<Textarea
-						placeholder="product description"
-						className="h-14"
-						name="description"
-						onChange={handleChange}
-						value={incoming.description}
-					/>
+
+					<div className="flex flex-col w-full">
+						<Textarea
+							placeholder="Product description not more than 250 characters"
+							className={`resize-none h-14 scrollbar-thin ${
+								characterCounter >= 201 && "focus-visible:!ring-red-500"
+							} ${
+								characterCounter >= 150 &&
+								characterCounter <= 200 &&
+								"focus-visible:!ring-yellow-500"
+							}`}
+							name="description"
+							onChange={handleChange}
+							value={incoming.description}
+						/>
+
+						<p
+							className={`text-xs pt-1 ${
+								characterCounter >= 201 && "text-red-500"
+							} ${
+								characterCounter >= 150 &&
+								characterCounter <= 200 &&
+								"text-yellow-500"
+							} `}
+						>
+							{characterCounter}/250
+						</p>
+					</div>
 				</div>
 
 				{isFilled && products.length !== 2 && (
@@ -435,7 +469,7 @@ export const SwapProductModal = () => {
 
 			<hr />
 
-			<div className="flex items-center p-3 px-4 gap-6">
+			<div className="flex items-center p-3 gap-6">
 				<Button
 					className="w-full py-5 bg-green-500 hover:bg-green-400"
 					onClick={handleConfirmSwap}

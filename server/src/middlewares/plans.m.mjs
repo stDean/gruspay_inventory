@@ -23,8 +23,6 @@ export const AddUserMiddleware = async (req, res, next) => {
 	const { company_id } = req.user;
 	const company = await checkCompany(company_id);
 
-	console.log({ a: company.Users.length });
-
 	switch (company.billingPlan) {
 		case "PERSONAL":
 			if (company.Users.length < 2) {

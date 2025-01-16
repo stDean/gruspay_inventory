@@ -595,7 +595,7 @@ export const InventoryCtrl = {
 			company: { connect: { id: company_id } },
 			invoiceNo: invoiceNumber,
 			product: { connect: { id: retrievedProduct.id } },
-			status: balance_owed === "0" ? "OUTSTANDING" : "PAID",
+			status: balance_owed !== "0" ? "OUTSTANDING" : "PAID",
 			balance_due: balance_owed ? String(balance_owed) : "0",
 		};
 
@@ -1340,7 +1340,7 @@ export const InventoryCtrl = {
 
 		if (invoice) {
 			// Update the invoice balance
-			const updatedInvoiceData = { balance_due: String(balance) };
+			let updatedInvoiceData = { balance_due: String(balance) };
 
 			// If balance is zero, mark the invoice as paid in full
 			if (balance === 0) {
@@ -1348,10 +1348,10 @@ export const InventoryCtrl = {
 					where: { id: updatedProduct.id },
 					include: { Customer: { select: { id: true } } },
 				});
+
 				updatedInvoiceData["status"] = "PAID";
 				updatedInvoiceData["customerId"] = product?.Customer?.id || null;
 			}
-			// TODO:error in the buyer id ish
 
 			console.log({ updatedInvoiceData });
 

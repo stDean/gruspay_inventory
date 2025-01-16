@@ -69,38 +69,40 @@ export const SwapProductTable = ({
 		<>
 			{filterBySearch.map((product, idx) => (
 				<TableRow key={product.id}>
-					<TableCell className="px-2 border-r w-5 md:w-10">{idx + 1}</TableCell>
+					<TableCell className="px-2 border-r ">
+						{idx + 1}
+					</TableCell>
 					<TableCell
-						className="px-2 border-r w-5 md:w-10 text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
+						className="px-2 border-r  text-blue-500 hover:text-blue-400 hover:underline hover:underline-offset-4 cursor-pointer"
 						onClick={() => {
 							handleClick(product.serial_no);
 						}}
 					>
 						{product.serial_no}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell className="px-2 border-r ">
 						{product.product_name}
 					</TableCell>
 					{user?.role === "ADMIN" && (
-						<TableCell className="px-2 border-r w-5 md:w-10">
+						<TableCell className="px-2 border-r ">
 							{product.price}
 						</TableCell>
 					)}
-					<TableCell className="px-2 border-r w-5 md:w-10 hidden md:block">
+					<TableCell className="px-2 border-r  hidden md:block">
 						{product.SoldByUser?.first_name
 							? `${product.SoldByUser?.first_name}`
 							: `${product.SoldByUser?.email}`}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell className="px-2 border-r ">
 						{product.Customer?.buyer_name}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell className="px-2 border-r ">
 						{product.OutgoingProduct?.incomingProducts.length}
 					</TableCell>
-					<TableCell className="px-2 border-r w-5 md:w-10">
+					<TableCell className="px-2 border-r ">
 						{product.bought_for}
 					</TableCell>
-					<TableCell className="px-2 w-full hidden md:block">
+					<TableCell className="px-2  hidden md:block truncate">
 						{format(product.date_sold as string, "PPP")}
 					</TableCell>
 				</TableRow>

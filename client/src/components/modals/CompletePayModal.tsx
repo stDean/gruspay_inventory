@@ -106,18 +106,22 @@ export const CompletePayModal = () => {
 				</div>
 
 				<div className="w-full space-y-2">
-					{[...(completeModal?.dates ?? [])]?.reverse()?.map((date, idx) => (
-						<div key={`${date} ${idx}`} className="flex items-center gap-3">
-							<MyInput
-								label={`Payment Date ${idx + 1}`}
-								value={format(date.date as string, "PPP")}
-							/>
-							<MyInput
-								label={`Amount ${idx + 1}`}
-								value={date.pricePaid as string}
-							/>
-						</div>
-					))}
+					{[...(completeModal?.dates ?? [])]
+						?.sort(
+							(x, y) => new Date(x.date).getTime() - new Date(y.date).getTime()
+						)
+						?.map((date, idx) => (
+							<div key={`${date} ${idx}`} className="flex items-center gap-3">
+								<MyInput
+									label={`Payment Date ${idx + 1}`}
+									value={format(date.date as string, "PPP")}
+								/>
+								<MyInput
+									label={`Amount ${idx + 1}`}
+									value={date.pricePaid as string}
+								/>
+							</div>
+						))}
 				</div>
 			</div>
 

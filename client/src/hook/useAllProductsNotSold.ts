@@ -10,7 +10,7 @@ export const useProductsNotSold = ({ token }: { token: string }) => {
 		if (res?.error) {
 			toast.error("Error", { description: res?.error });
 		}
-    
+
 		setAllProducts(res?.data);
 	}, [token]);
 

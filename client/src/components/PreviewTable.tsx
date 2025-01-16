@@ -52,7 +52,6 @@ const PreviewTableData = ({
 						<TableHead className="px-2 border-r">Brand</TableHead>
 						<TableHead className="px-2 border-r">Type</TableHead>
 						<TableHead className="px-2 border-r">Value</TableHead>
-						<TableHead className="px-2 border-r">Purchase Date</TableHead>
 						<TableHead className="px-2">Supplied By</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -77,9 +76,6 @@ const PreviewTableData = ({
 								{item["Item Type"]}
 							</TableCell>
 							<TableCell className="border-r">{item.Price}</TableCell>
-							<TableCell className="border-r">
-								{item["Purchase Date"]}
-							</TableCell>
 							<TableCell className="border-r">
 								{item["Supplier Name"]}
 							</TableCell>

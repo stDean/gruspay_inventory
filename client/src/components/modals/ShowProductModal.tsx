@@ -174,19 +174,14 @@ export const ShowProductModal = () => {
 	const { allProducts } = useProductsNotSold({ token });
 
 	// Filter products based on search input
-	const filteredOption = allProducts
-		?.filter(
-			(product: ProductProps) =>
-				product.sales_status !== "SOLD" && product.sales_status !== "SWAP"
-		)
-		?.filter((product: any) => {
-			if (search.value !== "") {
-				return product.serial_no
-					.toLowerCase()
-					.includes(search.value.toLowerCase());
-			}
-			return [true];
-		});
+	const filteredOption = allProducts?.filter((product: any) => {
+		if (search.value !== "") {
+			return product.serial_no
+				.toLowerCase()
+				.includes(search.value.toLowerCase());
+		}
+		return [true];
+	});
 
 	// Handle adding another item to the sale
 	const handleAddAnotherItem = async (serial_no: string) => {

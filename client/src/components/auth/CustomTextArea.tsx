@@ -30,10 +30,10 @@ export const CustomTextArea = ({
 						<Textarea
 							placeholder={placeholder}
 							className={`resize-none h-20 ${
-								characterCounter >= 191 && "focus-visible:!ring-red-500"
+								characterCounter >= 201 && "focus-visible:!ring-red-500"
 							} ${
 								characterCounter >= 150 &&
-								characterCounter <= 190 &&
+								characterCounter <= 200 &&
 								"focus-visible:!ring-yellow-500"
 							}`}
 							{...field}
@@ -41,7 +41,7 @@ export const CustomTextArea = ({
 								// Prevent typing beyond the character limit
 								if (
 									characterLimit !== undefined &&
-									e.target.value.length > characterLimit
+									e.target.value.length >= characterLimit
 								) {
 									return;
 								}
