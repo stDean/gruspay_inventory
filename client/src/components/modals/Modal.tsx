@@ -17,6 +17,7 @@ interface ModalProps {
 	addStyle?: string;
 	lessPadd?: string;
 	addStyle2?: boolean;
+	shouldScroll?: boolean;
 }
 
 export const Modal = ({
@@ -32,6 +33,7 @@ export const Modal = ({
 	addStyle,
 	lessPadd,
 	addStyle2,
+	shouldScroll,
 }: ModalProps) => {
 	const [showModal, setShowModal] = useState<boolean>(isOpen);
 
@@ -91,7 +93,14 @@ export const Modal = ({
 							</div>
 
 							{/* Body */}
-							<div className="relative flex-auto">{body}</div>
+							<div
+								className={`relative flex-auto ${
+									shouldScroll &&
+									"overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 max-h-[550px]"
+								}`}
+							>
+								{body}
+							</div>
 
 							{/* Footer */}
 							{footer && (

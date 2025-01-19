@@ -12,12 +12,12 @@ import useSwapProductModal from "@/hook/useSwapModal";
 import { ArrowRight, PlusCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
+	ChangeEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useTransition,
 } from "react";
 import { toast } from "sonner";
 
@@ -489,6 +489,7 @@ export const SwapProductModal = () => {
 			headerContent={headerContent}
 			body={bodyContent}
 			onSubmit={() => {}}
+			shouldScroll
 		/>
 	);
 };

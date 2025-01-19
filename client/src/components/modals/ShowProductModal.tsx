@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  getProduct,
-  sellProduct,
-  sellSingleProduct,
+	getProduct,
+	sellProduct,
+	sellSingleProduct,
 } from "@/actions/inventory";
 import { useAppDispatch } from "@/app/redux";
 import { CustomerInfo } from "@/components/CustomerInfo";
@@ -249,7 +249,7 @@ export const ShowProductModal = () => {
 							/>
 
 							<div
-								className="h-full bg-gray-100 border-l border-gray-400 rounded-tr-lg rounded-br-lg absolute right-0 w-11 flex items-center justify-center top-0 cursor-pointer"
+								className="h-full bg-gray-100 border-l border-gray-400 rounded-tr-lg rounded-br-lg absolute right-0 w-11 flex items-center justify-center top-0 cursor-pointer z-[1000]"
 								onClick={() => {
 									handleAddAnotherItem(search.value);
 									setProducts([
@@ -289,8 +289,7 @@ export const ShowProductModal = () => {
 				{/* Container with fixed height and scroll for products */}
 				<div
 					className={`flex gap-4 items-center flex-wrap ${
-						showProductModal?.products &&
-						showProductModal?.products?.length > 10
+						showProductModal?.products && showProductModal?.products?.length > 2
 							? "max-h-64 overflow-y-auto custom-scrollbar"
 							: ""
 					} `}
@@ -385,6 +384,11 @@ export const ShowProductModal = () => {
 			onClose={handleClose}
 			headerContent={headerContent}
 			body={bodyContent}
+			shouldScroll={
+				showProductModal?.products
+					? showProductModal?.products?.length > 2
+					: false
+			}
 			onSubmit={() => {}}
 		/>
 	);

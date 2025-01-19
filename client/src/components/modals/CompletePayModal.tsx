@@ -168,6 +168,7 @@ export const CompletePayModal = () => {
 			headerContent={headerContent}
 			body={bodyContent}
 			onSubmit={() => {}}
+      shouldScroll
 		/>
 	);
 };
