@@ -1,6 +1,6 @@
 "use client";
 
-import { cancelCompanyPlan } from "@/actions/user";
+import { cancelCompanyPlan, reactivateCompanyPlan } from "@/actions/user";
 import { useAppDispatch } from "@/app/redux";
 import { Button } from "@/components/ui/button";
 import useCanReactivateModal from "@/hook/useCanReactivateModal";
@@ -22,6 +22,19 @@ export const CanReactivatePlanModal = () => {
 
 	const handleReactivatePlan = () => {
 		startTransition(async () => {
+			// const res = await reactivateCompanyPlan({
+			// 	token,
+			// 	payment_plan: reactivateModal?.data?.payment_plan.toUpperCase() as string,
+			// 	billingType: reactivateModal?.data?.billingType as string,
+			// 	billingPrice: reactivateModal?.data?.price as string,
+			// });
+
+      // if (res?.error) {
+      //   toast.error("Error", { description: res?.error });
+      //   return;
+      // }
+
+			console.log({ a: reactivateModal.data });
 			toast.success("Success", {
 				description: "Your subscription has been successfully reactivated.",
 			});

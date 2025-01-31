@@ -481,3 +481,38 @@ export const cancelCompanyPlan = async ({ token }: { token: string }) => {
 		return { error: "Something went wrong, try again." };
 	}
 };
+
+export const reactivateCompanyPlan = async ({
+	token,
+	payment_plan,
+	billingType,
+	billingPrice,
+}: {
+	token: string;
+	payment_plan: string;
+	billingType: string;
+	billingPrice: string;
+}) => {
+	try {
+		const { data } = await axios.post(
+			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/reactivateSubscription`,
+			{ payment_plan, billingType, billingPrice },
+			{ headers: { Authorization: `Bearer ${token}` } }
+		);
+		return { data };
+	} catch (e: any) {
+		if (e.response?.status === 401) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 404) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 400) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		}
+
+		return { error: "Something went wrong, try again." };
+	}
+};

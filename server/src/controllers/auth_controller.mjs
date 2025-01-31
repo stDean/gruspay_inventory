@@ -45,13 +45,7 @@ const handleOtpForCompany = async email => {
 };
 
 // Function to update the billing plan
-const updateBillingPlan = async (
-	billingType,
-	payment_plan,
-	company_id,
-	subscription,
-	auth
-) => {
+const updateBillingPlan = async (billingType, payment_plan, company_id) => {
 	try {
 		await prisma.company.update({
 			where: { id: company_id },
@@ -59,33 +53,8 @@ const updateBillingPlan = async (
 				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
 				billingPlan: payment_plan.toUpperCase(),
 				paymentStatus: "ACTIVE",
-				expires: new Date(subscription.next_payment_date),
 				cancelable: true,
 				canUpdate: true,
-				payStackAuth: {
-					connectOrCreate: {
-						where: {
-							authorization_code_signature: {
-								authorization_code: auth.authorization_code,
-								signature: auth.signature,
-							},
-							companyId: company_id,
-						},
-						create: {
-							authorization_code: auth.authorization_code,
-							reusable: auth.reusable,
-							bank: auth.bank,
-							card_type: auth.card_type,
-							exp_year: auth.exp_year,
-							last4: auth.last4,
-							status: auth.status,
-							signature: auth.signature,
-							account_name: auth.account_name,
-							customerCode,
-							transactionId: "",
-						},
-					},
-				},
 			},
 		});
 
@@ -148,7 +117,12 @@ const deActivateAccount = async company_id => {
 	try {
 		await prisma.company.update({
 			where: { id: company_id },
-			data: { paymentStatus: "INACTIVE", canUpdate: true, cancelable: false },
+			data: {
+				paymentStatus: "INACTIVE",
+				canUpdate: true,
+				cancelable: false,
+				expires: null,
+			},
 		});
 
 		console.log("Account deactivated successfully");
@@ -561,8 +535,8 @@ export const AuthController = {
 				billingType,
 				payment_plan,
 				company.id,
-				subscription,
-				sub.authorization
+				// subscription,
+				// sub.authorization
 			);
 		});
 
@@ -600,5 +574,46 @@ export const AuthController = {
 			.status(StatusCodes.OK)
 			.json({ msg: "Subscription cancelled successfully" });
 	},
-  reactivateSubscription: async(req, res) => {}
+	reactivateSubscription: async (req, res) => {
+		const { email, company_id } = req.user;
+		if (!company_id || !email) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Unauthorized" });
+		}
+
+		const { payment_plan, billingType, billingPrice } = req.body;
+		if (!payment_plan || !billingType || !billingPrice) {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ msg: "Payment plan and billing type are required" });
+		}
+
+		// Initialize the company as a customer
+		const { transaction, error, verify } = await initializeSubscription({
+			email,
+			amount: billingPrice,
+			plan: my_plans[
+				`${payment_plan.toLowerCase()}_${billingType.toLowerCase()}`
+			],
+		});
+
+		if (error || !transaction || !verify) {
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ msg: "Error initializing subscription" });
+		}
+
+		await prisma.company.update({
+			where: { id: company_id },
+			data: {
+				cancelable: true,
+				canUpdate: true,
+				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
+				billingPlan: payment_plan.toUpperCase(),
+			},
+		});
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ msg: "Subscription reactivated successfully", transaction });
+	},
 };

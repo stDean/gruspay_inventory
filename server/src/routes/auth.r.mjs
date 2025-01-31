@@ -33,5 +33,10 @@ router.post(
 	[AuthMiddleware, AdminMiddleware, checkSubscriptionStatus],
 	AuthController.cancelSubscription
 );
+router.post(
+	"/reactivateSubscription",
+	[AuthMiddleware, AdminMiddleware],
+	AuthController.reactivateSubscription
+);
 
 export default router;

@@ -22,41 +22,25 @@ router
 router
 	.route("/getUser/:id")
 	.get(
-		[AuthMiddleware, AdminMiddleware, userRateLimiter],
+		[AuthMiddleware, AdminMiddleware, userRateLimiter, checkSubscriptionStatus],
 		UserCtrl.getUserById
 	);
 router
 	.route("/getSuppliers")
 	.get(
-		[
-			AuthMiddleware,
-			SupplierMiddleware,
-			checkSubscriptionStatus,
-			userRateLimiter,
-		],
+		[AuthMiddleware, SupplierMiddleware, userRateLimiter],
 		UserCtrl.getSuppliers
 	);
 router
 	.route("/getSupplier/:id")
 	.get(
-		[
-			AuthMiddleware,
-			AdminMiddleware,
-			SupplierMiddleware,
-			checkSubscriptionStatus,
-			userRateLimiter,
-		],
+		[AuthMiddleware, AdminMiddleware, SupplierMiddleware, userRateLimiter],
 		UserCtrl.getSupplier
 	);
 router
 	.route("/getCustomers")
 	.get(
-		[
-			AuthMiddleware,
-			CustomerAndCreditorMiddleware,
-			checkSubscriptionStatus,
-			userRateLimiter,
-		],
+		[AuthMiddleware, CustomerAndCreditorMiddleware, userRateLimiter],
 		UserCtrl.getCustomers
 	);
 router
@@ -66,7 +50,6 @@ router
 			AuthMiddleware,
 			AdminMiddleware,
 			CustomerAndCreditorMiddleware,
-			checkSubscriptionStatus,
 			userRateLimiter,
 		],
 		UserCtrl.getCustomer
@@ -78,7 +61,6 @@ router
 			AuthMiddleware,
 			AdminMiddleware,
 			CustomerAndCreditorMiddleware,
-			checkSubscriptionStatus,
 			userRateLimiter,
 		],
 		UserCtrl.getCreditors
@@ -90,7 +72,6 @@ router
 			AuthMiddleware,
 			AdminMiddleware,
 			CustomerAndCreditorMiddleware,
-			checkSubscriptionStatus,
 			userRateLimiter,
 		],
 		UserCtrl.getCreditor

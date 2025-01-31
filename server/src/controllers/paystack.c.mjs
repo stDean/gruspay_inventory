@@ -1,6 +1,5 @@
 import Paystack from "@paystack/paystack-sdk";
 import { my_plans } from "../utils/constants.mjs";
-import { verify } from "crypto";
 const paystack = new Paystack(process.env.PAYSTACKSECRETKEY);
 
 // this makes you get the customer and authorization keys from pay-stack

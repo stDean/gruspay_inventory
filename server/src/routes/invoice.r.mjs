@@ -9,10 +9,10 @@ const invoiceRateLimiter = customRateLimiter(15 * 60 * 1000, 5); // 15 minutes, 
 
 router
 	.route("/all")
-	.get([AuthMiddleware, checkSubscriptionStatus], InvoiceCtrl.getAllInvoices);
+	.get([AuthMiddleware], InvoiceCtrl.getAllInvoices);
 router
 	.route("/:invoiceNo")
-	.get([AuthMiddleware, checkSubscriptionStatus], InvoiceCtrl.getInvoice);
+	.get([AuthMiddleware], InvoiceCtrl.getInvoice);
 router
 	.route("/resend/:invoiceNo")
 	.post(

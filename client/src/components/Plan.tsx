@@ -125,6 +125,7 @@ export const PlanButtons = ({
 																	reactivateModal.onOpen({
 																		payment_plan: option.title,
 																		billingType: res.billingType,
+                                    price: res.billingType === "year" ? option.yrAmount : option.amount
 																	});
 															  }
 															: option.title === plan &&

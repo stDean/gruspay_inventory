@@ -98,6 +98,6 @@ router
 
 router
 	.route("/deleteProduct/:serialNo")
-	.delete([AuthMiddleware, AdminMiddleware], InventoryCtrl.deleteProduct);
+	.delete([AuthMiddleware, AdminMiddleware, checkSubscriptionStatus], InventoryCtrl.deleteProduct);
 
 export default router;
