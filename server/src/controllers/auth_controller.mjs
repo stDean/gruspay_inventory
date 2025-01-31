@@ -59,7 +59,7 @@ const updateBillingPlan = async (
 				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
 				billingPlan: payment_plan.toUpperCase(),
 				paymentStatus: "ACTIVE",
-				expires: subscription.next_payment_date,
+				expires: new Date(subscription.next_payment_date),
 				cancelable: true,
 				canUpdate: true,
 				payStackAuth: {
@@ -97,19 +97,6 @@ const updateBillingPlan = async (
 		console.log("Billing plan updated successfully");
 	} catch (error) {
 		console.error("Error updating billing plan:", error);
-	}
-};
-
-const deActivateAccount = async company_id => {
-	try {
-		await prisma.company.update({
-			where: { id: company_id },
-			data: { paymentStatus: "INACTIVE", canUpdate: true, cancelable: false },
-		});
-
-		console.log("Account deactivated successfully");
-	} catch (e) {
-		console.error("Error canceling billing plan:", error);
 	}
 };
 
@@ -154,6 +141,19 @@ const cancelCustomerSubscription = async sub => {
 	} catch (error) {
 		console.error("Error cancelling subscription:", error);
 		return { error: "Failed to cancel subscription" };
+	}
+};
+
+const deActivateAccount = async company_id => {
+	try {
+		await prisma.company.update({
+			where: { id: company_id },
+			data: { paymentStatus: "INACTIVE", canUpdate: true, cancelable: false },
+		});
+
+		console.log("Account deactivated successfully");
+	} catch (e) {
+		console.error("Error canceling billing plan:", error);
 	}
 };
 
@@ -212,7 +212,7 @@ export const AuthController = {
 			amount: "5000",
 		});
 
-		if (error) {
+		if (error || !transaction || !verify) {
 			return res
 				.status(StatusCodes.INTERNAL_SERVER_ERROR)
 				.json({ msg: "Subscription initialization failed." });
@@ -274,23 +274,19 @@ export const AuthController = {
 			.replace("LY", "")
 			.toLowerCase()}`;
 		const startDate = new Date();
-		startDate.setDate(startDate.getDate() + 7); // 7-day trial period
+		startDate.setDate(startDate.getDate() + 1); // 7-day trial period
 
 		const auth = await prisma.payStackAuth.findUnique({
 			where: { id: company.payStackAuth.id },
 		});
 
-		// new Date(Date.now() + 60 * 60 * 1000), // 1 hour
-
 		// create company subscription plan
-		const { subscription, error: subscriptionError } = await createSubscription(
-			{
-				customer: auth.customerCode,
-				plan: my_plans[planName],
-				start_date: startDate,
-				authorization: auth.authorization_code,
-			}
-		);
+		const { error: subscriptionError } = await createSubscription({
+			customer: auth.customerCode,
+			plan: my_plans[planName],
+			start_date: startDate,
+			authorization: auth.authorization_code,
+		});
 
 		if (subscriptionError) {
 			return res
@@ -307,7 +303,7 @@ export const AuthController = {
 		// update company verified field
 		await prisma.company.update({
 			where: { company_email: existingOtp.email },
-			data: { verified: true, expires: subscription.next_payment_date },
+			data: { verified: true, expires: startDate },
 		});
 
 		// delete the otp
@@ -578,7 +574,6 @@ export const AuthController = {
 	cancelSubscription: async (req, res) => {
 		const { email, company_id } = req.user;
 
-		// cancel the subscription
 		// get the current active subscriptions
 		const { sub, cronTime, error } = await getCustomerAndSubscription(email);
 		if (error) {
@@ -592,17 +587,18 @@ export const AuthController = {
 				.status(StatusCodes.INTERNAL_SERVER_ERROR)
 				.json({ msg: cancelError });
 
-		// set set update the the pay status as to INACTIVE when the end date is
-		cron.schedule(cronTime, () => deActivateAccount(company_id));
-
 		// make the cancel subscription be disabled
 		await prisma.company.update({
 			where: { id: company_id },
 			data: { cancelable: false, canUpdate: false },
 		});
 
+		// set set update the the pay status as to INACTIVE when the end date is
+		cron.schedule(cronTime, () => deActivateAccount(company_id));
+
 		return res
 			.status(StatusCodes.OK)
 			.json({ msg: "Subscription cancelled successfully" });
 	},
+  reactivateSubscription: async(req, res) => {}
 };

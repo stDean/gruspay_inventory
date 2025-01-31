@@ -109,3 +109,31 @@ export const refundInitialFee = async ({ transId, amount }) => {
 
 	return { refund: refundRes.data, error: null };
 };
+
+export const reactivateSubscription = async ({ email, amount, plan }) => {
+	let initializeTransactionRes = await paystack.transaction.initialize({
+		email,
+		amount,
+		plan,
+		channels: ["card"],
+		callback_url: process.env.REDIRECT_REACTIVATE_URL,
+	});
+
+	if (initializeTransactionRes.status === false) {
+		return { error: initializeTransactionRes.message, transaction: null };
+	}
+
+	const verifyTransRes = await paystack.transaction.verify({
+		reference: initializeTransactionRes.data.reference,
+	});
+
+	if (verifyTransRes.status === false) {
+		return { error: verifyTransRes.message, transaction: null };
+	}
+
+	return {
+		transaction: initializeTransactionRes.data,
+		verify: verifyTransRes.data,
+		error: null,
+	};
+};

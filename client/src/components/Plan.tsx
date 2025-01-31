@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import useCancelPlanModal from "@/hook/useCancelPlanModal";
+import useCanReactivateModal from "@/hook/useCanReactivateModal";
 import { useReduxState } from "@/hook/useRedux";
 import useUpdatePlanModal from "@/hook/useUpdatePlanModal";
 import { BillingPlanType, cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export const PlanButtons = ({
 	const { companyDetails } = useReduxState();
 	const cancelModal = useCancelPlanModal();
 	const updateModal = useUpdatePlanModal();
+	const reactivateModal = useCanReactivateModal();
 
 	const matcher: { [key: string]: string } = {
 		MONTHLY: "monthly",
@@ -114,8 +116,19 @@ export const PlanButtons = ({
 															: "default"
 													}
 													onClick={
-														option.title === plan &&
-														type === matcher[matchVal as string]
+														companyDetails?.paymentStatus === "INACTIVE"
+															? () => {
+																	const res = sendPlanAndType();
+																	console.log(
+																		`Reactivating account with payment_plan: ${option.title} and billing_type: ${res.billingType}`
+																	);
+																	reactivateModal.onOpen({
+																		payment_plan: option.title,
+																		billingType: res.billingType,
+																	});
+															  }
+															: option.title === plan &&
+															  type === matcher[matchVal as string]
 															? () => {
 																	const res = sendPlanAndType();
 																	cancelModal.onOpen({
@@ -138,8 +151,10 @@ export const PlanButtons = ({
 														!companyDetails?.canUpdate
 													}
 												>
-													{option.title === plan &&
-													type === matcher[matchVal as string]
+													{companyDetails?.paymentStatus === "INACTIVE"
+														? "Choose Plan"
+														: option.title === plan &&
+														  type === matcher[matchVal as string]
 														? "Cancel Subscription"
 														: "Upgrade Plan"}
 												</Button>

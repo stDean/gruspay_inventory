@@ -8,6 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model WebhookEvent {
+  eventId   String   @id @unique
+  createdAt DateTime @default(now())
+}
+
 model Company {
   id            String        @id @default(uuid())
   company_name  String

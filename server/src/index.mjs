@@ -9,13 +9,14 @@ import crypto from "crypto";
 import { prisma } from "./utils/db.mjs";
 import nodemailer from "nodemailer";
 import { scheduleJob } from "node-schedule";
+import PQueue from "p-queue";
 
 /* CONFIGURATIONS */
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(morgen("common"));
+app.use(morgen("combined"));
 app.use(cors());
 
 // Route
@@ -25,378 +26,301 @@ app.get("/test", (req, res) => {
 	return res.status(200).json({ msg: "API WORKING!!" });
 });
 
-// PayStack Webhook
-app.post("/webhook", async (req, res) => {
-	//validate event
-	const hash = crypto
-		.createHmac("sha512", process.env.PAYSTACKSECRETKEY)
-		.update(JSON.stringify(req.body))
-		.digest("hex");
+/* EMAIL SCHEDULING SYSTEM */
+const emailQueue = new PQueue({
+	concurrency: 2, // Process 2 emails at a time
+	timeout: 30000, // 30 seconds per email
+});
 
-	if (hash !== req.headers["x-paystack-signature"]) {
-		return res.status(400).json({ msg: "Invalid signature" });
-	}
-
-	// Extract data from the webhook payload
-	const payload = req.body;
-
-	switch (payload.event) {
-		case "subscription.create":
-			console.log({ msg: "Subscription created" });
-			break;
-		case "charge.success":
-			const getCompany = await prisma.company.findUnique({
-				where: { company_email: payload.data.customer.email },
-			});
-
-			if (!getCompany) {
-				console.log("Company not found");
-				return;
-			}
-
-			await prisma.company.update({
-				where: { id: getCompany.id, company_email: getCompany.company_email },
-				data: {
-					paymentStatus: "ACTIVE",
-					expires: payload.data.next_payment_date,
-					payStackAuth: {
-						connectOrCreate: {
-							where: {
-								authorization_code_signature: {
-									authorization_code:
-										payload.data.authorization.authorization_code,
-									signature: payload.data.authorization.signature,
-								},
-								companyId: getCompany.id,
-							},
-							create: {
-								authorization_code:
-									payload.data.authorization.authorization_code,
-								reusable: payload.data.authorization.reusable,
-								bank: payload.data.authorization.bank,
-								card_type: payload.data.authorization.card_type,
-								exp_year: payload.data.authorization.exp_year,
-								last4: payload.data.authorization.last4,
-								status: payload.data.authorization.status,
-								signature: payload.data.authorization.signature,
-								account_name: payload.data.authorization.account_name,
-								customerCode: payload.data.customer.customer_code,
-								transactionId: payload.data.id.toString(),
-							},
-						},
-					},
-				},
-			});
-
-			await prisma.company.update({
-				where: { id: getCompany.id },
-				data: {},
-			});
-
-			console.log({ msg: "Payment successful" });
-			break;
-		case "invoice.payment_failed":
-			const comp = await prisma.company.findUnique({
-				where: { company_email: payload.data.customer.email },
-			});
-
-			if (!comp) {
-				console.log("Company not found");
-				return;
-			}
-
-			await prisma.company.update({
-				where: { id: comp.id },
-				data: { paymentStatus: "INACTIVE", transactionId: payload.data.id },
-			});
-
-			console.log({ msg: "Payment failed" });
-			break;
-		default:
-			console.log("Unhandled event type: ", payload.type);
-			break;
+// Schedule daily emails at 11:55 PM
+scheduleJob("55 23 * * *", async () => {
+	console.log("Starting daily email processing...");
+	try {
+		await sendDailyEmails();
+		console.log("Daily email processing completed");
+	} catch (error) {
+		console.error("Daily email job failed:", error);
 	}
 });
 
-// Send Daily Emails
-const sendDailyEmails = async () => {
+async function sendDailyEmails() {
 	try {
-		// Fetch active and verified companies
-		const company = await prisma.company.findMany({
+		// Fetch active companies
+		const companies = await prisma.company.findMany({
 			where: { paymentStatus: "ACTIVE", verified: true },
-			select: { company_email: true, id: true, company_name: true },
+			select: { id: true, company_name: true, company_email: true },
 		});
 
-		// Get products not sold today
-		const productNotSoldToday = await prisma.products.findMany({
-			where: {
-				createdAt: {
-					gte: new Date(new Date().setHours(0, 0, 0, 0)),
-					lte: new Date(new Date().setHours(23, 59, 59, 999)),
-				},
-				sales_status: "NOT_SOLD",
-				companyId: { in: company.map(c => c.id) },
-			},
-			select: {
-				serial_no: true,
-				product_name: true,
-				price: true,
-				purchase_date: true,
-				AddedByUser: {
-					select: { first_name: true, last_name: true, email: true },
-				},
-				Company: { select: { company_name: true } },
-				Supplier: {
-					select: {
-						supplier_name: true,
-						supplier_email: true,
-						supplier_phone_no: true,
-					},
-				},
-			},
-		});
-
-		// Group not sold products by company
-		const groupedByCompany = productNotSoldToday.reduce((acc, product) => {
-			const companyName = product.Company.company_name;
-			if (!acc[companyName]) acc[companyName] = [];
-			acc[companyName].push({
-				serial_no: product.serial_no,
-				product_name: product.product_name,
-				price: product.price,
-				purchase_date: new Date(product.purchase_date).toDateString(),
-				supplier_name: product.Supplier.supplier_name,
-				supplier_email: product.Supplier.supplier_email,
-				supplier_phone_no: product.Supplier.supplier_phone_no,
-				addedBy:
-					product.AddedByUser.first_name + " " + product.AddedByUser.last_name,
-			});
-			return acc;
-		}, {});
-
-		// Get sold and swapped products
-		const getSoldAndSwappedToday = await prisma.products.findMany({
-			where: {
-				date_sold: {
-					gte: new Date(new Date().setHours(0, 0, 0, 0)),
-					lte: new Date(new Date().setHours(23, 59, 59, 999)),
-				},
-				companyId: { in: company.map(c => c.id) },
-				sales_status: { not: "NOT_SOLD" },
-			},
-			select: {
-				serial_no: true,
-				product_name: true,
-				price: true,
-				SoldByUser: {
-					select: { first_name: true, last_name: true, email: true },
-				},
-				Company: { select: { company_name: true } },
-				bought_for: true,
-				balance_owed: true,
-				Customer: {
-					select: { buyer_name: true, buyer_email: true, buyer_phone_no: true },
-				},
-				Creditor: {
-					select: {
-						creditor_name: true,
-						creditor_email: true,
-						creditor_phone_no: true,
-					},
-				},
-				sales_status: true,
-			},
-		});
-
-		// Group sold and swapped products by company
-		const groupedSoldByCompany = getSoldAndSwappedToday.reduce(
-			(acc, product) => {
-				const companyName = product.Company.company_name;
-				if (!acc[companyName]) acc[companyName] = [];
-				acc[companyName].push({
-					serial_no: product.serial_no,
-					product_name: product.product_name,
-					price: product.price,
-					sold_by:
-						product.SoldByUser.first_name + " " + product.SoldByUser.last_name,
-					bought_for: product.bought_for,
-					balance: product.balance_owed,
-					customerName:
-						product.balance_owed !== "0"
-							? product.Creditor.creditor_name
-							: product.Customer.buyer_name,
-					customerEmail:
-						product.balance_owed !== "0"
-							? product.Creditor.creditor_email
-							: product.Customer.buyer_email,
-					customerPhone:
-						product.balance_owed !== "0"
-							? product.Creditor.creditor_phone_no
-							: product.Customer.buyer_phone_no,
-					sales_status: product.sales_status,
-				});
-				return acc;
-			},
-			{}
+		// Create a map for quick company lookup
+		const companyMap = new Map(
+			companies.map(c => [c.id, { ...c, unsold: [], sold: [] }])
 		);
 
-		// Configure the email transporter
-		const transporter = nodemailer.createTransport({
-			host: "smtp.zoho.com", // Zoho Mail SMTP server
-			port: 465, // SMTP port (465 for SSL)
-			secure: true, // Use SSL
-			auth: {
-				user: process.env.ZOHO_USER, // Zoho email
-				pass: process.env.ZOHO_PASS, // Zoho app password
-			},
+		// Parallel fetch of product data
+		const [unsoldProducts, soldProducts] = await Promise.all([
+			getUnsoldProducts(companies),
+			getSoldProducts(companies),
+		]);
+
+		// Group unsold products by company ID
+		unsoldProducts.forEach(product => {
+			const company = companyMap.get(product.Company.id);
+			if (company) company.unsold.push(product);
 		});
 
-		// Send emails to each company
-		for (const c of company) {
-			const notSold = groupedByCompany[c.company_name] || [];
-			const soldAndSwapped = groupedSoldByCompany[c.company_name] || [];
+		// Group sold products by company ID
+		soldProducts.forEach(product => {
+			const company = companyMap.get(product.Company.id);
+			if (company) company.sold.push(product);
+		});
 
-			// Prepare the email content
-			// Create email content as an HTML table
-			const emailContent = `
-       <h1>Daily Summary for ${c.company_name}</h1>
-       <h2>Products Added Today:</h2>
-       ${
-					notSold.length === 0
-						? `<p style="color: green; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">No product added today.</p>`
-						: `
-        <table border="1" cellspacing="0" cellpadding="5">
-          <thead>
-            <tr>
-              <th>Serial Number</th>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>Purchase Date</th>
-              <th>Added By</th>
-              <th>Supplier Name</th>
-              <th>Supplier Email</th>
-              <th>Supplier Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${notSold
-							.map(
-								product => `
-                <tr>
-                  <td>${product.serial_no}</td>
-                  <td>${product.product_name}</td>
-                  <td>$${product.price}</td>
-                  <td>${product.purchase_date}</td>
-                  <td>${product.addedBy}</td>
-                  <td>${product.supplier_name}</td>
-                  <td>${product.supplier_email}</td>
-                  <td>${product.supplier_phone_no}</td>
-                </tr>`
-							)
-							.join("")}
-          </tbody>
-        </table>
- 
-        ${notSold
+		// Process emails for each company
+		for (const [companyId, companyData] of companyMap) {
+			await emailQueue.add(() => sendCompanyEmail(companyData));
+		}
+	} catch (error) {
+		console.error("Email scheduling error:", error);
+		throw error;
+	}
+}
+
+async function getUnsoldProducts(companies) {
+	return prisma.products.findMany({
+		where: {
+			createdAt: {
+				gte: new Date(new Date().setHours(0, 0, 0, 0)),
+				lte: new Date(new Date().setHours(23, 59, 59, 999)),
+			},
+			sales_status: "NOT_SOLD",
+			companyId: { in: companies.map(c => c.id) },
+		},
+		select: {
+			serial_no: true,
+			product_name: true,
+			price: true,
+			purchase_date: true,
+			AddedByUser: {
+				select: { first_name: true, last_name: true, email: true },
+			},
+			Company: { select: { company_name: true, id: true } },
+			Supplier: {
+				select: {
+					supplier_name: true,
+					supplier_email: true,
+					supplier_phone_no: true,
+				},
+			},
+		},
+	});
+}
+
+async function getSoldProducts(companies) {
+	return prisma.products.findMany({
+		where: {
+			date_sold: {
+				gte: new Date(new Date().setHours(0, 0, 0, 0)),
+				lte: new Date(new Date().setHours(23, 59, 59, 999)),
+			},
+			companyId: { in: companies.map(c => c.id) },
+			sales_status: { not: "NOT_SOLD" },
+		},
+		select: {
+			serial_no: true,
+			product_name: true,
+			price: true,
+			SoldByUser: {
+				select: { first_name: true, last_name: true, email: true },
+			},
+			Company: { select: { company_name: true, id: true } },
+			bought_for: true,
+			balance_owed: true,
+			Customer: {
+				select: { buyer_name: true, buyer_email: true, buyer_phone_no: true },
+			},
+			Creditor: {
+				select: {
+					creditor_name: true,
+					creditor_email: true,
+					creditor_phone_no: true,
+				},
+			},
+			sales_status: true,
+		},
+	});
+}
+
+async function sendCompanyEmail(companyData) {
+	const { company_name, company_email, unsold, sold } = companyData;
+
+	const transporter = nodemailer.createTransport({
+		host: "smtp.zoho.com",
+		port: 465,
+		secure: true,
+		auth: {
+			user: process.env.ZOHO_USER,
+			pass: process.env.ZOHO_PASS,
+		},
+	});
+
+	try {
+		const mailOptions = {
+			from: process.env.ZOHO_USER,
+			to: company_email,
+			subject: `Daily Summary for ${company_name}`,
+			html: generateEmailContent(company_name, unsold, sold),
+		};
+
+		await transporter.sendMail(mailOptions);
+	} finally {
+		transporter.close();
+	}
+}
+
+function generateEmailContent(company, unsold, sold) {
+	// HTML template implementation
+	return `
+    <h1>Daily Report for ${company}</h1>
+    ${renderProductTable("Unsold Products", unsold)}
+    ${renderProductTable("Sold Products", sold)}
+  `;
+}
+
+function renderProductTable(title, products) {
+	if (products.length === 0) {
+		return `<h3>${title}</h3><p>No items found</p>`;
+	}
+
+	return `
+    <h3>${title}</h3>
+    <table border="1" cellpadding="5" style="border-collapse: collapse; margin-bottom: 20px;">
+      <thead>
+        <tr>
+          ${Object.keys(products[0])
+						.map(key => `<th>${key.replace(/_/g, " ")}</th>`)
+						.join("")}
+        </tr>
+      </thead>
+      <tbody>
+        ${products
 					.map(
 						product => `
-             ${
-								product.price === "0" &&
-								`<p style="color: blue; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">Some products price need to be updated.</p>`
-							}
-             `
+            <tr>
+              ${Object.values(product)
+								.map(value => `<td>${formatValue(value)}</td>`)
+								.join("")}
+            </tr>
+          `
 					)
 					.join("")}
-        `
-				}
+      </tbody>
+    </table>
+  `;
+}
 
-       <h2>Sold and Swapped Products Today:</h2>
-       ${
-					soldAndSwapped.length === 0
-						? `<p style="color: green; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 20px">No products sold or swapped today.</p>`
-						: `
-            <table border="1" cellspacing="0" cellpadding="5">
-              <thead>
-                <tr>
-                  <th>Serial Number</th>
-                  <th>Product Name</th>
-                  <th>Price</th>
-                  <th>Sold By</th>
-                  <th>Bought For</th>
-                  <th>Balance</th>
-                  <th>Customer Name</th>
-                  <th>Customer Email</th>
-                  <th>Customer Phone</th>
-                  <th>Sales Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${soldAndSwapped
-									.map(
-										product => `
-                    <tr>
-                      <td>${product.serial_no}</td>
-                      <td>${product.product_name}</td>
-                      <td>$${product.price}</td>
-                      <td>${product.sold_by}</td>
-                      <td>$${product.bought_for}</td>
-                      <td>$${product.balance}</td>
-                      <td>${product.customerName}</td>
-                      <td>${product.customerEmail}</td>
-                      <td>${product.customerPhone}</td>
-                      <td>${product.sales_status}</td>
-                    </tr>`
-									)
-									.join("")}
-            `
-				}
-         </tbody>
-       </table>
-   `;
+// Helper function for formatting
+function formatValue(value) {
+	if (value instanceof Date) {
+		return value.toLocaleDateString();
+	}
 
-			// Send the email
-			await transporter.sendMail({
-				from: process.env.ZOHO_USER,
-				to: c.company_email,
-				subject: `Daily Summary for ${c.company_name}`,
-				html: emailContent,
-			});
+	if (typeof value === "object" && value !== null) {
+		// Handle user objects (AddedByUser/SoldByUser)
+		if ("first_name" in value || "last_name" in value) {
+			const firstName = value.first_name || "";
+			const lastName = value.last_name || "";
+			const fullName = `${firstName} ${lastName}`.trim();
+
+			// Fallback to email if no names exist
+			return fullName || value.email || "Unknown User";
 		}
 
-		return { message: "Daily summary emails sent successfully." };
-	} catch (error) {
-		console.error("Error sending daily emails:", error);
+		// Handle company object
+		if (value.company_name) {
+			return value.company_name;
+		}
+
+		// Handle supplier object
+		if (value.supplier_name) {
+			return value.supplier_name;
+		}
+
+		// Handle customer object
+		if (value.buyer_name) {
+			return value.buyer_name;
+		}
+
+		// Fallback for other objects
+		return JSON.stringify(value);
 	}
-};
 
-// Schedule the job to run at 10:00 PM every day
-// scheduleJob("59 21 * * *", () => {
-// 	console.log("Daily email sending schedule...");
-// 	sendDailyEmails();
-// });
+	return value;
+}
 
-const PORT = 5001 | process.env.PORT;
-const start = async () => {
+/* SERVER MANAGEMENT */
+function validateEnvironment() {
+	const requiredVars = [
+		"PAYSTACKSECRETKEY",
+		"ZOHO_USER",
+		"ZOHO_PASS",
+		"DATABASE_URL",
+	];
+
+	requiredVars.forEach(varName => {
+		if (!process.env[varName]) {
+			throw new Error(`Missing required environment variable: ${varName}`);
+		}
+	});
+}
+
+function setupGracefulShutdown(server) {
+	const shutdown = async signal => {
+		console.log(`Received ${signal}, shutting down...`);
+
+		// Close server first
+		server.close(async () => {
+			console.log("HTTP server closed");
+
+			// Disconnect Prisma
+			await prisma.$disconnect();
+			console.log("Database connection closed");
+
+			process.exit(0);
+		});
+
+		// Force shutdown after timeout
+		setTimeout(() => {
+			console.error("Forcing shutdown after timeout");
+			process.exit(1);
+		}, 10000);
+	};
+
+	process.on("SIGINT", shutdown);
+	process.on("SIGTERM", shutdown);
+}
+
+/* APPLICATION STARTUP */
+async function startServer() {
 	try {
-		app.listen(PORT, () => {
-			console.log(`server started on port: ${PORT}`);
+		// Validate configuration
+		validateEnvironment();
+
+		// Connect to database
+		await prisma.$connect();
+		console.log("Database connected successfully");
+
+		// Start server
+		const port = process.env.PORT || 5001;
+		const server = app.listen(port, () => {
+			console.log(`Server running on port ${port}`);
 		});
 
-		// Gracefully close Prisma client when the process terminates
-		process.on("SIGINT", async () => {
-			console.log("SIGINT received: closing Prisma client");
-			await prisma.$disconnect();
-			process.exit(0);
-		});
-
-		process.on("SIGTERM", async () => {
-			console.log("SIGTERM received: closing Prisma client");
-			await prisma.$disconnect();
-			process.exit(0);
-		});
+		// Configure graceful shutdown
+		setupGracefulShutdown(server);
 	} catch (error) {
-		console.log(error);
+		console.error("Server startup failed:", error);
+		process.exit(1);
 	}
-};
+}
 
-start();
+// Start the application
+startServer();

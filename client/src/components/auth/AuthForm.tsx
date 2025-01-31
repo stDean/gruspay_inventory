@@ -97,7 +97,12 @@ export const AuthForm = () => {
 					toast.success("Success", {
 						description: "OTP sent successfully",
 					});
-					router.push(res?.success.transaction.authorization_url);
+
+					if (res?.success?.transaction) {
+						router.push(res?.success?.transaction?.authorization_url);
+					} else {
+						router.push("/code");
+					}
 
 					form.reset();
 					typeof localStorage !== "undefined" &&
