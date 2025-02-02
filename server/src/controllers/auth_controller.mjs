@@ -581,7 +581,7 @@ export const AuthController = {
 					.json({ msg: cancelError });
 
 			const deactivationDate = DateTime.fromISO(sub.next_payment_date)
-				.plus({ minutes: 20 }) // Add 20 minutes
+				.plus({ minutes: 10}) // Add 10 minutes 
 				.toUTC()
 				.toJSDate();
 
