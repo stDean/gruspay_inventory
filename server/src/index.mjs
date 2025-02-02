@@ -282,7 +282,7 @@ function initializeSubscriptionJobs() {
 
 // Schedule daily emails at 11:55 PM local time (converted to UTC)
 function scheduleEmailJobs() {
-	scheduleJob("57 23 * * *", async () => {
+	scheduleJob("55 23 * * *", async () => {
 		console.log("Starting daily email processing...");
 		try {
 			await sendDailyEmails();

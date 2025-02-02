@@ -32,10 +32,7 @@ export const CanReactivatePlanModal = () => {
 
 			if (res?.data) {
 				router.push(res?.data?.transaction?.authorization_url);
-
-				toast.success("Success", {
-					description: "Your subscription has been successfully reactivated.",
-				});
+        toast.success("Success", { description: "Redirecting to payment page" });
 				reactivateModal.onClose();
 			}
 		});

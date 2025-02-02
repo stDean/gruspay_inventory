@@ -7,14 +7,16 @@ import { Button } from "@/components/ui/button";
 import { useReduxState } from "@/hook/useRedux";
 import useUpdatePlanModal from "@/hook/useUpdatePlanModal";
 import { fetchUser } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { toast } from "sonner";
 
 export const UpdatePlanModal = () => {
-  const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 	const updateModal = useUpdatePlanModal();
 	const [isPending, startTransition] = useTransition();
 	const { token } = useReduxState();
+	const router = useRouter();
 
 	const setUserState = useCallback(async () => {
 		await fetchUser(token, dispatch);
@@ -30,6 +32,13 @@ export const UpdatePlanModal = () => {
 
 			if (res?.error) {
 				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			if (res?.data?.transaction) {
+				router.push(res?.data?.transaction?.authorization_url);
+        toast.success("Success", { description: "Redirecting to payment page" });
+				updateModal.onClose();
 				return;
 			}
 

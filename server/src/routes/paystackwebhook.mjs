@@ -172,7 +172,21 @@ const handleSubCreated = async (data, tx) => {
 };
 
 const handleSubscriptionDisable = async (data, tx) => {
-	console.log({ c: data });
+	const { customer } = data;
+	if (!customer?.email) {
+		console.log("Invalid payment failed payload");
+		return;
+	}
+
+	return await tx.company.update({
+		where: { company_email: customer.email },
+		data: {
+			paymentStatus: "INACTIVE",
+			canUpdate: true,
+			cancelable: false,
+			expires: null,
+		},
+	});
 };
 
 // Main webhook handler
@@ -220,6 +234,10 @@ router.route("/webhook").post(validatePayStackSignature, async (req, res) => {
 					break;
 				case "subscription.not_renew":
 					console.log("subscription.not_renew");
+					processedData = await handleSubscriptionDisable(data, tx);
+					break;
+				case "subscription.disable":
+					console.log("subscription.disable");
 					processedData = await handleSubscriptionDisable(data, tx);
 					break;
 				default:

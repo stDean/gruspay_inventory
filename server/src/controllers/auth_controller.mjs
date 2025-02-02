@@ -23,6 +23,14 @@ const sendOtpEmail = async (to, token) => {
 	await sendNodeMail(to, "Your OTP Code", "", htmlContent);
 };
 
+function isSameDay(date1, date2) {
+	return (
+		date1.getFullYear() === date2.getFullYear() &&
+		date1.getMonth() === date2.getMonth() &&
+		date1.getDate() === date2.getDate()
+	);
+}
+
 const handleOtpForCompany = async email => {
 	const { token, expires } = await generateVerificationToken(email);
 	const existingOtp = await prisma.otp.findFirst({ where: { email } });
@@ -40,30 +48,6 @@ const handleOtpForCompany = async email => {
 
 	sendOtpEmail(email, token);
 };
-
-/**
- * Stores subscription updates in DB and schedules background job
- * Ensures job persistence across server restarts
- */
-const scheduleSubscriptionUpdate = async (
-	companyId,
-	paymentPlan,
-	billingType,
-	nextBillingDate
-) => {
-	JobLogger.record("SUBSCRIPTION_UPDATE", companyId, executeAt);
-	// Store update metadata in database
-	await prisma.company.update({
-		where: { id: companyId },
-		data: {
-			pendingPlanUpdate: `${paymentPlan}_${billingType}`,
-			nextBillingDate,
-			canUpdate: false,
-			cancelable: false,
-		},
-	});
-};
-//#endregion
 
 // Reusable function to get customer and active subscription
 const getCustomerAndSubscription = async email => {
@@ -108,6 +92,38 @@ const cancelCustomerSubscription = async sub => {
 		console.error("Error cancelling subscription:", error);
 		return { error: "Failed to cancel subscription" };
 	}
+};
+
+const reactivateAndBillCustomer = async ({
+	payment_plan,
+	billingType,
+	email,
+	company_id,
+	amount,
+}) => {
+	const { transaction, error, verify } = await reactivateSubscription({
+		email,
+		amount: amount ? amount : "50000000",
+		plan: my_plans[
+			`${payment_plan.toLowerCase()}_${billingType.toLowerCase()}`
+		],
+	});
+
+	if (error || !transaction || !verify) {
+		return { error };
+	}
+
+	await prisma.company.update({
+		where: { id: company_id },
+		data: {
+			cancelable: true,
+			canUpdate: true,
+			billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
+			billingPlan: payment_plan.toUpperCase(),
+		},
+	});
+
+	return { success: true, transaction };
 };
 
 export const AuthController = {
@@ -497,39 +513,22 @@ export const AuthController = {
 					.json({ msg: cancelError });
 		}
 
-		console.log({ nextBillingDate, a: new Date() });
-		return;
-
-		if (nextBillingDate === new Date()) {
-			console.log("Subscription is due for renewal");
-			return;
-			const { transaction, error, verify } = await reactivateSubscription({
+		if (isSameDay(nextBillingDate, new Date())) {
+			const { error, success, transaction } = await reactivateAndBillCustomer({
+				payment_plan,
+				billingType,
 				email,
-				amount: "500000",
-				plan: my_plans[
-					`${payment_plan.toLowerCase()}_${billingType.toLowerCase()}`
-				],
+				company_id,
 			});
-
-			if (error || !transaction || !verify) {
+			if (error) {
 				return res
 					.status(StatusCodes.INTERNAL_SERVER_ERROR)
 					.json({ msg: error });
 			}
 
-			await prisma.company.update({
-				where: { id: company_id },
-				data: {
-					cancelable: true,
-					canUpdate: true,
-					billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
-					billingPlan: payment_plan.toUpperCase(),
-				},
-			});
-
 			return res
 				.status(StatusCodes.OK)
-				.json({ msg: "Subscription updated successfully", transaction });
+				.json({ msg: "Plan has been successfully changed.", transaction });
 		}
 
 		// create a new subscription with a start date the date the previous one ends
@@ -582,7 +581,7 @@ export const AuthController = {
 					.json({ msg: cancelError });
 
 			const deactivationDate = DateTime.fromISO(sub.next_payment_date)
-				.plus({ minutes: 10 }) // Add 10 minutes
+				.plus({ minutes: 20 }) // Add 20 minutes
 				.toUTC()
 				.toJSDate();
 
@@ -623,29 +622,16 @@ export const AuthController = {
 		}
 
 		// Initialize the company as a customer
-		const { transaction, error, verify } = await reactivateSubscription({
+		const { error, success, transaction } = await reactivateAndBillCustomer({
+			payment_plan,
+			billingType,
 			email,
+			company_id,
 			amount: billingPrice,
-			plan: my_plans[
-				`${payment_plan.toLowerCase()}_${billingType.toLowerCase()}`
-			],
 		});
-
-		if (error || !transaction || !verify) {
-			return res
-				.status(StatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ msg: "Error initializing subscription" });
+		if (error) {
+			return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
 		}
-
-		await prisma.company.update({
-			where: { id: company_id },
-			data: {
-				cancelable: true,
-				canUpdate: true,
-				billingType: billingType === "year" ? "YEARLY" : "MONTHLY",
-				billingPlan: payment_plan.toUpperCase(),
-			},
-		});
 
 		return res
 			.status(StatusCodes.OK)
