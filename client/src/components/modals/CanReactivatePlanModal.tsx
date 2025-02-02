@@ -1,45 +1,43 @@
 "use client";
 
-import { cancelCompanyPlan, reactivateCompanyPlan } from "@/actions/user";
-import { useAppDispatch } from "@/app/redux";
+import { reactivateCompanyPlan } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import useCanReactivateModal from "@/hook/useCanReactivateModal";
 import { useReduxState } from "@/hook/useRedux";
-import { fetchUser } from "@/lib/utils";
-import { useCallback, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { toast } from "sonner";
 import { Modal } from "./Modal";
 
 export const CanReactivatePlanModal = () => {
-	const dispatch = useAppDispatch();
 	const reactivateModal = useCanReactivateModal();
 	const [isPending, startTransition] = useTransition();
 	const { token } = useReduxState();
-
-	const setUserState = useCallback(async () => {
-		await fetchUser(token, dispatch);
-	}, []);
+	const router = useRouter();
 
 	const handleReactivatePlan = () => {
 		startTransition(async () => {
-			// const res = await reactivateCompanyPlan({
-			// 	token,
-			// 	payment_plan: reactivateModal?.data?.payment_plan.toUpperCase() as string,
-			// 	billingType: reactivateModal?.data?.billingType as string,
-			// 	billingPrice: reactivateModal?.data?.price as string,
-			// });
-
-      // if (res?.error) {
-      //   toast.error("Error", { description: res?.error });
-      //   return;
-      // }
-
-			console.log({ a: reactivateModal.data });
-			toast.success("Success", {
-				description: "Your subscription has been successfully reactivated.",
+			const res = await reactivateCompanyPlan({
+				token,
+				payment_plan:
+					reactivateModal?.data?.payment_plan.toUpperCase() as string,
+				billingType: reactivateModal?.data?.billingType as string,
+				billingPrice: reactivateModal?.data?.price as string,
 			});
-			setUserState();
-			reactivateModal.onClose();
+
+			if (res?.error) {
+				toast.error("Error", { description: res?.error });
+				return;
+			}
+
+			if (res?.data) {
+				router.push(res?.data?.transaction?.authorization_url);
+
+				toast.success("Success", {
+					description: "Your subscription has been successfully reactivated.",
+				});
+				reactivateModal.onClose();
+			}
 		});
 	};
 

@@ -34,6 +34,10 @@ export const PlanButtons = ({
 		YEARLY: "yearly",
 	};
 	const matchVal = companyDetails?.billingType;
+	const disableButton =
+		companyDetails?.paymentStatus !== "INACTIVE" &&
+		((companyDetails?.canUpdate && !companyDetails?.cancelable) ||
+			(!companyDetails?.canUpdate && !companyDetails?.cancelable));
 
 	return (
 		<>
@@ -111,7 +115,8 @@ export const PlanButtons = ({
 													className="px-4 md:px-5 text-xs md:text-sm"
 													variant={
 														option.title === plan &&
-														type === matcher[matchVal as string]
+														type === matcher[matchVal as string] &&
+														companyDetails?.paymentStatus !== "INACTIVE"
 															? "outline"
 															: "default"
 													}
@@ -119,13 +124,14 @@ export const PlanButtons = ({
 														companyDetails?.paymentStatus === "INACTIVE"
 															? () => {
 																	const res = sendPlanAndType();
-																	console.log(
-																		`Reactivating account with payment_plan: ${option.title} and billing_type: ${res.billingType}`
-																	);
+
 																	reactivateModal.onOpen({
 																		payment_plan: option.title,
 																		billingType: res.billingType,
-                                    price: res.billingType === "year" ? option.yrAmount : option.amount
+																		price:
+																			res.billingType === "year"
+																				? option.yrAmountPY
+																				: option.amount,
 																	});
 															  }
 															: option.title === plan &&
@@ -145,12 +151,7 @@ export const PlanButtons = ({
 																	});
 															  }
 													}
-													disabled={
-														(option.title === plan &&
-															type === matcher[matchVal as string] &&
-															!companyDetails?.cancelable) ||
-														!companyDetails?.canUpdate
-													}
+													disabled={disableButton}
 												>
 													{companyDetails?.paymentStatus === "INACTIVE"
 														? "Choose Plan"

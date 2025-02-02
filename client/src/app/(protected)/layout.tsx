@@ -4,6 +4,7 @@ import { AddProductsModal } from "@/components/modals/AddProductsModal";
 import { AddSingleProductModal } from "@/components/modals/AddSingleProductModal";
 import { AddUserModal } from "@/components/modals/AddUserModal";
 import { CancelPlanModal } from "@/components/modals/CancelPlanModal";
+import { CanReactivatePlanModal } from "@/components/modals/CanReactivatePlanModal";
 import { CompletePayModal } from "@/components/modals/CompletePayModal";
 import { ConfirmDeleteItemModel } from "@/components/modals/ConfirmDeleteItem";
 import { ModifyRoleModal } from "@/components/modals/ModifyRoleModal";
@@ -36,6 +37,7 @@ export default function RootLayout({
 				<UpdatePlanModal />
 				<ConfirmDeleteItemModel />
 				<UpdateItemModal />
+				<CanReactivatePlanModal />
 			</>
 			<DashboardWrapper>{children}</DashboardWrapper>
 		</>

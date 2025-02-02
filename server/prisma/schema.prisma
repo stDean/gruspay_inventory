@@ -14,28 +14,48 @@ model WebhookEvent {
 }
 
 model Company {
-  id            String        @id @default(uuid())
-  company_name  String
-  company_email String        @unique
-  password      String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  verified      Boolean       @default(false)
-  country       String
-  paymentStatus PlanStatus    @default(INACTIVE)
-  cancelable    Boolean       @default(true)
-  billingPlan   Payment_Plan  @default(PERSONAL)
-  billingType   BillType      @default(MONTHLY)
-  expires       DateTime?
-  canUpdate     Boolean       @default(true)
-  customers     Buyer[]
-  creditors     Creditor[]
-  Invoice       Invoice[]
-  payStackAuth  PayStackAuth?
-  Products      Products[]
-  suppliers     Supplier[]
-  swaps         Swaps[]
-  Users         Users[]
+  id                    String        @id @default(uuid())
+  company_name          String
+  company_email         String        @unique
+  password              String
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  verified              Boolean       @default(false)
+  country               String
+  paymentStatus         PlanStatus    @default(INACTIVE)
+  cancelable            Boolean       @default(true)
+  billingPlan           Payment_Plan  @default(PERSONAL)
+  billingType           BillType      @default(MONTHLY)
+  expires               DateTime?
+  canUpdate             Boolean       @default(true)
+  pendingPlanUpdate     String?       @db.VarChar(255)
+  nextBillingDate       DateTime?     @db.Timestamp(6)
+  scheduledDeactivation DateTime?     @db.Timestamp(6)
+  customers             Buyer[]
+  creditors             Creditor[]
+  Invoice               Invoice[]
+  payStackAuth          PayStackAuth?
+  Products              Products[]
+  suppliers             Supplier[]
+  swaps                 Swaps[]
+  Users                 Users[]
+
+  @@index([pendingPlanUpdate])
+  @@index([nextBillingDate])
+  @@index([scheduledDeactivation])
+  @@index([company_email])
+  @@index([id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  companyId String
+  action    String
+  details   String?
+
+  @@index([companyId])
+  @@index([action])
 }
 
 model PayStackAuth {

@@ -11,12 +11,13 @@ export const useProductsNotSold = ({ token }: { token: string }) => {
 			toast.error("Error", { description: res?.error });
 		}
 
+
 		setAllProducts(res?.data);
 	}, [token]);
 
 	useEffect(() => {
 		getProducts();
-	}, []);
+	}, [getProducts]);
 
 	return { allProducts };
 };

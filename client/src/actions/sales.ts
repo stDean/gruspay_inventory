@@ -19,6 +19,8 @@ export const getSoldProductsByCount = async ({ token }: { token: string }) => {
 			return { error: error.response.data.msg };
 		} else if (error.response?.status === 400) {
 			return { error: error.response.data.msg };
+		}else if (error.response?.status === 500) {
+			return { error: error.response.data.msg };
 		}
 		return { error: "Something went wrong." };
 	}
@@ -51,6 +53,8 @@ export const getSoldProductsByName = async ({
 			return { error: error.response.data.msg };
 		} else if (error.response?.status === 400) {
 			return { error: error.response.data.msg };
+		} else if (error.response?.status === 500) {
+			return { error: error.response.data.msg };
 		}
 		return { error: "Something went wrong." };
 	}
@@ -72,6 +76,8 @@ export const getSwapProductsByCount = async ({ token }: { token: string }) => {
 		if (error.response?.status === 401) {
 			return { error: error.response.data.msg };
 		} else if (error.response?.status === 400) {
+			return { error: error.response.data.msg };
+		} else if (error.response?.status === 500) {
 			return { error: error.response.data.msg };
 		}
 		return { error: "Something went wrong." };
@@ -104,6 +110,8 @@ export const getSwapProductsByName = async ({
 		} else if (error.response?.status === 429) {
 			return { error: error.response.data.msg };
 		} else if (error.response?.status === 400) {
+			return { error: error.response.data.msg };
+		} else if (error.response?.status === 500) {
 			return { error: error.response.data.msg };
 		}
 		return { error: "Something went wrong." };

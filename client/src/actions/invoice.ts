@@ -19,6 +19,8 @@ export const getSoldInvoices = async ({ token }: { token: string }) => {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -52,6 +54,8 @@ export const getSoldInvoice = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -68,7 +72,7 @@ export const resendInvoice = async ({
 	try {
 		const { data } = await axios.post(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/invoice/resend/${invoiceNo}`,
-      {},
+			{},
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -85,6 +89,8 @@ export const resendInvoice = async ({
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 

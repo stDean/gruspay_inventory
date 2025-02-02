@@ -1,22 +1,22 @@
-import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import helmet from "helmet";
-import morgen from "morgan";
-import Routes from "./routes/index.mjs";
+import express from "express";
 import "express-async-errors";
-import crypto from "crypto";
-import { prisma } from "./utils/db.mjs";
-import nodemailer from "nodemailer";
+import helmet from "helmet";
+import { DateTime } from "luxon";
 import { scheduleJob } from "node-schedule";
+import nodemailer from "nodemailer";
 import PQueue from "p-queue";
+import Routes from "./routes/index.mjs";
+import { AuthScheduleController } from "./utils/AuthSchedule.mjs";
+import { prisma } from "./utils/db.mjs";
+import { JobLogger } from "./utils/JobLogger.mjs";
 
 /* CONFIGURATIONS */
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(morgen("combined"));
 app.use(cors());
 
 // Route
@@ -26,21 +26,14 @@ app.get("/test", (req, res) => {
 	return res.status(200).json({ msg: "API WORKING!!" });
 });
 
+app.get("/jobs", (req, res) => {
+	res.json(JobLogger.getLogs());
+});
+
 /* EMAIL SCHEDULING SYSTEM */
 const emailQueue = new PQueue({
 	concurrency: 2, // Process 2 emails at a time
 	timeout: 30000, // 30 seconds per email
-});
-
-// Schedule daily emails at 11:55 PM
-scheduleJob("55 23 * * *", async () => {
-	console.log("Starting daily email processing...");
-	try {
-		await sendDailyEmails();
-		console.log("Daily email processing completed");
-	} catch (error) {
-		console.error("Daily email job failed:", error);
-	}
 });
 
 async function sendDailyEmails() {
@@ -256,6 +249,66 @@ function formatValue(value) {
 	return value;
 }
 
+/* SUBSCRIPTION SCHEDULING SYSTEM */
+function initializeSubscriptionJobs() {
+	// Daily check for pending subscription updates
+	scheduleJob("0 12 * * *", async () => {
+		// 12 PM UTC (8 AM EST)
+		try {
+			console.log("Checking for pending subscription updates...");
+			await AuthScheduleController.processPendingSubscriptions();
+		} catch (error) {
+			console.error("Subscription update check failed:", error);
+		}
+	});
+
+	// Hourly cleanup of expired scheduling data
+	scheduleJob("0 * * * *", async () => {
+		const sixMonthsAgo = DateTime.now().minus({ months: 6 }).toJSDate();
+		await prisma.company.updateMany({
+			where: {
+				AND: [
+					{ nextBillingDate: { lte: sixMonthsAgo } },
+					{ pendingPlanUpdate: { not: null } },
+				],
+			},
+			data: {
+				pendingPlanUpdate: null,
+				nextBillingDate: null,
+			},
+		});
+	});
+}
+
+// Schedule daily emails at 11:55 PM local time (converted to UTC)
+function scheduleEmailJobs() {
+	scheduleJob("57 23 * * *", async () => {
+		console.log("Starting daily email processing...");
+		try {
+			await sendDailyEmails();
+			console.log("Daily email processing completed");
+		} catch (error) {
+			console.error("Daily email job failed:", error);
+		}
+	});
+}
+
+async function setupScheduledJobs() {
+	try {
+		// Initialize subscription-related jobs
+		await AuthScheduleController.initializeScheduledJobs();
+		initializeSubscriptionJobs();
+
+		// Schedule email jobs
+		scheduleEmailJobs();
+
+		console.log("All scheduled jobs initialized");
+	} catch (error) {
+		console.error("Failed to initialize scheduled jobs:", error);
+		throw error;
+	}
+}
+
 /* SERVER MANAGEMENT */
 function validateEnvironment() {
 	const requiredVars = [
@@ -307,6 +360,9 @@ async function startServer() {
 		// Connect to database
 		await prisma.$connect();
 		console.log("Database connected successfully");
+
+		// Initialize all scheduled jobs
+		await setupScheduledJobs();
 
 		// Start server
 		const port = process.env.PORT || 5001;

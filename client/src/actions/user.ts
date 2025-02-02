@@ -23,6 +23,8 @@ export const getUser = async ({ token }: { token: string }) => {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -56,6 +58,8 @@ export const getUserById = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -82,6 +86,8 @@ export const getUsers = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 
@@ -125,6 +131,8 @@ export const updateUser = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -166,6 +174,8 @@ export const createUser = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -202,6 +212,8 @@ export const updateUserRole = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -235,6 +247,8 @@ export const deleteUser = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -260,6 +274,8 @@ export const getSuppliers = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 
@@ -294,6 +310,8 @@ export const getSupplier = async ({
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -319,6 +337,8 @@ export const getCustomers = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 
@@ -353,6 +373,8 @@ export const getCustomer = async ({
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -378,6 +400,8 @@ export const getCreditors = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 
@@ -411,6 +435,8 @@ export const getCreditor = async ({
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg, status: 400 };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 
@@ -449,6 +475,8 @@ export const updateCompanyPlan = async ({
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong, try again." };
@@ -475,6 +503,8 @@ export const cancelCompanyPlan = async ({ token }: { token: string }) => {
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 
@@ -510,6 +540,8 @@ export const reactivateCompanyPlan = async ({
 		} else if (e.response?.status === 400) {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 429) {
+			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
 			return { error: e.response.data.msg };
 		}
 

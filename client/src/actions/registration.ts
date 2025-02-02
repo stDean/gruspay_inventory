@@ -62,6 +62,8 @@ export const ResendOTP = async ({ email }: { email: string }) => {
 			return { error: e.response.data.msg };
 		} else if (e.response?.status === 403) {
 			return { error: e.response.data.msg };
+		} else if (e.response?.status === 500) {
+			return { error: e.response.data.msg };
 		}
 
 		return { error: "Something went wrong." };

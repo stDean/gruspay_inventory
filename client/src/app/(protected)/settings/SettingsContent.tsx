@@ -1,11 +1,12 @@
 "use client";
 
+import { useAppDispatch } from "@/app/redux";
 import { UserSettingsForm } from "@/components/auth/UserSettingsForm";
 import { Billing } from "@/components/Billing";
 import { Tab } from "@/components/Tab";
 import { useReduxState } from "@/hook/useRedux";
-import { BillingPlanType } from "@/lib/utils";
-import { useState } from "react";
+import { BillingPlanType, fetchUser } from "@/lib/utils";
+import { useCallback, useEffect, useState } from "react";
 
 enum Plans {
 	"Personal" = 0,
@@ -14,7 +15,8 @@ enum Plans {
 }
 
 export const SettingsContent = () => {
-	const { user, companyDetails } = useReduxState();
+	const { user, companyDetails, token } = useReduxState();
+  const dispatch = useAppDispatch();
 	const [tab, setTab] = useState<{
 		billing: boolean;
 		security: boolean;
@@ -49,6 +51,14 @@ export const SettingsContent = () => {
 	const sendPlanAndType = () => {
 		return { billingType: billingType === "monthly" ? "month" : "year" };
 	};
+
+	const setUserState = useCallback(async () => {
+		await fetchUser(token, dispatch);
+	}, []);
+
+  useEffect(() => {
+    setUserState();
+  }, [])
 
 	return (
 		<div className="flex flex-col gap-3">

@@ -110,9 +110,18 @@ export const refundInitialFee = async ({ transId, amount }) => {
 };
 
 export const reactivateSubscription = async ({ email, amount, plan }) => {
+	// Remove the '#' and any commas using a regular expression
+	const numericString = amount.replace(/[^0-9]/g, ""); // "11000"
+
+	// Convert the string to a number
+	const numberValue = Number(numericString); // 11000
+
+	// Multiply by 100 to get the desired result
+	const finalValue = numberValue * 100; // 1100000
+
 	let initializeTransactionRes = await paystack.transaction.initialize({
 		email,
-		amount,
+		amount: finalValue,
 		plan,
 		channels: ["card"],
 		callback_url: process.env.REDIRECT_REACTIVATE_URL,
